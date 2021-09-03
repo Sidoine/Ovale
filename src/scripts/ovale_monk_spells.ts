@@ -127,8 +127,15 @@ Define(fist_of_the_white_tiger 261947)
   SpellInfo(fist_of_the_white_tiger energy=40 cd=30 gcd=1)
   SpellRequire(fist_of_the_white_tiger unusable set=1 enabled=(not hastalent(fist_of_the_white_tiger_talent)))
 Define(fists_of_fury 113656)
-# Pummels all targets in front of you, dealing 5*s5 damage over 4 seconds to your primary target and 5*s5*s6/100 damage over 4 seconds to up to s1 other targets. Can be channeled while moving.
+# Pummels all targets in front of you, dealing 5*s5 Physical damage over 4 seconds to your primary target and 5*s5*s6/100 damage over 4 seconds to up to s1 other targets. Can be channeled while moving.
   SpellInfo(fists_of_fury chi=3 cd=24 duration=4 channel=4 gcd=1 tick=0.166)
+Define(fleshcraft 324631)
+# Form a shield of flesh and bone over 3 seconds that absorbs damage equal to s1 of your maximum health for 120 seconds.rnrnWhile channeling, your damage taken is reduced by s2.rnrn|cFFFFFFFFPassive:|r Moving near an enemy's corpse consumes their essence to reduce Fleshcraft's cooldown by <cdr> sec.
+  SpellInfo(fleshcraft cd=120 duration=3 channel=3 tick=0.5)
+  # Damage taken reduced by w2.
+  SpellAddBuff(fleshcraft fleshcraft add=1)
+  # Immune to crowd control effects.rnHealing s17 health every t17 sec.
+  SpellAddBuff(fleshcraft ultimate_form_buff add=1)
 Define(flying_serpent_kick 101545)
 # Soar forward through the air at high speed for 1.5 seconds.rn rnIf used again while active, you will land, dealing 123586m1 damage to all enemies within 123586A1 yards and reducing movement speed by 123586m2 for 4 seconds.
   SpellInfo(flying_serpent_kick cd=25 duration=1.5 gcd=1)
@@ -150,8 +157,11 @@ Define(invoke_niuzao_the_black_ox 132578)
 Define(invoke_xuen_the_white_tiger 123904)
 # Summons an effigy of Xuen, the White Tiger for 24 seconds. Xuen attacks your primary target, and strikes 3 enemies within 123996A1 yards every 123999t1 sec with Tiger Lightning for 123996s1 Nature damage.?s323999[rnrnEvery 323999s1 sec, Xuen strikes your enemies with Empowered Tiger Lightning dealing 323999s2 of the damage you have dealt to those targets in the last 323999s1 sec.][]
   SpellInfo(invoke_xuen_the_white_tiger cd=120 duration=24 gcd=1 tick=4)
+Define(invokers_delight_buff 338321)
+# You gain 338321m1 haste for 20 seconds after summoning your Celestial. 
+  SpellInfo(invokers_delight_buff duration=20 gcd=0 offgcd=1)
 Define(keg_smash 121253)
-# Smash a keg of brew on the target, dealing s2 damage to all enemies within A2 yds and reducing their movement speed by m3 for 15 seconds. Deals reduced damage beyond s7 targets.rnrnGrants Shuffle for s6 sec and reduces the remaining cooldown on your Brews by s4 sec.
+# Smash a keg of brew on the target, dealing s2 Physical damage to all enemies within A2 yds and reducing their movement speed by m3 for 15 seconds. Deals reduced damage beyond s7 targets.rnrnGrants Shuffle for s6 sec and reduces the remaining cooldown on your Brews by s4 sec.
   SpellInfo(keg_smash energy=40 cd=8 duration=15 gcd=1)
   # ?w3!=0[Movement speed reduced by w3.rn][]Drenched in brew, vulnerable to Breath of Fire.
   SpellAddTargetDebuff(keg_smash keg_smash add=1)
@@ -180,7 +190,7 @@ Define(rising_sun_kick 107428)
 # Kick upwards, dealing ?s137025[185099s1*<CAP>/AP][185099s1] Physical damage?s128595[, and reducing the effectiveness of healing on the target for 10 seconds][].
   SpellInfo(rising_sun_kick chi=2 cd=10)
 Define(rushing_jade_wind 116847)
-# Summons a whirling tornado around you, causing (1+6 seconds/t1)*148187s1 damage over 6 seconds to up to s1 enemies within 107270A1 yards.
+# Summons a whirling tornado around you, causing (1+6 seconds/t1)*148187s1 Physical damage over 6 seconds to up to s1 enemies within 107270A1 yards.
   SpellInfo(rushing_jade_wind chi=1 cd=6 duration=6 tick=0.75)
   SpellRequire(rushing_jade_wind unusable set=1 enabled=(not {hastalent(rushing_jade_wind_talent) or hastalent(rushing_jade_wind_talent_windwalker)}))
   # Dealing physical damage to nearby enemies every 116847t1 sec.
@@ -195,18 +205,18 @@ Define(spear_hand_strike 116705)
 # Jabs the target in the throat, interrupting spellcasting and preventing any spell from that school of magic from being cast for 4 seconds.
   SpellInfo(spear_hand_strike cd=15 duration=4 gcd=0 offgcd=1 interrupt=1)
 Define(spinning_crane_kick 101546)
-# Spin while kicking in the air, dealing ?s137025[4*107270s1*<CAP>/AP][4*107270s1] Physical damage over 1.5 seconds to up to s1 enemies within 107270A1 yds.?c3[rnrnSpinning Crane Kick's damage is increased by 220358s1 for each unique target you've struck in the last 15 seconds with Tiger Palm, Blackout Kick, or Rising Sun Kick.][]
+# Spin while kicking in the air, dealing ?s137025[4*107270s1*<CAP>/AP][4*107270s1] Physical damage over 1.5 seconds to up to s1 enemies within 107270A1 yds.?c3[rnrnSpinning Crane Kick's damage is increased by 220358s1 for each unique target you've struck in the last 20 seconds with Tiger Palm, Blackout Kick, or Rising Sun Kick. Stacks up to 228287i times.][]
   SpellInfo(spinning_crane_kick chi=2 energy=40 duration=1.5 channel=1.5 tick=0.5)
   SpellRequire(spinning_crane_kick replaced_by set=spinning_crane_kick_brewmaster enabled=(specialization("brewmaster")))
 Define(spinning_crane_kick_brewmaster 322729)
-# Spin while kicking in the air, dealing ?s137025[4*107270s1*<CAP>/AP][4*107270s1] Physical damage over 1.5 seconds to enemies within 107270A1 yds.?c3[rnrnSpinning Crane Kick's damage is increased by 220358s1 for each unique target you've struck in the last 15 seconds with Tiger Palm, Blackout Kick, or Rising Sun Kick.][]
+# Spin while kicking in the air, dealing ?s137025[4*107270s1*<CAP>/AP][4*107270s1] Physical damage over 1.5 seconds to enemies within 107270A1 yds. ?s322700[rnrnDealing damage with Spinning Crane Kick grants Shuffle for 322700s1 sec, and your Healing Spheres travel towards you.][] ?c3[rnrnSpinning Crane Kick's damage is increased by 220358s1 for each unique target you've struck in the last 20 seconds with Tiger Palm, Blackout Kick, or Rising Sun Kick.][]
   SpellInfo(spinning_crane_kick_brewmaster energy=25 duration=1.5 channel=1.5 tick=0.5)
   # Attacking all nearby enemies for Physical damage every 101546t1 sec.rnrnMovement speed reduced by s2.
   SpellAddBuff(spinning_crane_kick_brewmaster spinning_crane_kick_brewmaster_buff add=1)
   # Attacking all nearby enemies for Physical damage every 101546t1 sec.
   SpellAddBuff(spinning_crane_kick_brewmaster spinning_crane_kick_brewmaster add=1)
 Define(spinning_crane_kick_brewmaster_buff 107270)
-# Spin while kicking in the air, dealing ?s137025[4*107270s1*<CAP>/AP][4*107270s1] Physical damage over 1.5 seconds to up to s1 enemies within 107270A1 yds.?c3[rnrnSpinning Crane Kick's damage is increased by 220358s1 for each unique target you've struck in the last 15 seconds with Tiger Palm, Blackout Kick, or Rising Sun Kick.][]
+# Spin while kicking in the air, dealing ?s137025[4*107270s1*<CAP>/AP][4*107270s1] Physical damage over 1.5 seconds to up to s1 enemies within 107270A1 yds.?c3[rnrnSpinning Crane Kick's damage is increased by 220358s1 for each unique target you've struck in the last 20 seconds with Tiger Palm, Blackout Kick, or Rising Sun Kick. Stacks up to 228287i times.][]
   SpellInfo(spinning_crane_kick_brewmaster_buff gcd=0 offgcd=1)
 Define(storm_earth_and_fire 137639)
 # Split into 3 elemental spirits for 15 seconds, each spirit dealing 100+m1 of normal damage and healing.rnrnYou directly control the Storm spirit, while Earth and Fire spirits mimic your attacks on nearby enemies.rnrnWhile active, casting Storm, Earth, and Fire again will cause the spirits to fixate on your target.
@@ -214,11 +224,6 @@ Define(storm_earth_and_fire 137639)
   SpellRequire(storm_earth_and_fire replaced_by set=serenity enabled=(hastalent(serenity_talent)))
   # Elemental spirits summoned, mirroring all of the Monk's attacks.rnThe Monk and spirits each do 100+m1 of normal damage and healing.
   SpellAddBuff(storm_earth_and_fire storm_earth_and_fire add=1)
-Define(storm_earth_and_fire_fixate 221771)
-# Direct your Earth and Fire spirits to focus their attacks only on the target.
-  SpellInfo(storm_earth_and_fire_fixate cd=1 gcd=0 offgcd=1)
-  # Elemental spirits summoned, mirroring all of the Monk's attacks.rnThe Monk and spirits each do 100+m1 of normal damage and healing.
-  SpellAddBuff(storm_earth_and_fire_fixate storm_earth_and_fire_fixate add=1)
 Define(the_emperors_capacitor_buff 337291)
 # Chi spenders increase the damage of your next Crackling Jade Lightning by 235054s1 and reduce its cost by 235054s2, stacking up to 235054u times.
   SpellInfo(the_emperors_capacitor_buff max_stacks=20 gcd=0 offgcd=1)
@@ -235,6 +240,9 @@ Define(touch_of_karma 122470)
   SpellAddBuff(touch_of_karma touch_of_karma add=1)
   # Damage dealt to the Monk is redirected to you as Nature damage over 124280d.
   SpellAddTargetDebuff(touch_of_karma touch_of_karma add=1)
+Define(ultimate_form_buff 323524)
+# While channeling Fleshcraft, you are immune to crowd control and you regenerate 323524s17 health every 323524t17 sec. rnrnIf you finish the full channel, you gain 3 seconds of crowd control immunity, during which you regenerate 323524s17 health every 323524t17 sec.
+  SpellInfo(ultimate_form_buff duration=3 gcd=0 offgcd=1 tick=1)
 Define(war_stomp 20549)
 # Stuns up to i enemies within A1 yds for 2 seconds.
   SpellInfo(war_stomp cd=90 duration=2 gcd=0 offgcd=1)
@@ -254,6 +262,7 @@ Define(whirling_dragon_punch 152175)
 # Performs a devastating whirling upward strike, dealing 3*158221s1 damage to all nearby enemies. Only usable while both Fists of Fury and Rising Sun Kick are on cooldown.
   SpellInfo(whirling_dragon_punch cd=24 duration=1 gcd=1 tick=0.25)
   SpellRequire(whirling_dragon_punch unusable set=1 enabled=(not hastalent(whirling_dragon_punch_talent)))
+SpellList(gladiators_badge_item dread_gladiators_badge_item sinister_gladiators_badge_item notorious_gladiators_badge_item corrupted_gladiators_badge_item)
 Define(black_ox_brew_talent 19992)
 # Chug some Black Ox Brew, which instantly refills your Energy, Purifying Brew charges, and resets the cooldown of Celestial Brew.
 Define(blackout_combo_talent 22108)
@@ -273,9 +282,9 @@ Define(fist_of_the_white_tiger_talent 19771)
 Define(hit_combo_talent 22093)
 # Each successive attack that triggers Combo Strikes in a row grants 196741s1 increased damage, stacking up to 196741u times.
 Define(rushing_jade_wind_talent_windwalker 23122)
-# Summons a whirling tornado around you, causing (1+6 seconds/t1)*148187s1 damage over 6 seconds to up to s1 enemies within 107270A1 yards.
+# Summons a whirling tornado around you, causing (1+6 seconds/t1)*148187s1 Physical damage over 6 seconds to up to s1 enemies within 107270A1 yards.
 Define(rushing_jade_wind_talent 20184)
-# Summons a whirling tornado around you, causing (1+6 seconds/t1)*148187s1 damage over 6 seconds to up to s1 enemies within 107270A1 yards.
+# Summons a whirling tornado around you, causing (1+6 seconds/t1)*148187s1 Physical damage over 6 seconds to up to s1 enemies within 107270A1 yards.
 Define(serenity_talent 21191)
 # Enter an elevated state of mental and physical serenity for ?s115069[s1 sec][12 seconds]. While in this state, you deal s2 increased damage and healing, and all Chi consumers are free and cool down s4 more quickly.
 Define(spitfire_talent 22097)
@@ -283,12 +292,31 @@ Define(spitfire_talent 22097)
 Define(whirling_dragon_punch_talent 22105)
 # Performs a devastating whirling upward strike, dealing 3*158221s1 damage to all nearby enemies. Only usable while both Fists of Fury and Rising Sun Kick are on cooldown.
 Define(potion_of_phantom_fire_item 171349)
-    ItemInfo(potion_of_phantom_fire_item cd=300 shared_cd="item_cd_4" rppm=6 proc=307495)
+    ItemInfo(potion_of_phantom_fire_item cd=300 shared_cd="item_cd_4" rppm=12 proc=307495)
+Define(dread_gladiators_badge_item 161902)
+    ItemInfo(dread_gladiators_badge_item cd=120 proc=277185)
+Define(sinister_gladiators_badge_item 165058)
+    ItemInfo(sinister_gladiators_badge_item cd=120 proc=277185)
+Define(notorious_gladiators_badge_item 167380)
+    ItemInfo(notorious_gladiators_badge_item cd=120 proc=277185)
+Define(corrupted_gladiators_badge_item 172669)
+    ItemInfo(corrupted_gladiators_badge_item cd=120 proc=277185)
+Define(inscrutable_quantum_device_item 179350)
+    ItemInfo(inscrutable_quantum_device_item cd=180 proc=348098)
+Define(overcharged_anima_battery_item 180116)
+    ItemInfo(overcharged_anima_battery_item cd=90 proc=345530)
 Define(potion_of_spectral_agility_item 171270)
     ItemInfo(potion_of_spectral_agility_item cd=1 shared_cd="item_cd_4" proc=307159)
+Define(shadowgrasp_totem_item 179356)
+    ItemInfo(shadowgrasp_totem_item cd=120 proc=329878)
+Define(wrathstone_item 156000)
+    ItemInfo(wrathstone_item shared_cd="item_cd_1141" cd=120 proc=64800)
 Define(charred_passions_runeforge 7076)
+Define(shaohaos_might_runeforge 7079)
 Define(fatal_touch_runeforge 7081)
-Define(coordinated_offensive_conduit 22)
+Define(invokers_delight_runeforge 7082)
+Define(pustule_eruption_soulbind 351094)
+Define(volatile_solvent_soulbind 323074)
     `;
     // END
     code += `

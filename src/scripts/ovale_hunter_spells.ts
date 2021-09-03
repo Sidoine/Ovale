@@ -47,7 +47,7 @@ Define(bag_of_tricks 312411)
 Define(barbed_shot 217200)
 # Fire a shot that tears through your enemy, causing them to bleed for s1*s2 damage over 8 seconds.rnrnSends your pet into a frenzy, increasing attack speed by 272790s1 for 8 seconds, stacking up to 272790u times.rnrn|cFFFFFFFFGenerates 246152s1*8 seconds/246152t1 Focus over 8 seconds.|r
   SpellInfo(barbed_shot cd=12 duration=8 tick=2)
-  # Suffering sw1 damage every t1 sec.
+  # Suffering w1 damage every t1 sec.
   SpellAddTargetDebuff(barbed_shot barbed_shot add=1)
 Define(barrage 120360)
 # Rapidly fires a spray of shots for 3 seconds, dealing an average of <damageSec> Physical damage to up to 120361I enemies in front of you. Usable while moving.
@@ -99,7 +99,7 @@ Define(chimaera_shot 53209)
   SpellInfo(chimaera_shot cd=15)
   SpellRequire(chimaera_shot unusable set=1 enabled=(not hastalent(chimaera_shot_talent_beast_mastery)))
 Define(chimaera_shot_marksmanship 342049)
-# A two-headed shot that hits your primary target for 344120sw1 Nature damage and another nearby target for  344121sw1*(s1/100) Frost damage.
+# A two-headed shot that hits your primary target for 344120sw1 Nature damage and another nearby target for 344121sw1*(s1/100) Frost damage.
   SpellInfo(chimaera_shot_marksmanship focus=20)
   SpellRequire(chimaera_shot_marksmanship unusable set=1 enabled=(not hastalent(chimaera_shot_talent)))
 Define(cobra_shot 193455)
@@ -134,6 +134,9 @@ Define(double_tap 260402)
   SpellRequire(double_tap unusable set=1 enabled=(not hastalent(double_tap_talent)))
   # Your next Aimed Shot will fire a second time instantly at s4 power and consume no Focus, or your next Rapid Fire will shoot s3 additional shots during its channel.
   SpellAddBuff(double_tap double_tap add=1)
+Define(eagletalons_true_focus_buff 336851)
+# Trueshot lasts an additional m2/1000.1 sec and reduces the Focus cost of all of your abilities by 336851s1.
+  SpellInfo(eagletalons_true_focus_buff gcd=0 offgcd=1)
 Define(explosive_shot 212431)
 # Fires an explosive shot at your target. After t1 sec, the shot will explode, dealing 212680s1 Fire damage to up to 212680I enemies within 212680A1 yards.
   SpellInfo(explosive_shot focus=20 cd=30 duration=3 tick=3)
@@ -151,15 +154,22 @@ Define(flare 1543)
 # Exposes all hidden and invisible enemies within the targeted area for m1 sec.
   SpellInfo(flare cd=20)
 Define(flayed_shot 324149)
-# Fire a shot at your enemy, causing them to bleed for o1 Shadow damage over 14 seconds. Each time Flayed Shot deals damage, you have a s2 chance to gain Flayer's Mark, causing your next Kill Shot to be free and usable on any target, regardless of their current health.
-  SpellInfo(flayed_shot focus=10 cd=30 duration=14 tick=2)
+# Fire a shot at your enemy, causing them to bleed for o1 Shadow damage over 18 seconds. Each time Flayed Shot deals damage, you have a s2 chance to gain Flayer's Mark, causing your next Kill Shot to be free  and usable on any target, regardless of their current health, and deal 324156s3 increased damage.
+  SpellInfo(flayed_shot cd=30 duration=18 tick=2)
   # Bleeding for s1 Shadow damage every t1 sec.
   SpellAddTargetDebuff(flayed_shot flayed_shot add=1)
 Define(flayers_mark_buff 324156)
-# Fire a shot at your enemy, causing them to bleed for o1 Shadow damage over 14 seconds. Each time Flayed Shot deals damage, you have a s2 chance to gain Flayer's Mark, causing your next Kill Shot to be free and usable on any target, regardless of their current health.
+# Fire a shot at your enemy, causing them to bleed for o1 Shadow damage over 18 seconds. Each time Flayed Shot deals damage, you have a s2 chance to gain Flayer's Mark, causing your next Kill Shot to be free  and usable on any target, regardless of their current health, and deal 324156s3 increased damage.
   SpellInfo(flayers_mark_buff duration=12 gcd=0 offgcd=1)
-  # Kill Shot can be used on any target, regardless of their current health, and will not consume any Focus.
+  # Your next Kill Shot can be used on any target, regardless of their current health, deals s3 increased damage, and will not consume any Focus.
   SpellAddBuff(flayers_mark_buff flayers_mark_buff add=1)
+Define(fleshcraft 324631)
+# Form a shield of flesh and bone over 3 seconds that absorbs damage equal to s1 of your maximum health for 120 seconds.rnrnWhile channeling, your damage taken is reduced by s2.rnrn|cFFFFFFFFPassive:|r Moving near an enemy's corpse consumes their essence to reduce Fleshcraft's cooldown by <cdr> sec.
+  SpellInfo(fleshcraft cd=120 duration=3 channel=3 tick=0.5)
+  # Damage taken reduced by w2.
+  SpellAddBuff(fleshcraft fleshcraft add=1)
+  # Immune to crowd control effects.rnHealing s17 health every t17 sec.
+  SpellAddBuff(fleshcraft ultimate_form_buff add=1)
 Define(freezing_trap 187650)
 # Hurls a frost trap to the target location that incapacitates the first enemy that approaches for 60 seconds. Damage will break the effect. Limit 1. Trap will exist for 60 seconds.
   SpellInfo(freezing_trap cd=30)
@@ -222,6 +232,11 @@ Define(nesingwarys_trapping_apparatus_buff 336744)
   SpellInfo(nesingwarys_trapping_apparatus_buff duration=5 gcd=0 offgcd=1 focus=-45)
   # Focus Generation increased by s2.
   SpellAddBuff(nesingwarys_trapping_apparatus_buff nesingwarys_trapping_apparatus_buff add=1)
+Define(newfound_resolve_buff 352917)
+# At any moment during combat, there is a low chance your Doubt will manifest for 10 seconds. Directly facing your Doubt will overcome it, granting 352917s1 pri and Stamina for 15 seconds.
+  SpellInfo(newfound_resolve_buff duration=15 gcd=0 offgcd=1)
+  # w1 increased pri and Stamina.
+  SpellAddBuff(newfound_resolve_buff newfound_resolve_buff add=1)
 Define(pheromone_bomb 270323)
 # Hurl a bomb at the target, exploding for 270329s1 Fire damage in a cone and coating enemies in pheromones, causing them to suffer 270332o1 Fire damage over 6 seconds.rnrnKill Command has a s2 chance to reset against targets coated with Pheromone Bomb.
   SpellInfo(pheromone_bomb cd=18)
@@ -302,6 +317,9 @@ Define(trueshot 288613)
   SpellInfo(trueshot cd=120 duration=15 gcd=0 offgcd=1)
   # The cooldown of Aimed Shot and Rapid Fire is reduced by m1/4, and Aimed Shot casts s4 faster.rnrnAll Focus generation is increased by s5.
   SpellAddBuff(trueshot trueshot add=1)
+Define(ultimate_form_buff 323524)
+# While channeling Fleshcraft, you are immune to crowd control and you regenerate 323524s17 health every 323524t17 sec. rnrnIf you finish the full channel, you gain 3 seconds of crowd control immunity, during which you regenerate 323524s17 health every 323524t17 sec.
+  SpellInfo(ultimate_form_buff duration=3 gcd=0 offgcd=1 tick=1)
 Define(vipers_venom_buff 268552)
 # ?s259387[Mongoose Bite][Raptor Strike] has a chance to make your next Serpent Sting cost no Focus and deal an additional 268552s1 initial damage.
   SpellInfo(vipers_venom_buff duration=8 gcd=0 offgcd=1)
@@ -314,13 +332,21 @@ Define(volley 260243)
   SpellRequire(volley unusable set=1 enabled=(not hastalent(volley_talent)))
   # Raining arrows down in the target area.
   SpellAddBuff(volley volley add=1)
+Define(wailing_arrow 355589)
+# Fire an enchanted arrow, dealing 354831s1 Shadow damage to your target and an additional 354831s2 Shadow damage to all enemies within 354831A2 yds of your target. Targets struck by a Wailing Arrow are silenced for 5 seconds.
+  SpellInfo(wailing_arrow focus=15 cd=60)
+  # Silenced.
+  SpellAddTargetDebuff(wailing_arrow wailing_arrow_debuff add=1)
+Define(wailing_arrow_debuff 354831)
+# Fire an enchanted arrow, dealing 354831s1 Shadow damage to your target and an additional 354831s2 Shadow damage to all enemies within 354831A2 yds of your target. Targets struck by a Wailing Arrow are silenced for 5 seconds.
+  SpellInfo(wailing_arrow_debuff gcd=0 offgcd=1)
 Define(war_stomp 20549)
 # Stuns up to i enemies within A1 yds for 2 seconds.
   SpellInfo(war_stomp cd=90 duration=2 gcd=0 offgcd=1)
   # Stunned.
   SpellAddTargetDebuff(war_stomp war_stomp add=1)
 Define(wild_spirits 328231)
-# Evoke the energy of Wild Spirits at the target location, dealing 328837s3 Nature damage and apply Hunter's Mark to all enemy targets within the area for 15 seconds.rnrnWhile the Wild Spirits are active, each damaging ability you or your pet use against a target in the area will strike up to 328757I nearby targets for 328757s1 Nature damage.
+# Evoke the energy of Wild Spirits at the target location, dealing 328837s3 Nature damage and apply Wild Mark to all enemy targets within the area for 15 seconds.rnrnWhile the Wild Spirits are active, each damaging ability you or your pet use against a target in the area will strike up to 328757I nearby targets for 328757s1 Nature damage.
   SpellInfo(wild_spirits cd=120)
 Define(wildfire_bomb 259495)
 # Hurl a bomb at the target, exploding for 265157s1 Fire damage in a cone and coating enemies in wildfire, scorching them for 269747o1 Fire damage over 6 seconds.
@@ -342,16 +368,20 @@ Define(barrage_talent_marksmanship 22497)
 # Rapidly fires a spray of shots for 3 seconds, dealing an average of <damageSec> Physical damage to up to 120361I enemies in front of you. Usable while moving.
 Define(barrage_talent 22002)
 # Rapidly fires a spray of shots for 3 seconds, dealing an average of <damageSec> Physical damage to up to 120361I enemies in front of you. Usable while moving.
+Define(birds_of_prey_talent 22272)
+# Attacking your pet's target with ?s259387[Mongoose Bite][Raptor Strike] or ?s212436[Butchery][Carve] extends the duration of Coordinated Assault by <duration> sec.
 Define(bloodshed_talent 22295)
 # Command your pet to tear into your target, causing your target to bleed for <damage> over 18 seconds and increase all damage taken from your pet by 321538s2 for 18 seconds.
 Define(butchery_talent 22297)
 # Attack up to I nearby enemies in a flurry of strikes, inflicting s1 Physical damage to each.?s294029[rnrnReduces the remaining cooldown on Wildfire Bomb by <cdr> sec for each target hit.][]
+Define(calling_the_shots_talent 22274)
+# Casting ?s342049[Chimaera Shot][Arcane Shot] or Multi-Shot reduces the cooldown of Trueshot by m1/1000.1 sec.
 Define(chakrams_talent 23105)
 # Throw a pair of chakrams at your target, slicing all enemies in the chakrams' path for <damage> Physical damage. The chakrams will return to you, damaging enemies again.rnrnYour primary target takes 259398s2 increased damage.
 Define(chimaera_shot_talent_beast_mastery 22290)
 # A two-headed shot that hits your primary target and another nearby target, dealing 171457sw2 Nature damage to one and 171454sw2 Frost damage to the other.?s137015[rnrn|cFFFFFFFFGenerates 204304s1 Focus for each target hit.|r][]
 Define(chimaera_shot_talent 21998)
-# A two-headed shot that hits your primary target for 344120sw1 Nature damage and another nearby target for  344121sw1*(s1/100) Frost damage.
+# A two-headed shot that hits your primary target for 344120sw1 Nature damage and another nearby target for 344121sw1*(s1/100) Frost damage.
 Define(dire_beast_talent 22282)
 # Summons a powerful wild beast that attacks the target and roars, increasing your Haste by 281036s1 for 8 seconds.
 Define(double_tap_talent 22287)
@@ -386,17 +416,23 @@ Define(wildfire_infusion_talent 22301)
 # Lace your Wildfire Bomb with extra reagents, randomly giving it one of the following enhancements each time you throw it:rnrn|cFFFFFFFFShrapnel Bomb: |rShrapnel pierces the targets, causing ?s259387[Mongoose Bite][Raptor Strike] and ?s212436[Butchery][Carve] to apply a bleed for 9 seconds that stacks up to 270343u times.rnrn|cFFFFFFFFPheromone Bomb: |rKill Command has a 270323s2 chance to reset against targets coated with Pheromones.rnrn|cFFFFFFFFVolatile Bomb: |rReacts violently with poison, causing an extra explosion against enemies suffering from your Serpent Sting and refreshes your Serpent Stings.
 Define(potion_of_spectral_agility_item 171270)
     ItemInfo(potion_of_spectral_agility_item cd=1 shared_cd="item_cd_4" proc=307159)
-Define(dreadfire_vessel_item 184030)
-    ItemInfo(dreadfire_vessel_item cd=90 proc=344732)
+Define(jotungeirr_destinys_call_item 186404)
+    ItemInfo(jotungeirr_destinys_call_item cd=180 proc=359003)
+Define(fragments_of_the_elder_antlers_runeforge 7716)
 Define(nessingwarys_trapping_apparatus_runeforge 7004)
+Define(pouch_of_razor_fragments_runeforge 7717)
 Define(qapla_eredun_war_order_runeforge 7009)
 Define(sephuzs_proclamation_runeforge 7103)
 Define(soulforge_embers_runeforge 7005)
 Define(eagletalons_true_focus_runeforge 7011)
 Define(surging_shots_runeforge 7012)
 Define(rylakstalkers_confounding_strikes_runeforge 7016)
+Define(bloodletting_conduit 253)
 Define(reversal_of_fortune_conduit 175)
 Define(niyas_tools_poison_soulbind 320660)
+Define(effusive_anima_accelerator_soulbind 352188)
+Define(pustule_eruption_soulbind 351094)
+Define(volatile_solvent_soulbind 323074)
     `;
     // END
     code += `

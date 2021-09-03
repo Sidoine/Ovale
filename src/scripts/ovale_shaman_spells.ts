@@ -19,12 +19,6 @@ Define(ascendance_enhancement 114051)
   SpellRequire(ascendance_enhancement unusable set=1 enabled=(not hastalent(ascendance_talent_enhancement)))
   # Transformed into a powerful Air ascendant. Auto attacks have a 114089r yard range. Stormstrike is empowered and has a 114089r yard range.
   SpellAddBuff(ascendance_enhancement ascendance_enhancement add=1)
-Define(ascendance_restoration 114052)
-# Transform into a Water Ascendant, duplicating all healing you deal for 15 seconds and immediately healing for (876 of Spell Power). Ascendant healing is distributed evenly among allies within 114083A1 yds.
-  SpellInfo(ascendance_restoration cd=180 duration=15 tick=1)
-  SpellRequire(ascendance_restoration unusable set=1 enabled=(not hastalent(ascendance_talent_restoration)))
-  # Transformed into a powerful Water Ascendant. Healing you deal is duplicated and distributed evenly among nearby allies.
-  SpellAddBuff(ascendance_restoration ascendance_restoration add=1)
 Define(bag_of_tricks 312411)
 # Pull your chosen trick from the bag and use it on target enemy or ally. Enemies take <damage> damage, while allies are healed for <healing>. 
   SpellInfo(bag_of_tricks cd=90)
@@ -50,7 +44,7 @@ Define(chain_harvest 320674)
 # Send a wave of anima at the target, which then jumps to additional nearby targets. Deals (204.99999999999997 of Spell Power) Shadow damage to up to 5 enemies, and restores (315 of Spell Power) health to up to 5 allies.rnrnFor each target critically struck, the cooldown of Chain Harvest is reduced by 5 sec.
   SpellInfo(chain_harvest cd=90)
 Define(chain_lightning 188443)
-# Hurls a lightning bolt at the enemy, dealing (47 of Spell Power) Nature damage and then jumping to additional nearby enemies. Affects x1 total targets.?s187874[rnrnIf Chain Lightning hits more than 1 target, each target hit by your Chain Lightning increases the damage of your next Crash Lightning by 333964s1.][]?a343725[rnrn|cFFFFFFFFGenerates 343725s5 Maelstrom per target hit.|r][]
+# Hurls a lightning bolt at the enemy, dealing (63.5 of Spell Power) Nature damage and then jumping to additional nearby enemies. Affects x1 total targets.?s187874[rnrnIf Chain Lightning hits more than 1 target, each target hit by your Chain Lightning increases the damage of your next Crash Lightning by 333964s1.][]?a343725[rnrn|cFFFFFFFFGenerates 343725s5 Maelstrom per target hit.|r][]
   SpellInfo(chain_lightning)
 Define(crash_lightning 187874)
 # Electrocutes all enemies in front of you, dealing s1*<CAP>/AP Nature damage. Hitting 2 or more targets enhances your weapons for 10 seconds, causing Stormstrike and Lava Lash to also deal 195592s1*<CAP>/AP Nature damage to all targets in front of you.  rnrnEach target hit by Crash Lightning increases the damage of your next Stormstrike by s2.
@@ -69,7 +63,7 @@ Define(earth_elemental 198103)
 # Calls forth a Greater Earth Elemental to protect you and your allies for 60 seconds.
   SpellInfo(earth_elemental cd=300)
 Define(earth_shock 8042)
-# Instantly shocks the target with concussive force, causing (210 of Spell Power) Nature damage.?a190493[rnrnEarth Shock will consume all stacks of Fulmination to deal extra Nature damage to your target.][]
+# Instantly shocks the target with concussive force, causing (273 of Spell Power) Nature damage.?a190493[rnrnEarth Shock will consume all stacks of Fulmination to deal extra Nature damage to your target.][]
   SpellInfo(earth_shock maelstrom=60)
 Define(earthen_spike 188089)
 # Summons an Earthen Spike under an enemy, dealing s1 Physical damage and increasing Physical and Nature damage you deal to the target by s2 for 10 seconds.
@@ -99,12 +93,12 @@ Define(elemental_equilibrium_buff 347348)
   # Damage dealt increased by s1.
   SpellAddBuff(elemental_equilibrium_buff elemental_equilibrium_buff add=1)
 Define(fae_transfusion 328923)
-# Transfer the life force of up to 328928I enemies in the targeted area, dealing (94 of Spell Power)*3 seconds/t2 Nature damage evenly split to each enemy target over 3 seconds. ?a137041[rnrnFully channeling Fae Transfusion generates s4 Lstack:stacks; of Maelstrom Weapon.][]rnrnPressing Fae Transfusion again within 20 seconds will release s1 of all damage from Fae Transfusion, healing up to 328930s2 allies near yourself.
+# Transfer the life force of up to 328928I enemies in the targeted area, dealing (117.5 of Spell Power)*3 seconds/t2 Nature damage evenly split to each enemy target over 3 seconds. ?a137041[rnrnFully channeling Fae Transfusion generates s4 Lstack:stacks; of Maelstrom Weapon.][]rnrnPressing Fae Transfusion again within 20 seconds will release s1 of all damage from Fae Transfusion, healing up to 328930s2 allies within 328930A1 yds.
   SpellInfo(fae_transfusion cd=120 duration=3 channel=3 tick=0.5)
-  # Fae Transfusion will heal up to 328930I nearby allies for w1.
+  # Fae Transfusion will heal up to 328930s2 nearby allies for w1.
   SpellAddBuff(fae_transfusion fae_transfusion_buff add=1)
 Define(fae_transfusion_buff 328933)
-# Transfer the life force of up to 328928I enemies in the targeted area, dealing (94 of Spell Power)*3 seconds/t2 Nature damage evenly split to each enemy target over 3 seconds. ?a137041[rnrnFully channeling Fae Transfusion generates s4 Lstack:stacks; of Maelstrom Weapon.][]rnrnPressing Fae Transfusion again within 20 seconds will release s1 of all damage from Fae Transfusion, healing up to 328930s2 allies near yourself.
+# Transfer the life force of up to 328928I enemies in the targeted area, dealing (117.5 of Spell Power)*3 seconds/t2 Nature damage evenly split to each enemy target over 3 seconds. ?a137041[rnrnFully channeling Fae Transfusion generates s4 Lstack:stacks; of Maelstrom Weapon.][]rnrnPressing Fae Transfusion again within 20 seconds will release s1 of all damage from Fae Transfusion, healing up to 328930s2 allies within 328930A1 yds.
   SpellInfo(fae_transfusion_buff duration=20 gcd=0 offgcd=1 tick=0.5)
 Define(feral_lunge 196884)
 # Lunge at your enemy as a ghostly wolf, biting them to deal 215802s1 Physical damage.
@@ -130,10 +124,17 @@ Define(flame_shock 188389)
   # Suffering w2 Fire damage every t2 sec.
   SpellAddTargetDebuff(flame_shock flame_shock add=1)
 Define(flametongue_weapon 318038)
-# Imbue your ?s33757[off-hand ][]weapon with the element of Fire for 3600 seconds, causing each of your ?s33757[off-hand ][]attacks to deal max((<coeff>*AP),1) additional Fire damage.
+# Imbue your ?s33757[off-hand ][]weapon with the element of Fire for 3600 seconds, causing each of your attacks to deal max((<coeff>*AP),1) additional Fire damage.
   SpellInfo(flametongue_weapon)
-  # Each of your ?s33757[off-hand ][]weapon attacks causes up to max((<coeff>*AP),1) additional Fire damage.
+  # Each of your weapon attacks causes up to max((<coeff>*AP),1) additional Fire damage.
   SpellAddBuff(flametongue_weapon flametongue_weapon add=1)
+Define(fleshcraft 324631)
+# Form a shield of flesh and bone over 3 seconds that absorbs damage equal to s1 of your maximum health for 120 seconds.rnrnWhile channeling, your damage taken is reduced by s2.rnrn|cFFFFFFFFPassive:|r Moving near an enemy's corpse consumes their essence to reduce Fleshcraft's cooldown by <cdr> sec.
+  SpellInfo(fleshcraft cd=120 duration=3 channel=3 tick=0.5)
+  # Damage taken reduced by w2.
+  SpellAddBuff(fleshcraft fleshcraft add=1)
+  # Immune to crowd control effects.rnHealing s17 health every t17 sec.
+  SpellAddBuff(fleshcraft ultimate_form_buff add=1)
 Define(frost_shock 196840)
 # Chills the target with frost, causing (45 of Spell Power) Frost damage and reducing the target's movement speed by s2 for 6 seconds.?s33757[rnrnFrost Shock shares a cooldown with Flame Shock.][]
   SpellInfo(frost_shock duration=6)
@@ -165,10 +166,10 @@ Define(icefury 210714)
   # Frost Shock damage increased by s2.
   SpellAddBuff(icefury icefury add=1)
 Define(lava_beam 114074)
-# Unleashes a blast of superheated flame at the enemy, dealing (47 of Spell Power) Fire damage and then jumping to additional nearby enemies. Damage is increased by s2 after each jump. Affects x1 total targets.  rnrn|cFFFFFFFFGenerates 343725s6 Maelstrom per target hit.|r 
+# Unleashes a blast of superheated flame at the enemy, dealing (63.5 of Spell Power) Fire damage and then jumping to additional nearby enemies. Damage is increased by s2 after each jump. Affects x1 total targets.  rnrn|cFFFFFFFFGenerates 343725s6 Maelstrom per target hit.|r 
   SpellInfo(lava_beam)
 Define(lava_burst 51505)
-# Hurls molten lava at the target, dealing (108 of Spell Power) Fire damage.?a231721[ Lava Burst will always critically strike if the target is affected by Flame Shock.][]?a343725[rnrn|cFFFFFFFFGenerates 343725s3 Maelstrom.|r][]
+# Hurls molten lava at the target, dealing (97.2 of Spell Power) Fire damage.?a231721[ Lava Burst will always critically strike if the target is affected by Flame Shock.][]?a343725[rnrn|cFFFFFFFFGenerates 343725s3 Maelstrom.|r][]
   SpellInfo(lava_burst cd=8 maelstrom=0)
 Define(lava_lash 60103)
 # Charges your off-hand weapon with lava and burns your target, dealing s1 Fire damage.rnrnDamage is increased by s2 if your offhand weapon is imbued with Flametongue Weapon.
@@ -180,7 +181,7 @@ Define(lightning_bolt 188196)
 # Hurls a bolt of lightning at the target, dealing (95 of Spell Power) Nature damage.?a343725[rnrn|cFFFFFFFFGenerates 343725s1 Maelstrom.|r][]
   SpellInfo(lightning_bolt)
 Define(lightning_shield 192106)
-# Surround yourself with a shield of lightning for 1800 seconds.rnrnMelee attackers have a h chance to suffer (3.5999999999999996 of Spell Power) Nature damage?a137041[ and have a s3 chance to generate a stack of Maelstrom Weapon]?a137040[ and have a s4 chance to generate s5 Maelstrom][].rnrnOnly one Elemental Shield can be active on the Shaman at a time.
+# Surround yourself with a shield of lightning for 1800 seconds.rnrnMelee attackers have a h chance to suffer (15 of Spell Power) Nature damage?a137041[ and have a s3 chance to generate a stack of Maelstrom Weapon]?a137040[ and have a s4 chance to generate s5 Maelstrom][].rnrnOnly one Elemental Shield can be active on the Shaman at a time.
   SpellInfo(lightning_shield duration=1800)
   # Chance to deal 192109s1 Nature damage when you take melee damage.
   SpellAddBuff(lightning_shield lightning_shield add=1)
@@ -234,10 +235,10 @@ Define(stormkeeper 191634)
   # Your next Lightning Bolt will deal s2 increased damage, and your next Lightning Bolt or Chain Lightning will be instant cast and cause an Elemental Overload to trigger on every target hit.
   SpellAddBuff(stormkeeper stormkeeper add=1)
 Define(stormkeeper_enhancement 320137)
-# Charge yourself with lightning, causing your next n Lightning Bolts or Chain Lightnings to deal s2 more damage and be instant cast.
+# Charge yourself with lightning, causing your next n Chain Lightnings to deal s2 more damage and be instant cast.
   SpellInfo(stormkeeper_enhancement cd=60 duration=15)
   SpellRequire(stormkeeper_enhancement unusable set=1 enabled=(not hastalent(stormkeeper_talent_enhancement)))
-  # Your next Lightning Bolt or Chain Lightning will deal s2 increased damage and be instant cast.
+  # Your next Chain Lightning will deal s2 increased damage and be instant cast.
   SpellAddBuff(stormkeeper_enhancement stormkeeper_enhancement add=1)
 Define(stormstrike 17364)
 # Energizes both your weapons with lightning and delivers a massive blow to your target, dealing a total of 32175sw1+32176sw1 Physical damage.
@@ -248,9 +249,12 @@ Define(sundering 197214)
   SpellRequire(sundering unusable set=1 enabled=(not hastalent(sundering_talent)))
   # Incapacitated.
   SpellAddTargetDebuff(sundering sundering add=1)
+Define(ultimate_form_buff 323524)
+# While channeling Fleshcraft, you are immune to crowd control and you regenerate 323524s17 health every 323524t17 sec. rnrnIf you finish the full channel, you gain 3 seconds of crowd control immunity, during which you regenerate 323524s17 health every 323524t17 sec.
+  SpellInfo(ultimate_form_buff duration=3 gcd=0 offgcd=1 tick=1)
 Define(vesper_totem 324386)
-# Summon a totem at the target location for 30 seconds. Your next s2 damage spells or abilities will cause the totem to radiate (64 of Spell Power) Arcane damage to up to 324520I enemies near the totem, and your next s4 healing spells will heal up to s6 allies near the totem for (73 of Spell Power) health.rnrnCasting this ability again while the totem is active will relocate the totem.
-  SpellInfo(vesper_totem cd=60 duration=30)
+# Summon a totem at the target location for 30 seconds. Your next s2 damage spells or abilities will cause the totem to radiate (80 of Spell Power) Arcane damage to up to 324520I enemies near the totem, and your next s4 healing spells will heal up to s6 allies near the totem for (91 of Spell Power) health.rnrnCasting this ability again while the totem is active will relocate the totem.
+  SpellInfo(vesper_totem cd=60 duration=30 gcd=1)
 Define(war_stomp 20549)
 # Stuns up to i enemies within A1 yds for 2 seconds.
   SpellInfo(war_stomp cd=90 duration=2 gcd=0 offgcd=1)
@@ -263,7 +267,7 @@ Define(wind_shear 57994)
 # Disrupts the target's concentration with a burst of wind, interrupting spellcasting and preventing any spell in that school from being cast for 3 seconds.
   SpellInfo(wind_shear cd=12 duration=3 gcd=0 offgcd=1 interrupt=1)
 Define(windfury_totem 8512)
-# Summons a Windfury Totem with s1 health at the feet of the caster for 120 seconds.  Party members within s2 yds have a 327942h chance when they auto-attack to swing an extra time.
+# Summons a Windfury Totem with s1 health at the feet of the caster for 120 seconds.  Party members within s2 yds have a ?a343211[327942h][327942h-343211m1] chance when they auto-attack to swing an extra time.
   SpellInfo(windfury_totem duration=120 gcd=1)
 Define(windfury_weapon 33757)
 # Imbue your main-hand weapon with the element of Wind for 3600 seconds. Each main-hand attack has a 319773h chance to trigger two extra attacks, dealing 25504sw1 Physical damage each.
@@ -271,8 +275,6 @@ Define(windfury_weapon 33757)
 Define(windstrike 115356)
 # Hurl a staggering blast of wind at an enemy, dealing a total of 115357sw1+115360sw1 Physical damage, bypassing armor.
   SpellInfo(windstrike cd=9)
-Define(ascendance_talent_restoration 22359)
-# Transform into a Water Ascendant, duplicating all healing you deal for 15 seconds and immediately healing for (876 of Spell Power). Ascendant healing is distributed evenly among allies within 114083A1 yds.
 Define(ascendance_talent_enhancement 21972)
 # Transform into an Air Ascendant for 15 seconds, immediately dealing 344548s1 Nature damage to any enemy within 344548A1 yds, reducing the cooldown and cost of Stormstrike by s4, and transforming your auto attack and Stormstrike into Wind attacks which bypass armor and have a s1 yd range.
 Define(ascendance_talent 21675)
@@ -310,7 +312,7 @@ Define(static_discharge_talent 22358)
 Define(storm_elemental_talent 19272)
 # Calls forth a Greater Storm Elemental to hurl gusts of wind that damage the Shaman's enemies for 30 seconds.rnrnWhile the Storm Elemental is active, each time you cast Lightning Bolt or Chain Lightning, the cast time of Lightning Bolt and Chain Lightning is reduced by 263806s1, stacking up to 263806u times.
 Define(stormkeeper_talent_enhancement 22352)
-# Charge yourself with lightning, causing your next n Lightning Bolts or Chain Lightnings to deal s2 more damage and be instant cast.
+# Charge yourself with lightning, causing your next n Chain Lightnings to deal s2 more damage and be instant cast.
 Define(stormkeeper_talent 22153)
 # Charge yourself with lightning, causing your next n Lightning Bolts to deal s2 more damage, and also causes your next n Lightning Bolts or Chain Lightnings to be instant cast and trigger an Elemental Overload on every target.
 Define(sundering_talent 22351)
@@ -320,12 +322,16 @@ Define(potion_of_spectral_intellect_item 171273)
     ItemInfo(potion_of_spectral_intellect_item cd=1 shared_cd="item_cd_4" proc=307162)
 Define(potion_of_spectral_agility_item 171270)
     ItemInfo(potion_of_spectral_agility_item cd=1 shared_cd="item_cd_4" proc=307159)
-Define(deeptremor_stone_runeforge 6986)
 Define(echoes_of_great_sundering_runeforge 6991)
 Define(elemental_equilibrium_runeforge 6990)
+Define(seeds_of_rampant_growth_runeforge 7708)
 Define(skybreakers_fiery_demise_runeforge 6989)
+Define(windspeakers_lava_resurgence_runeforge 6992)
 Define(doom_winds_runeforge 6993)
 Define(primal_lava_actuators_runeforge 6996)
+Define(lead_by_example_soulbind 342156)
+Define(pustule_eruption_soulbind 351094)
+Define(volatile_solvent_soulbind 323074)
 Define(field_of_blossoms_soulbind 319191)
 Define(grove_invigoration_soulbind 322721)
     `;

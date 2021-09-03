@@ -17,7 +17,7 @@ Define(bulk_extraction 320341)
   SpellInfo(bulk_extraction cd=90)
   SpellRequire(bulk_extraction unusable set=1 enabled=(not hastalent(bulk_extraction_talent)))
 Define(burning_wound_debuff 346278)
-# Demon's Bite leaves an open wound on your enemy dealing 346278s1 Chaos damage over 15 seconds and increasing damage taken from your Immolation Aura by 346278s2.
+# Demon's Bite leaves an open wound on your enemy dealing 346278o1 Chaos damage over 15 seconds and increasing damage taken from your Immolation Aura by 346278s2.
   SpellInfo(burning_wound_debuff duration=15 gcd=0 offgcd=1 tick=3)
 Define(chaos_blades 247938)
 # Increases all damage done by s2 for 18 seconds.rnrnWhile active, your auto attack deals s1 increased damage, and causes Chaos damage.
@@ -130,11 +130,6 @@ Define(fiery_brand_debuff 207744)
   SpellInfo(fiery_brand_debuff duration=8 gcd=0 offgcd=1)
   # Branded, dealing 204021s1 less damage to @auracaster?s264002[ and taking s2 more Fire damage from them][].
   SpellAddTargetDebuff(fiery_brand_debuff fiery_brand_debuff add=1)
-Define(fodder_to_the_flame 329554)
-# Call forth and defeat a demon from the Theater of Pain to release an Empowered Demon Soul, increasing your damage done by 347765s1 and reducing all damage taken by 347765s4 for 20 seconds.rn rnThe demon will escape to the Nether after 25 seconds. Throw Glaive deals considerably more damage to the demon and Fleshcraft treats it as a powerful enemy.
-  SpellInfo(fodder_to_the_flame cd=120 duration=25)
-  # Battling a demon from the Theater of Pain...
-  SpellAddBuff(fodder_to_the_flame fodder_to_the_flame add=1)
 Define(fracture 263642)
 # Rapidly slash your target for 225919sw1+225921sw1 Physical damage, and shatter s1 Lesser Soul Fragments from them.rnrn|cFFFFFFFFGenerates s4 Fury.|r
   SpellInfo(fracture cd=4.5 fury=-25)
@@ -171,7 +166,7 @@ Define(metamorphosis_buff 162264)
 # Leap into the air and land with explosive force, dealing 200166s2 Chaos damage to enemies within 8 yds, and stunning them for 3 seconds. Players are Dazed for 3 seconds instead.rnrnUpon landing, you are transformed into a hellish demon for 30 seconds, ?s320645[immediately resetting the cooldown of your Eye Beam and Blade Dance abilities, ][]greatly empowering your Chaos Strike and Blade Dance abilities?s320422[ and gaining 320422s1 Haste][]?s204909[ and 162264s3 Leech][].
   SpellInfo(metamorphosis_buff duration=30 gcd=0 offgcd=1 tick=1)
 Define(metamorphosis_vengeance 187827)
-# Transform to demon form for 15 seconds, increasing current and maximum health by s2 and Armor by s7.?s321067[ While transformed, Shear and Fracture generate one additional Lesser Soul Fragment][]?s321068[ and s4 additional Fury][].
+# Transform to demon form for 15 seconds, increasing current and maximum health by s2 and Armor by s7?s321067[. While transformed, Shear and Fracture generate one additional Lesser Soul Fragment][]?s321068[ and s4 additional Fury][].
   SpellInfo(metamorphosis_vengeance cd=300 duration=15 gcd=0 offgcd=1 tick=2)
   # Maximum health increased by w2.rnArmor increased by w7.rn?s263642[Fracture][Shear] generates w4 additional Fury and one additional Lesser Soul Fragment.
   SpellAddBuff(metamorphosis_vengeance metamorphosis_vengeance add=1)
@@ -222,13 +217,13 @@ Define(the_hunt 323639)
   # Marked by the Demon Hunter, converting ?c1[345422s1][345422s2] of the damage done to healing.
   SpellAddTargetDebuff(the_hunt the_hunt_debuff add=1)
   # Suffering w1 Nature damage every t1 sec.
-  SpellAddTargetDebuff(the_hunt the_hunt_unused_3 add=1)
+  SpellAddTargetDebuff(the_hunt the_hunt_unused_2 add=1)
 Define(the_hunt_debuff 323802)
 # Charge to your target, striking them for 323802s1 Nature damage, rooting them in place for 1.5 seconds and inflicting 345335o1 Nature damage over 6 seconds to up to 345396s2 enemies in your path. rnrnThe pursuit invigorates your soul, healing you for ?c1[345422s1][345422s2] of the damage you deal to your Hunt target for 30 seconds.
   SpellInfo(the_hunt_debuff duration=30 gcd=0 offgcd=1)
-Define(the_hunt_unused_3 345335)
+Define(the_hunt_unused_2 345335)
 # Charge to your target, striking them for 323802s1 Nature damage, rooting them in place for 1.5 seconds and inflicting 345335o1 Nature damage over 6 seconds to up to 345396s2 enemies in your path. rnrnThe pursuit invigorates your soul, healing you for ?c1[345422s1][345422s2] of the damage you deal to your Hunt target for 30 seconds.
-  SpellInfo(the_hunt_unused_3 duration=6 gcd=0 offgcd=1 tick=2)
+  SpellInfo(the_hunt_unused_2 duration=6 gcd=0 offgcd=1 tick=2)
 Define(throw_glaive 185123)
 # Throw a demonic glaive at the target, dealing 337819s1 Physical damage. The glaive can ricochet to ?s320386[337819x1-1 additional enemies][an additional enemy] within 10 yards. 
   SpellInfo(throw_glaive cd=9)
@@ -258,6 +253,8 @@ Define(burning_alive_talent 22507)
 # Every 207771t3 sec, Fiery Brand spreads to one nearby enemy.
 Define(charred_flesh_talent 22541)
 # Immolation Aura damage increases the duration of your Fiery Brand by s1/1000.2 sec.
+Define(cycle_of_hatred_talent 21866)
+# When Chaos Strike refunds Fury, it also reduces the cooldown of Eye Beam by s1 sec.
 Define(demon_blades_talent 22799)
 # Your auto attacks have a s1 chance to deal additional Shadow damage and generate Fury.
 Define(demonic_talent 21900)
@@ -289,9 +286,10 @@ Define(trail_of_ruin_talent 22909)
 Define(unbound_chaos_talent 22494)
 # Activating Immolation Aura increases the damage of your next Fel Rush by 347462s1. Lasts 20 seconds.
 Define(potion_of_phantom_fire_item 171349)
-    ItemInfo(potion_of_phantom_fire_item cd=300 shared_cd="item_cd_4" rppm=6 proc=307495)
+    ItemInfo(potion_of_phantom_fire_item cd=300 shared_cd="item_cd_4" rppm=12 proc=307495)
 Define(burning_wound_runeforge 7219)
 Define(chaos_theory_runeforge 7050)
+Define(darkglare_medallion_runeforge 7043)
 Define(razelikhs_defilement_runeforge 7046)
 Define(serrated_glaive_conduit 152)
     `;

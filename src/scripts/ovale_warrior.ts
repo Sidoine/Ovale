@@ -5,13 +5,13 @@ export function registerWarrior(scripts: OvaleScriptsClass) {
     // ANY CHANGES MADE BELOW THIS POINT WILL BE LOST
 
     {
-        const name = "sc_t26_warrior_arms";
-        const desc = "[9.0] Simulationcraft: T26_Warrior_Arms";
+        const name = "sc_t27_warrior_arms";
+        const desc = "[9.1] Simulationcraft: T27_Warrior_Arms";
         const code = `
-# Based on SimulationCraft profile "T26_Warrior_Arms".
+# Based on SimulationCraft profile "T27_Warrior_Arms".
 #	class=warrior
 #	spec=arms
-#	talents=3113123
+#	talents=3133122
 
 Include(ovale_common)
 Include(ovale_warrior_spells)
@@ -33,12 +33,6 @@ AddFunction armsinterruptactions
  }
 }
 
-AddFunction armsuseitemactions
-{
- item(trinket0slot text=13 usable=1)
- item(trinket1slot text=14 usable=1)
-}
-
 AddFunction armsgetinmeleerange
 {
  if checkboxon(opt_melee_range) and not inflighttotarget(charge) and not inflighttotarget(heroic_leap) and not target.inrange(pummel)
@@ -53,28 +47,28 @@ AddFunction armsgetinmeleerange
 
 AddFunction armssingle_targetmainactions
 {
- #rend,if=remains<=duration*0.3
- if target.debuffremaining(rend) <= baseduration(rend) * 0.3 spell(rend)
- #cleave,if=spell_targets.whirlwind>1&dot.deep_wounds.remains<gcd
- if enemies(tagged=1) > 1 and target.debuffremaining(deep_wounds_arms_debuff) < gcd() spell(cleave)
+ #rend,if=remains<=gcd
+ if target.debuffremaining(rend) <= gcd() spell(rend)
  #overpower,if=charges=2
  if charges(overpower) == 2 spell(overpower)
- #mortal_strike,if=buff.overpower.stack>=2&buff.deadly_calm.down|(dot.deep_wounds.remains<=gcd&cooldown.colossus_smash.remains>gcd)
- if buffstacks(overpower) >= 2 and buffexpires(deadly_calm) or target.debuffremaining(deep_wounds_arms_debuff) <= gcd() and spellcooldown(colossus_smash) > gcd() spell(mortal_strike)
- #skullsplitter,if=rage<60&buff.deadly_calm.down
- if rage() < 60 and buffexpires(deadly_calm) spell(skullsplitter)
- #overpower
- spell(overpower)
- #condemn,if=buff.sudden_death.react
- if buffpresent(sudden_death_buff) spell(condemn)
+ #mortal_strike,if=runeforge.enduring_blow|runeforge.battlelord|buff.overpower.stack>=2
+ if runeforge(enduring_blow_runeforge) or runeforge(battlelord_runeforge) or buffstacks(overpower) >= 2 spell(mortal_strike)
  #execute,if=buff.sudden_death.react
  if buffpresent(sudden_death_buff) spell(execute)
+ #skullsplitter,if=rage.deficit>45&buff.deadly_calm.down
+ if ragedeficit() > 45 and buffexpires(deadly_calm) spell(skullsplitter)
+ #overpower
+ spell(overpower)
  #mortal_strike
  spell(mortal_strike)
- #whirlwind,if=talent.fervor_of_battle.enabled
- if hastalent(fervor_of_battle_talent) spell(whirlwind)
- #slam,if=!talent.fervor_of_battle.enabled
- if not hastalent(fervor_of_battle_talent) spell(slam)
+ #rend,if=remains<duration*0.3
+ if target.debuffremaining(rend) < baseduration(rend) * 0.3 spell(rend)
+ #cleave,if=spell_targets.whirlwind>1
+ if enemies(tagged=1) > 1 spell(cleave)
+ #whirlwind,if=talent.fervor_of_battle.enabled|spell_targets.whirlwind>4|spell_targets.whirlwind>2&buff.sweeping_strikes.down
+ if hastalent(fervor_of_battle_talent) or enemies(tagged=1) > 4 or enemies(tagged=1) > 2 and buffexpires(sweeping_strikes) spell(whirlwind)
+ #slam,if=!talent.fervor_of_battle.enabled&(rage>50|debuff.colossus_smash.up|!runeforge.enduring_blow)
+ if not hastalent(fervor_of_battle_talent) and { rage() > 50 or target.debuffpresent(colossus_smash_debuff) or not runeforge(enduring_blow_runeforge) } spell(slam)
 }
 
 AddFunction armssingle_targetmainpostconditions
@@ -83,35 +77,32 @@ AddFunction armssingle_targetmainpostconditions
 
 AddFunction armssingle_targetshortcdactions
 {
- #avatar,if=cooldown.colossus_smash.remains<8&gcd.remains=0
- if spellcooldown(colossus_smash) < 8 and not 0 > 0 spell(avatar)
-
- unless target.debuffremaining(rend) <= baseduration(rend) * 0.3 and spell(rend) or enemies(tagged=1) > 1 and target.debuffremaining(deep_wounds_arms_debuff) < gcd() and spell(cleave)
+ unless target.debuffremaining(rend) <= gcd() and spell(rend)
  {
+  #avatar,if=gcd.remains=0
+  if not 0 > 0 spell(avatar)
+  #ravager
+  spell(ravager)
   #warbreaker
   spell(warbreaker)
   #colossus_smash
   spell(colossus_smash)
-  #ravager,if=buff.avatar.remains<18&!dot.ravager.remains
-  if buffremaining(avatar) < 18 and not target.debuffremaining(ravager) spell(ravager)
+  #ancient_aftershock,if=debuff.colossus_smash.up
+  if target.debuffpresent(colossus_smash_debuff) spell(ancient_aftershock)
 
-  unless charges(overpower) == 2 and spell(overpower)
+  unless charges(overpower) == 2 and spell(overpower) or { runeforge(enduring_blow_runeforge) or runeforge(battlelord_runeforge) or buffstacks(overpower) >= 2 } and spell(mortal_strike) or buffpresent(sudden_death_buff) and spell(execute) or ragedeficit() > 45 and buffexpires(deadly_calm) and spell(skullsplitter)
   {
-   #bladestorm,if=buff.deadly_calm.down&(debuff.colossus_smash.up&rage<30|rage<70)
-   if buffexpires(deadly_calm) and { target.debuffpresent(colossus_smash_debuff) and rage() < 30 or rage() < 70 } spell(bladestorm_arms)
-
-   unless { buffstacks(overpower) >= 2 and buffexpires(deadly_calm) or target.debuffremaining(deep_wounds_arms_debuff) <= gcd() and spellcooldown(colossus_smash) > gcd() } and spell(mortal_strike)
-   {
-    #deadly_calm
-    spell(deadly_calm)
-   }
+   #bladestorm,if=buff.deadly_calm.down&rage<30
+   if buffexpires(deadly_calm) and rage() < 30 spell(bladestorm_arms)
+   #deadly_calm
+   spell(deadly_calm)
   }
  }
 }
 
 AddFunction armssingle_targetshortcdpostconditions
 {
- target.debuffremaining(rend) <= baseduration(rend) * 0.3 and spell(rend) or enemies(tagged=1) > 1 and target.debuffremaining(deep_wounds_arms_debuff) < gcd() and spell(cleave) or charges(overpower) == 2 and spell(overpower) or { buffstacks(overpower) >= 2 and buffexpires(deadly_calm) or target.debuffremaining(deep_wounds_arms_debuff) <= gcd() and spellcooldown(colossus_smash) > gcd() } and spell(mortal_strike) or rage() < 60 and buffexpires(deadly_calm) and spell(skullsplitter) or spell(overpower) or buffpresent(sudden_death_buff) and spell(condemn) or buffpresent(sudden_death_buff) and spell(execute) or spell(mortal_strike) or hastalent(fervor_of_battle_talent) and spell(whirlwind) or not hastalent(fervor_of_battle_talent) and spell(slam)
+ target.debuffremaining(rend) <= gcd() and spell(rend) or charges(overpower) == 2 and spell(overpower) or { runeforge(enduring_blow_runeforge) or runeforge(battlelord_runeforge) or buffstacks(overpower) >= 2 } and spell(mortal_strike) or buffpresent(sudden_death_buff) and spell(execute) or ragedeficit() > 45 and buffexpires(deadly_calm) and spell(skullsplitter) or spell(overpower) or spell(mortal_strike) or target.debuffremaining(rend) < baseduration(rend) * 0.3 and spell(rend) or enemies(tagged=1) > 1 and spell(cleave) or { hastalent(fervor_of_battle_talent) or enemies(tagged=1) > 4 or enemies(tagged=1) > 2 and buffexpires(sweeping_strikes) } and spell(whirlwind) or not hastalent(fervor_of_battle_talent) and { rage() > 50 or target.debuffpresent(colossus_smash_debuff) or not runeforge(enduring_blow_runeforge) } and spell(slam)
 }
 
 AddFunction armssingle_targetcdactions
@@ -120,7 +111,7 @@ AddFunction armssingle_targetcdactions
 
 AddFunction armssingle_targetcdpostconditions
 {
- spellcooldown(colossus_smash) < 8 and not 0 > 0 and spell(avatar) or target.debuffremaining(rend) <= baseduration(rend) * 0.3 and spell(rend) or enemies(tagged=1) > 1 and target.debuffremaining(deep_wounds_arms_debuff) < gcd() and spell(cleave) or spell(warbreaker) or spell(colossus_smash) or buffremaining(avatar) < 18 and not target.debuffremaining(ravager) and spell(ravager) or charges(overpower) == 2 and spell(overpower) or buffexpires(deadly_calm) and { target.debuffpresent(colossus_smash_debuff) and rage() < 30 or rage() < 70 } and spell(bladestorm_arms) or { buffstacks(overpower) >= 2 and buffexpires(deadly_calm) or target.debuffremaining(deep_wounds_arms_debuff) <= gcd() and spellcooldown(colossus_smash) > gcd() } and spell(mortal_strike) or spell(deadly_calm) or rage() < 60 and buffexpires(deadly_calm) and spell(skullsplitter) or spell(overpower) or buffpresent(sudden_death_buff) and spell(condemn) or buffpresent(sudden_death_buff) and spell(execute) or spell(mortal_strike) or hastalent(fervor_of_battle_talent) and spell(whirlwind) or not hastalent(fervor_of_battle_talent) and spell(slam)
+ target.debuffremaining(rend) <= gcd() and spell(rend) or not 0 > 0 and spell(avatar) or spell(ravager) or spell(warbreaker) or spell(colossus_smash) or target.debuffpresent(colossus_smash_debuff) and spell(ancient_aftershock) or charges(overpower) == 2 and spell(overpower) or { runeforge(enduring_blow_runeforge) or runeforge(battlelord_runeforge) or buffstacks(overpower) >= 2 } and spell(mortal_strike) or buffpresent(sudden_death_buff) and spell(execute) or ragedeficit() > 45 and buffexpires(deadly_calm) and spell(skullsplitter) or buffexpires(deadly_calm) and rage() < 30 and spell(bladestorm_arms) or spell(deadly_calm) or spell(overpower) or spell(mortal_strike) or target.debuffremaining(rend) < baseduration(rend) * 0.3 and spell(rend) or enemies(tagged=1) > 1 and spell(cleave) or { hastalent(fervor_of_battle_talent) or enemies(tagged=1) > 4 or enemies(tagged=1) > 2 and buffexpires(sweeping_strikes) } and spell(whirlwind) or not hastalent(fervor_of_battle_talent) and { rage() > 50 or target.debuffpresent(colossus_smash_debuff) or not runeforge(enduring_blow_runeforge) } and spell(slam)
 }
 
 ### actions.precombat
@@ -165,8 +156,6 @@ AddFunction armshacmainactions
  if buffpresent(sweeping_strikes) or target.debuffremaining(deep_wounds_arms_debuff) < gcd() and not hastalent(cleave_talent) spell(mortal_strike)
  #overpower,if=talent.dreadnaught.enabled
  if hastalent(dreadnaught_talent) spell(overpower)
- #condemn
- spell(condemn)
  #execute,if=buff.sweeping_strikes.up
  if buffpresent(sweeping_strikes) spell(execute)
  #overpower
@@ -185,24 +174,26 @@ AddFunction armshacshortcdactions
  {
   #avatar,if=cooldown.colossus_smash.remains<1
   if spellcooldown(colossus_smash) < 1 spell(avatar)
+  #warbreaker
+  spell(warbreaker)
+  #colossus_smash
+  spell(colossus_smash)
 
   unless target.debuffremaining(deep_wounds_arms_debuff) <= gcd() and spell(cleave)
   {
-   #warbreaker
-   spell(warbreaker)
+   #ancient_aftershock
+   spell(ancient_aftershock)
    #bladestorm
    spell(bladestorm_arms)
    #ravager
    spell(ravager)
-   #colossus_smash
-   spell(colossus_smash)
   }
  }
 }
 
 AddFunction armshacshortcdpostconditions
 {
- rage() < 60 and buffexpires(deadly_calm) and spell(skullsplitter) or target.debuffremaining(deep_wounds_arms_debuff) <= gcd() and spell(cleave) or target.debuffremaining(rend) <= baseduration(rend) * 0.3 and buffpresent(sweeping_strikes) and spell(rend) or spell(cleave) or { buffpresent(sweeping_strikes) or target.debuffremaining(deep_wounds_arms_debuff) < gcd() and not hastalent(cleave_talent) } and spell(mortal_strike) or hastalent(dreadnaught_talent) and spell(overpower) or spell(condemn) or buffpresent(sweeping_strikes) and spell(execute) or spell(overpower) or spell(whirlwind)
+ rage() < 60 and buffexpires(deadly_calm) and spell(skullsplitter) or target.debuffremaining(deep_wounds_arms_debuff) <= gcd() and spell(cleave) or target.debuffremaining(rend) <= baseduration(rend) * 0.3 and buffpresent(sweeping_strikes) and spell(rend) or spell(cleave) or { buffpresent(sweeping_strikes) or target.debuffremaining(deep_wounds_arms_debuff) < gcd() and not hastalent(cleave_talent) } and spell(mortal_strike) or hastalent(dreadnaught_talent) and spell(overpower) or buffpresent(sweeping_strikes) and spell(execute) or spell(overpower) or spell(whirlwind)
 }
 
 AddFunction armshaccdactions
@@ -211,31 +202,27 @@ AddFunction armshaccdactions
 
 AddFunction armshaccdpostconditions
 {
- rage() < 60 and buffexpires(deadly_calm) and spell(skullsplitter) or spellcooldown(colossus_smash) < 1 and spell(avatar) or target.debuffremaining(deep_wounds_arms_debuff) <= gcd() and spell(cleave) or spell(warbreaker) or spell(bladestorm_arms) or spell(ravager) or spell(colossus_smash) or target.debuffremaining(rend) <= baseduration(rend) * 0.3 and buffpresent(sweeping_strikes) and spell(rend) or spell(cleave) or { buffpresent(sweeping_strikes) or target.debuffremaining(deep_wounds_arms_debuff) < gcd() and not hastalent(cleave_talent) } and spell(mortal_strike) or hastalent(dreadnaught_talent) and spell(overpower) or spell(condemn) or buffpresent(sweeping_strikes) and spell(execute) or spell(overpower) or spell(whirlwind)
+ rage() < 60 and buffexpires(deadly_calm) and spell(skullsplitter) or spellcooldown(colossus_smash) < 1 and spell(avatar) or spell(warbreaker) or spell(colossus_smash) or target.debuffremaining(deep_wounds_arms_debuff) <= gcd() and spell(cleave) or spell(ancient_aftershock) or spell(bladestorm_arms) or spell(ravager) or target.debuffremaining(rend) <= baseduration(rend) * 0.3 and buffpresent(sweeping_strikes) and spell(rend) or spell(cleave) or { buffpresent(sweeping_strikes) or target.debuffremaining(deep_wounds_arms_debuff) < gcd() and not hastalent(cleave_talent) } and spell(mortal_strike) or hastalent(dreadnaught_talent) and spell(overpower) or buffpresent(sweeping_strikes) and spell(execute) or spell(overpower) or spell(whirlwind)
 }
 
 ### actions.execute
 
 AddFunction armsexecutemainactions
 {
- #rend,if=remains<=duration*0.3
- if target.debuffremaining(rend) <= baseduration(rend) * 0.3 spell(rend)
- #skullsplitter,if=rage<60&(!talent.deadly_calm.enabled|buff.deadly_calm.down)
- if rage() < 60 and { not hastalent(deadly_calm_talent) or buffexpires(deadly_calm) } spell(skullsplitter)
- #cleave,if=spell_targets.whirlwind>1&dot.deep_wounds.remains<gcd
- if enemies(tagged=1) > 1 and target.debuffremaining(deep_wounds_arms_debuff) < gcd() spell(cleave)
- #condemn,if=debuff.colossus_smash.up|buff.sudden_death.react|rage>65
- if target.debuffpresent(colossus_smash_debuff) or buffpresent(sudden_death_buff) or rage() > 65 spell(condemn)
+ #execute,if=buff.ashen_juggernaut.up&buff.ashen_juggernaut.remains<gcd&conduit.ashen_juggernaut.rank>1
+ if buffpresent(ashen_juggernaut_buff) and buffremaining(ashen_juggernaut_buff) < gcd() and conduitrank(ashen_juggernaut_conduit) > 1 spell(execute)
+ #rend,if=remains<=gcd&(!talent.warbreaker.enabled&cooldown.colossus_smash.remains<4|talent.warbreaker.enabled&cooldown.warbreaker.remains<4)&target.time_to_die>12
+ if target.debuffremaining(rend) <= gcd() and { not hastalent(warbreaker_talent) and spellcooldown(colossus_smash) < 4 or hastalent(warbreaker_talent) and spellcooldown(warbreaker) < 4 } and target.timetodie() > 12 spell(rend)
  #overpower,if=charges=2
  if charges(overpower) == 2 spell(overpower)
- #mortal_strike,if=dot.deep_wounds.remains<=gcd
- if target.debuffremaining(deep_wounds_arms_debuff) <= gcd() spell(mortal_strike)
- #skullsplitter,if=rage<40
- if rage() < 40 spell(skullsplitter)
+ #cleave,if=spell_targets.whirlwind>1&dot.deep_wounds.remains<gcd
+ if enemies(tagged=1) > 1 and target.debuffremaining(deep_wounds_arms_debuff) < gcd() spell(cleave)
+ #mortal_strike,if=dot.deep_wounds.remains<=gcd|runeforge.enduring_blow|buff.overpower.stack=2&debuff.exploiter.stack=2|buff.battlelord.up
+ if target.debuffremaining(deep_wounds_arms_debuff) <= gcd() or runeforge(enduring_blow_runeforge) or buffstacks(overpower) == 2 and target.debuffstacks(exploiter_debuff) == 2 or buffpresent(battlelord_buff) spell(mortal_strike)
+ #skullsplitter,if=rage<45
+ if rage() < 45 spell(skullsplitter)
  #overpower
  spell(overpower)
- #condemn
- spell(condemn)
  #execute
  spell(execute)
 }
@@ -248,25 +235,29 @@ AddFunction armsexecuteshortcdactions
 {
  #deadly_calm
  spell(deadly_calm)
+ #cancel_buff,name=bladestorm,if=spell_targets.whirlwind=1&gcd.remains=0&(rage>75|rage>50&buff.recklessness.up)
+ if enemies(tagged=1) == 1 and not gcdremaining() > 0 and { rage() > 75 or rage() > 50 and buffpresent(recklessness) } and buffpresent(bladestorm_arms) texture(bladestorm_arms text=cancel)
+ #avatar,if=gcd.remains=0|target.time_to_die<20
+ if not 0 > 0 or target.timetodie() < 20 spell(avatar)
 
- unless target.debuffremaining(rend) <= baseduration(rend) * 0.3 and spell(rend) or rage() < 60 and { not hastalent(deadly_calm_talent) or buffexpires(deadly_calm) } and spell(skullsplitter)
+ unless buffpresent(ashen_juggernaut_buff) and buffremaining(ashen_juggernaut_buff) < gcd() and conduitrank(ashen_juggernaut_conduit) > 1 and spell(execute)
  {
-  #avatar,if=cooldown.colossus_smash.remains<8&gcd.remains=0
-  if spellcooldown(colossus_smash) < 8 and not 0 > 0 spell(avatar)
-  #ravager,if=buff.avatar.remains<18&!dot.ravager.remains
-  if buffremaining(avatar) < 18 and not target.debuffremaining(ravager) spell(ravager)
+  #ravager
+  spell(ravager)
 
-  unless enemies(tagged=1) > 1 and target.debuffremaining(deep_wounds_arms_debuff) < gcd() and spell(cleave)
+  unless target.debuffremaining(rend) <= gcd() and { not hastalent(warbreaker_talent) and spellcooldown(colossus_smash) < 4 or hastalent(warbreaker_talent) and spellcooldown(warbreaker) < 4 } and target.timetodie() > 12 and spell(rend)
   {
    #warbreaker
    spell(warbreaker)
    #colossus_smash
    spell(colossus_smash)
+   #ancient_aftershock,,if=debuff.colossus_smash.up
+   if target.debuffpresent(colossus_smash_debuff) spell(ancient_aftershock)
 
-   unless { target.debuffpresent(colossus_smash_debuff) or buffpresent(sudden_death_buff) or rage() > 65 } and spell(condemn) or charges(overpower) == 2 and spell(overpower)
+   unless charges(overpower) == 2 and spell(overpower) or enemies(tagged=1) > 1 and target.debuffremaining(deep_wounds_arms_debuff) < gcd() and spell(cleave) or { target.debuffremaining(deep_wounds_arms_debuff) <= gcd() or runeforge(enduring_blow_runeforge) or buffstacks(overpower) == 2 and target.debuffstacks(exploiter_debuff) == 2 or buffpresent(battlelord_buff) } and spell(mortal_strike) or rage() < 45 and spell(skullsplitter)
    {
-    #bladestorm,if=buff.deadly_calm.down&rage<50
-    if buffexpires(deadly_calm) and rage() < 50 spell(bladestorm_arms)
+    #bladestorm,if=buff.deadly_calm.down&(rage<20|!runeforge.sinful_surge&rage<50)
+    if buffexpires(deadly_calm) and { rage() < 20 or not runeforge(sinful_surge_runeforge) and rage() < 50 } spell(bladestorm_arms)
    }
   }
  }
@@ -274,7 +265,7 @@ AddFunction armsexecuteshortcdactions
 
 AddFunction armsexecuteshortcdpostconditions
 {
- target.debuffremaining(rend) <= baseduration(rend) * 0.3 and spell(rend) or rage() < 60 and { not hastalent(deadly_calm_talent) or buffexpires(deadly_calm) } and spell(skullsplitter) or enemies(tagged=1) > 1 and target.debuffremaining(deep_wounds_arms_debuff) < gcd() and spell(cleave) or { target.debuffpresent(colossus_smash_debuff) or buffpresent(sudden_death_buff) or rage() > 65 } and spell(condemn) or charges(overpower) == 2 and spell(overpower) or target.debuffremaining(deep_wounds_arms_debuff) <= gcd() and spell(mortal_strike) or rage() < 40 and spell(skullsplitter) or spell(overpower) or spell(condemn) or spell(execute)
+ buffpresent(ashen_juggernaut_buff) and buffremaining(ashen_juggernaut_buff) < gcd() and conduitrank(ashen_juggernaut_conduit) > 1 and spell(execute) or target.debuffremaining(rend) <= gcd() and { not hastalent(warbreaker_talent) and spellcooldown(colossus_smash) < 4 or hastalent(warbreaker_talent) and spellcooldown(warbreaker) < 4 } and target.timetodie() > 12 and spell(rend) or charges(overpower) == 2 and spell(overpower) or enemies(tagged=1) > 1 and target.debuffremaining(deep_wounds_arms_debuff) < gcd() and spell(cleave) or { target.debuffremaining(deep_wounds_arms_debuff) <= gcd() or runeforge(enduring_blow_runeforge) or buffstacks(overpower) == 2 and target.debuffstacks(exploiter_debuff) == 2 or buffpresent(battlelord_buff) } and spell(mortal_strike) or rage() < 45 and spell(skullsplitter) or spell(overpower) or spell(execute)
 }
 
 AddFunction armsexecutecdactions
@@ -283,7 +274,7 @@ AddFunction armsexecutecdactions
 
 AddFunction armsexecutecdpostconditions
 {
- spell(deadly_calm) or target.debuffremaining(rend) <= baseduration(rend) * 0.3 and spell(rend) or rage() < 60 and { not hastalent(deadly_calm_talent) or buffexpires(deadly_calm) } and spell(skullsplitter) or spellcooldown(colossus_smash) < 8 and not 0 > 0 and spell(avatar) or buffremaining(avatar) < 18 and not target.debuffremaining(ravager) and spell(ravager) or enemies(tagged=1) > 1 and target.debuffremaining(deep_wounds_arms_debuff) < gcd() and spell(cleave) or spell(warbreaker) or spell(colossus_smash) or { target.debuffpresent(colossus_smash_debuff) or buffpresent(sudden_death_buff) or rage() > 65 } and spell(condemn) or charges(overpower) == 2 and spell(overpower) or buffexpires(deadly_calm) and rage() < 50 and spell(bladestorm_arms) or target.debuffremaining(deep_wounds_arms_debuff) <= gcd() and spell(mortal_strike) or rage() < 40 and spell(skullsplitter) or spell(overpower) or spell(condemn) or spell(execute)
+ spell(deadly_calm) or enemies(tagged=1) == 1 and not gcdremaining() > 0 and { rage() > 75 or rage() > 50 and buffpresent(recklessness) } and buffpresent(bladestorm_arms) and texture(bladestorm_arms text=cancel) or { not 0 > 0 or target.timetodie() < 20 } and spell(avatar) or buffpresent(ashen_juggernaut_buff) and buffremaining(ashen_juggernaut_buff) < gcd() and conduitrank(ashen_juggernaut_conduit) > 1 and spell(execute) or spell(ravager) or target.debuffremaining(rend) <= gcd() and { not hastalent(warbreaker_talent) and spellcooldown(colossus_smash) < 4 or hastalent(warbreaker_talent) and spellcooldown(warbreaker) < 4 } and target.timetodie() > 12 and spell(rend) or spell(warbreaker) or spell(colossus_smash) or target.debuffpresent(colossus_smash_debuff) and spell(ancient_aftershock) or charges(overpower) == 2 and spell(overpower) or enemies(tagged=1) > 1 and target.debuffremaining(deep_wounds_arms_debuff) < gcd() and spell(cleave) or { target.debuffremaining(deep_wounds_arms_debuff) <= gcd() or runeforge(enduring_blow_runeforge) or buffstacks(overpower) == 2 and target.debuffstacks(exploiter_debuff) == 2 or buffpresent(battlelord_buff) } and spell(mortal_strike) or rage() < 45 and spell(skullsplitter) or buffexpires(deadly_calm) and { rage() < 20 or not runeforge(sinful_surge_runeforge) and rage() < 50 } and spell(bladestorm_arms) or spell(overpower) or spell(execute)
 }
 
 ### actions.default
@@ -349,8 +340,8 @@ AddFunction arms_defaultcdactions
 {
  unless checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) and spell(charge)
  {
-  #potion
-  if checkboxon(opt_use_consumables) and target.classification(worldboss) item(potion_of_spectral_strength_item usable=1)
+  #potion,if=gcd.remains=0&debuff.colossus_smash.remains>8|target.time_to_die<25
+  if { not gcdremaining() > 0 and target.debuffremaining(colossus_smash_debuff) > 8 or target.timetodie() < 25 } and { checkboxon(opt_use_consumables) and target.classification(worldboss) } item(potion_of_spectral_strength_item usable=1)
   #pummel,if=target.debuff.casting.react
   if target.isinterruptible() armsinterruptactions()
   #blood_fury,if=debuff.colossus_smash.up
@@ -366,28 +357,20 @@ AddFunction arms_defaultcdactions
   #ancestral_call,if=debuff.colossus_smash.up
   if target.debuffpresent(colossus_smash_debuff) spell(ancestral_call)
 
-  unless target.debuffexpires(colossus_smash_debuff) and spellcooldown(mortal_strike) > 0 and spell(bag_of_tricks)
+  unless target.debuffexpires(colossus_smash_debuff) and spellcooldown(mortal_strike) > 0 and spell(bag_of_tricks) or enemies(tagged=1) > 1 and { spellcooldown(bladestorm_arms) > 15 or hastalent(ravager_talent) } and spell(sweeping_strikes)
   {
-   #use_item,name=inscrutable_quantum_device
-   armsuseitemactions()
-   #use_item,name=dreadfire_vessel
-   armsuseitemactions()
+   #run_action_list,name=hac,if=raid_event.adds.exists
+   if never(raid_event_adds_exists) armshaccdactions()
 
-   unless enemies(tagged=1) > 1 and { spellcooldown(bladestorm_arms) > 15 or hastalent(ravager_talent) } and spell(sweeping_strikes)
+   unless never(raid_event_adds_exists) and armshaccdpostconditions()
    {
-    #run_action_list,name=hac,if=raid_event.adds.exists
-    if never(raid_event_adds_exists) armshaccdactions()
+    #run_action_list,name=execute,if=(talent.massacre.enabled&target.health.pct<35)|target.health.pct<20|(target.health.pct>80&covenant.venthyr)
+    if hastalent(massacre_talent_arms) and target.healthpercent() < 35 or target.healthpercent() < 20 or target.healthpercent() > 80 and iscovenant("venthyr") armsexecutecdactions()
 
-    unless never(raid_event_adds_exists) and armshaccdpostconditions()
+    unless { hastalent(massacre_talent_arms) and target.healthpercent() < 35 or target.healthpercent() < 20 or target.healthpercent() > 80 and iscovenant("venthyr") } and armsexecutecdpostconditions()
     {
-     #run_action_list,name=execute,if=(talent.massacre.enabled&target.health.pct<35)|target.health.pct<20|(target.health.pct>80&covenant.venthyr)
-     if hastalent(massacre_talent_arms) and target.healthpercent() < 35 or target.healthpercent() < 20 or target.healthpercent() > 80 and iscovenant("venthyr") armsexecutecdactions()
-
-     unless { hastalent(massacre_talent_arms) and target.healthpercent() < 35 or target.healthpercent() < 20 or target.healthpercent() > 80 and iscovenant("venthyr") } and armsexecutecdpostconditions()
-     {
-      #run_action_list,name=single_target
-      armssingle_targetcdactions()
-     }
+     #run_action_list,name=single_target
+     armssingle_targetcdactions()
     }
    }
   }
@@ -441,9 +424,14 @@ AddIcon enabled=(checkboxon(opt_warrior_arms_aoe) and specialization(arms)) help
 
 ### Required symbols
 # ancestral_call
+# ancient_aftershock
 # arcane_torrent
+# ashen_juggernaut_buff
+# ashen_juggernaut_conduit
 # avatar
 # bag_of_tricks
+# battlelord_buff
+# battlelord_runeforge
 # berserking
 # bladestorm_arms
 # blood_fury_ap
@@ -452,12 +440,12 @@ AddIcon enabled=(checkboxon(opt_warrior_arms_aoe) and specialization(arms)) help
 # cleave_talent
 # colossus_smash
 # colossus_smash_debuff
-# condemn
 # deadly_calm
-# deadly_calm_talent
 # deep_wounds_arms_debuff
 # dreadnaught_talent
+# enduring_blow_runeforge
 # execute
+# exploiter_debuff
 # fervor_of_battle_talent
 # fireblood
 # heroic_leap
@@ -471,8 +459,10 @@ AddIcon enabled=(checkboxon(opt_warrior_arms_aoe) and specialization(arms)) help
 # quaking_palm
 # ravager
 # ravager_talent
+# recklessness
 # rend
 # shockwave
+# sinful_surge_runeforge
 # skullsplitter
 # slam
 # storm_bolt
@@ -480,22 +470,34 @@ AddIcon enabled=(checkboxon(opt_warrior_arms_aoe) and specialization(arms)) help
 # sweeping_strikes
 # war_stomp
 # warbreaker
+# warbreaker_talent
 # whirlwind
 `;
         scripts.registerScript("WARRIOR", "arms", name, desc, code, "script");
     }
 
     {
-        const name = "sc_t26_warrior_fury";
-        const desc = "[9.0] Simulationcraft: T26_Warrior_Fury";
+        const name = "sc_t27_warrior_fury";
+        const desc = "[9.1] Simulationcraft: T27_Warrior_Fury";
         const code = `
-# Based on SimulationCraft profile "T26_Warrior_Fury".
+# Based on SimulationCraft profile "T27_Warrior_Fury".
 #	class=warrior
 #	spec=fury
-#	talents=2113323
+#	talents=2113322
 
 Include(ovale_common)
 Include(ovale_warrior_spells)
+
+
+AddFunction unique_legendaries
+{
+ runeforge(signet_of_tormented_kings_runeforge) or runeforge(sinful_surge_runeforge) or runeforge(elysian_might_runeforge)
+}
+
+AddFunction execute_phase
+{
+ hastalent(massacre_talent) and target.healthpercent() < 35 or target.healthpercent() < 20 or target.healthpercent() > 80 and iscovenant("venthyr")
+}
 
 AddCheckBox(opt_interrupt l(interrupt) default enabled=(specialization(fury)))
 AddCheckBox(opt_melee_range l(not_in_melee_range) enabled=(specialization(fury)))
@@ -512,12 +514,6 @@ AddFunction furyinterruptactions
   if target.distance() < 5 and not target.classification(worldboss) spell(war_stomp)
   if target.inrange(intimidating_shout) and not target.classification(worldboss) spell(intimidating_shout)
  }
-}
-
-AddFunction furyuseitemactions
-{
- item(trinket0slot text=13 usable=1)
- item(trinket1slot text=14 usable=1)
 }
 
 AddFunction furygetinmeleerange
@@ -538,22 +534,26 @@ AddFunction furysingle_targetmainactions
  if equippedruneforge(will_of_the_berserker_runeforge) and buffremaining(will_of_the_berserker_buff) < gcd() spell(raging_blow)
  #crushing_blow,if=runeforge.will_of_the_berserker.equipped&buff.will_of_the_berserker.remains<gcd
  if equippedruneforge(will_of_the_berserker_runeforge) and buffremaining(will_of_the_berserker_buff) < gcd() spell(crushing_blow)
+ #condemn,if=(buff.enrage.up|buff.recklessness.up&runeforge.sinful_surge)&variable.execute_phase
+ if { isenraged() or buffpresent(recklessness) and runeforge(sinful_surge_runeforge) } and execute_phase() spell(condemn_fury)
  #rampage,if=buff.recklessness.up|(buff.enrage.remains<gcd|rage>90)|buff.frenzy.remains<1.5
  if buffpresent(recklessness) or enrageremaining() < gcd() or rage() > 90 or buffremaining(frenzy_warrior_buff) < 1.5 spell(rampage)
  #condemn
  spell(condemn_fury)
  #execute
  spell(execute_fury)
- #bloodthirst,if=buff.enrage.down|conduit.vicious_contempt.rank>5&target.health.pct<35&!talent.cruelty.enabled
- if not isenraged() or conduitrank(vicious_contempt_conduit) > 5 and target.healthpercent() < 35 and not hastalent(cruelty_talent) spell(bloodthirst)
+ #bloodthirst,if=buff.enrage.down|conduit.vicious_contempt.rank>5&target.health.pct<35
+ if not isenraged() or conduitrank(vicious_contempt_conduit) > 5 and target.healthpercent() < 35 spell(bloodthirst)
  #bloodbath,if=buff.enrage.down|conduit.vicious_contempt.rank>5&target.health.pct<35&!talent.cruelty.enabled
  if not isenraged() or conduitrank(vicious_contempt_conduit) > 5 and target.healthpercent() < 35 and not hastalent(cruelty_talent) spell(bloodbath)
  #onslaught
  spell(onslaught)
- #raging_blow,if=charges=2
- if charges(raging_blow) == 2 spell(raging_blow)
- #crushing_blow,if=charges=2
- if charges(crushing_blow) == 2 spell(crushing_blow)
+ #whirlwind,if=buff.merciless_bonegrinder.up&spell_targets.whirlwind>3
+ if buffpresent(merciless_bonegrinder_buff) and enemies(tagged=1) > 3 spell(whirlwind_fury)
+ #raging_blow,if=charges=2|buff.recklessness.up&variable.execute_phase&talent.massacre.enabled
+ if charges(raging_blow) == 2 or buffpresent(recklessness) and execute_phase() and hastalent(massacre_talent) spell(raging_blow)
+ #crushing_blow,if=charges=2|buff.recklessness.up&variable.execute_phase&talent.massacre.enabled
+ if charges(crushing_blow) == 2 or buffpresent(recklessness) and execute_phase() and hastalent(massacre_talent) spell(crushing_blow)
  #bloodthirst
  spell(bloodthirst)
  #bloodbath
@@ -574,18 +574,24 @@ AddFunction furysingle_targetshortcdactions
 {
  unless equippedruneforge(will_of_the_berserker_runeforge) and buffremaining(will_of_the_berserker_buff) < gcd() and spell(raging_blow) or equippedruneforge(will_of_the_berserker_runeforge) and buffremaining(will_of_the_berserker_buff) < gcd() and spell(crushing_blow)
  {
-  #siegebreaker,if=spell_targets.whirlwind>1|raid_event.adds.in>15
-  if enemies(tagged=1) > 1 or 600 > 15 spell(siegebreaker)
+  #cancel_buff,name=bladestorm,if=spell_targets.whirlwind=1&gcd.remains=0&(talent.massacre.enabled|covenant.venthyr.enabled)&variable.execute_phase&(rage>90|!cooldown.condemn.remains)
+  if enemies(tagged=1) == 1 and not gcdremaining() > 0 and { hastalent(massacre_talent) or iscovenant("venthyr") } and execute_phase() and { rage() > 90 or not spellcooldown(condemn_fury) > 0 } and buffpresent(bladestorm) texture(bladestorm text=cancel)
 
-  unless { buffpresent(recklessness) or enrageremaining() < gcd() or rage() > 90 or buffremaining(frenzy_warrior_buff) < 1.5 } and spell(rampage) or spell(condemn_fury) or spell(execute_fury)
+  unless { isenraged() or buffpresent(recklessness) and runeforge(sinful_surge_runeforge) } and execute_phase() and spell(condemn_fury)
   {
-   #bladestorm,if=buff.enrage.up&(spell_targets.whirlwind>1|raid_event.adds.in>45)
-   if isenraged() and { enemies(tagged=1) > 1 or 600 > 45 } spell(bladestorm)
+   #siegebreaker,if=spell_targets.whirlwind>1|raid_event.adds.in>15
+   if enemies(tagged=1) > 1 or 600 > 15 spell(siegebreaker)
 
-   unless { not isenraged() or conduitrank(vicious_contempt_conduit) > 5 and target.healthpercent() < 35 and not hastalent(cruelty_talent) } and spell(bloodthirst) or { not isenraged() or conduitrank(vicious_contempt_conduit) > 5 and target.healthpercent() < 35 and not hastalent(cruelty_talent) } and spell(bloodbath)
+   unless { buffpresent(recklessness) or enrageremaining() < gcd() or rage() > 90 or buffremaining(frenzy_warrior_buff) < 1.5 } and spell(rampage) or spell(condemn_fury) or spell(execute_fury)
    {
-    #dragon_roar,if=buff.enrage.up&(spell_targets.whirlwind>1|raid_event.adds.in>15)
-    if isenraged() and { enemies(tagged=1) > 1 or 600 > 15 } spell(dragon_roar)
+    #bladestorm,if=buff.enrage.up&(!buff.recklessness.remains|rage<50)&(spell_targets.whirlwind=1&raid_event.adds.in>45|spell_targets.whirlwind=2)
+    if isenraged() and { not buffpresent(recklessness) or rage() < 50 } and { enemies(tagged=1) == 1 and 600 > 45 or enemies(tagged=1) == 2 } spell(bladestorm)
+
+    unless { not isenraged() or conduitrank(vicious_contempt_conduit) > 5 and target.healthpercent() < 35 } and spell(bloodthirst) or { not isenraged() or conduitrank(vicious_contempt_conduit) > 5 and target.healthpercent() < 35 and not hastalent(cruelty_talent) } and spell(bloodbath)
+    {
+     #dragon_roar,if=buff.enrage.up&(spell_targets.whirlwind>1|raid_event.adds.in>15)
+     if isenraged() and { enemies(tagged=1) > 1 or 600 > 15 } spell(dragon_roar)
+    }
    }
   }
  }
@@ -593,7 +599,7 @@ AddFunction furysingle_targetshortcdactions
 
 AddFunction furysingle_targetshortcdpostconditions
 {
- equippedruneforge(will_of_the_berserker_runeforge) and buffremaining(will_of_the_berserker_buff) < gcd() and spell(raging_blow) or equippedruneforge(will_of_the_berserker_runeforge) and buffremaining(will_of_the_berserker_buff) < gcd() and spell(crushing_blow) or { buffpresent(recklessness) or enrageremaining() < gcd() or rage() > 90 or buffremaining(frenzy_warrior_buff) < 1.5 } and spell(rampage) or spell(condemn_fury) or spell(execute_fury) or { not isenraged() or conduitrank(vicious_contempt_conduit) > 5 and target.healthpercent() < 35 and not hastalent(cruelty_talent) } and spell(bloodthirst) or { not isenraged() or conduitrank(vicious_contempt_conduit) > 5 and target.healthpercent() < 35 and not hastalent(cruelty_talent) } and spell(bloodbath) or spell(onslaught) or charges(raging_blow) == 2 and spell(raging_blow) or charges(crushing_blow) == 2 and spell(crushing_blow) or spell(bloodthirst) or spell(bloodbath) or spell(raging_blow) or spell(crushing_blow) or spell(whirlwind_fury)
+ equippedruneforge(will_of_the_berserker_runeforge) and buffremaining(will_of_the_berserker_buff) < gcd() and spell(raging_blow) or equippedruneforge(will_of_the_berserker_runeforge) and buffremaining(will_of_the_berserker_buff) < gcd() and spell(crushing_blow) or { isenraged() or buffpresent(recklessness) and runeforge(sinful_surge_runeforge) } and execute_phase() and spell(condemn_fury) or { buffpresent(recklessness) or enrageremaining() < gcd() or rage() > 90 or buffremaining(frenzy_warrior_buff) < 1.5 } and spell(rampage) or spell(condemn_fury) or spell(execute_fury) or { not isenraged() or conduitrank(vicious_contempt_conduit) > 5 and target.healthpercent() < 35 } and spell(bloodthirst) or { not isenraged() or conduitrank(vicious_contempt_conduit) > 5 and target.healthpercent() < 35 and not hastalent(cruelty_talent) } and spell(bloodbath) or spell(onslaught) or buffpresent(merciless_bonegrinder_buff) and enemies(tagged=1) > 3 and spell(whirlwind_fury) or { charges(raging_blow) == 2 or buffpresent(recklessness) and execute_phase() and hastalent(massacre_talent) } and spell(raging_blow) or { charges(crushing_blow) == 2 or buffpresent(recklessness) and execute_phase() and hastalent(massacre_talent) } and spell(crushing_blow) or spell(bloodthirst) or spell(bloodbath) or spell(raging_blow) or spell(crushing_blow) or spell(whirlwind_fury)
 }
 
 AddFunction furysingle_targetcdactions
@@ -602,7 +608,7 @@ AddFunction furysingle_targetcdactions
 
 AddFunction furysingle_targetcdpostconditions
 {
- equippedruneforge(will_of_the_berserker_runeforge) and buffremaining(will_of_the_berserker_buff) < gcd() and spell(raging_blow) or equippedruneforge(will_of_the_berserker_runeforge) and buffremaining(will_of_the_berserker_buff) < gcd() and spell(crushing_blow) or { enemies(tagged=1) > 1 or 600 > 15 } and spell(siegebreaker) or { buffpresent(recklessness) or enrageremaining() < gcd() or rage() > 90 or buffremaining(frenzy_warrior_buff) < 1.5 } and spell(rampage) or spell(condemn_fury) or spell(execute_fury) or isenraged() and { enemies(tagged=1) > 1 or 600 > 45 } and spell(bladestorm) or { not isenraged() or conduitrank(vicious_contempt_conduit) > 5 and target.healthpercent() < 35 and not hastalent(cruelty_talent) } and spell(bloodthirst) or { not isenraged() or conduitrank(vicious_contempt_conduit) > 5 and target.healthpercent() < 35 and not hastalent(cruelty_talent) } and spell(bloodbath) or isenraged() and { enemies(tagged=1) > 1 or 600 > 15 } and spell(dragon_roar) or spell(onslaught) or charges(raging_blow) == 2 and spell(raging_blow) or charges(crushing_blow) == 2 and spell(crushing_blow) or spell(bloodthirst) or spell(bloodbath) or spell(raging_blow) or spell(crushing_blow) or spell(whirlwind_fury)
+ equippedruneforge(will_of_the_berserker_runeforge) and buffremaining(will_of_the_berserker_buff) < gcd() and spell(raging_blow) or equippedruneforge(will_of_the_berserker_runeforge) and buffremaining(will_of_the_berserker_buff) < gcd() and spell(crushing_blow) or enemies(tagged=1) == 1 and not gcdremaining() > 0 and { hastalent(massacre_talent) or iscovenant("venthyr") } and execute_phase() and { rage() > 90 or not spellcooldown(condemn_fury) > 0 } and buffpresent(bladestorm) and texture(bladestorm text=cancel) or { isenraged() or buffpresent(recklessness) and runeforge(sinful_surge_runeforge) } and execute_phase() and spell(condemn_fury) or { enemies(tagged=1) > 1 or 600 > 15 } and spell(siegebreaker) or { buffpresent(recklessness) or enrageremaining() < gcd() or rage() > 90 or buffremaining(frenzy_warrior_buff) < 1.5 } and spell(rampage) or spell(condemn_fury) or spell(execute_fury) or isenraged() and { not buffpresent(recklessness) or rage() < 50 } and { enemies(tagged=1) == 1 and 600 > 45 or enemies(tagged=1) == 2 } and spell(bladestorm) or { not isenraged() or conduitrank(vicious_contempt_conduit) > 5 and target.healthpercent() < 35 } and spell(bloodthirst) or { not isenraged() or conduitrank(vicious_contempt_conduit) > 5 and target.healthpercent() < 35 and not hastalent(cruelty_talent) } and spell(bloodbath) or isenraged() and { enemies(tagged=1) > 1 or 600 > 15 } and spell(dragon_roar) or spell(onslaught) or buffpresent(merciless_bonegrinder_buff) and enemies(tagged=1) > 3 and spell(whirlwind_fury) or { charges(raging_blow) == 2 or buffpresent(recklessness) and execute_phase() and hastalent(massacre_talent) } and spell(raging_blow) or { charges(crushing_blow) == 2 or buffpresent(recklessness) and execute_phase() and hastalent(massacre_talent) } and spell(crushing_blow) or spell(bloodthirst) or spell(bloodbath) or spell(raging_blow) or spell(crushing_blow) or spell(whirlwind_fury)
 }
 
 ### actions.precombat
@@ -617,6 +623,12 @@ AddFunction furyprecombatmainpostconditions
 
 AddFunction furyprecombatshortcdactions
 {
+ #flask
+ #food
+ #augmentation
+ #snapshot_stats
+ #recklessness,if=!runeforge.signet_of_tormented_kings.equipped
+ if not equippedruneforge(signet_of_tormented_kings_runeforge) spell(recklessness)
 }
 
 AddFunction furyprecombatshortcdpostconditions
@@ -629,6 +641,7 @@ AddFunction furyprecombatcdactions
 
 AddFunction furyprecombatcdpostconditions
 {
+ not equippedruneforge(signet_of_tormented_kings_runeforge) and spell(recklessness)
 }
 
 ### actions.movement
@@ -660,12 +673,62 @@ AddFunction furymovementcdpostconditions
  checkboxon(opt_melee_range) and target.distance() >= 8 and target.distance() <= 40 and spell(heroic_leap)
 }
 
+### actions.aoe
+
+AddFunction furyaoemainactions
+{
+ #condemn,if=spell_targets.whirlwind>1&(buff.enrage.up|buff.recklessness.up&runeforge.sinful_surge)&variable.execute_phase
+ if enemies(tagged=1) > 1 and { isenraged() or buffpresent(recklessness) and runeforge(sinful_surge_runeforge) } and execute_phase() spell(condemn_fury)
+ #rampage,if=spell_targets.whirlwind>1
+ if enemies(tagged=1) > 1 spell(rampage)
+}
+
+AddFunction furyaoemainpostconditions
+{
+}
+
+AddFunction furyaoeshortcdactions
+{
+ #cancel_buff,name=bladestorm,if=spell_targets.whirlwind>1&gcd.remains=0&soulbind.first_strike&buff.first_strike.remains&buff.enrage.remains<gcd
+ if enemies(tagged=1) > 1 and not gcdremaining() > 0 and soulbind(first_strike_soulbind) and buffpresent(first_strike_buff) and enrageremaining() < gcd() and buffpresent(bladestorm) texture(bladestorm text=cancel)
+ #bladestorm,if=buff.enrage.up&spell_targets.whirlwind>2
+ if isenraged() and enemies(tagged=1) > 2 spell(bladestorm)
+
+ unless enemies(tagged=1) > 1 and { isenraged() or buffpresent(recklessness) and runeforge(sinful_surge_runeforge) } and execute_phase() and spell(condemn_fury)
+ {
+  #siegebreaker,if=spell_targets.whirlwind>1
+  if enemies(tagged=1) > 1 spell(siegebreaker)
+
+  unless enemies(tagged=1) > 1 and spell(rampage)
+  {
+   #bladestorm,if=buff.enrage.remains>gcd*2.5&spell_targets.whirlwind>1
+   if enrageremaining() > gcd() * 2.5 and enemies(tagged=1) > 1 spell(bladestorm)
+  }
+ }
+}
+
+AddFunction furyaoeshortcdpostconditions
+{
+ enemies(tagged=1) > 1 and { isenraged() or buffpresent(recklessness) and runeforge(sinful_surge_runeforge) } and execute_phase() and spell(condemn_fury) or enemies(tagged=1) > 1 and spell(rampage)
+}
+
+AddFunction furyaoecdactions
+{
+}
+
+AddFunction furyaoecdpostconditions
+{
+ enemies(tagged=1) > 1 and not gcdremaining() > 0 and soulbind(first_strike_soulbind) and buffpresent(first_strike_buff) and enrageremaining() < gcd() and buffpresent(bladestorm) and texture(bladestorm text=cancel) or isenraged() and enemies(tagged=1) > 2 and spell(bladestorm) or enemies(tagged=1) > 1 and { isenraged() or buffpresent(recklessness) and runeforge(sinful_surge_runeforge) } and execute_phase() and spell(condemn_fury) or enemies(tagged=1) > 1 and spell(siegebreaker) or enemies(tagged=1) > 1 and spell(rampage) or enrageremaining() > gcd() * 2.5 and enemies(tagged=1) > 1 and spell(bladestorm)
+}
+
 ### actions.default
 
 AddFunction fury_defaultmainactions
 {
  #charge
  if checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) spell(charge)
+ #variable,name=execute_phase,value=talent.massacre&target.health.pct<35|target.health.pct<20|target.health.pct>80&covenant.venthyr
+ #variable,name=unique_legendaries,value=runeforge.signet_of_tormented_kings|runeforge.sinful_surge|runeforge.elysian_might
  #run_action_list,name=movement,if=movement.distance>5
  if target.distance() > 5 furymovementmainactions()
 
@@ -675,14 +738,20 @@ AddFunction fury_defaultmainactions
   if spellcooldown(recklessness) < 3 and hastalent(reckless_abandon_talent) spell(rampage)
   #whirlwind,if=spell_targets.whirlwind>1&!buff.meat_cleaver.up|raid_event.adds.in<gcd&!buff.meat_cleaver.up
   if enemies(tagged=1) > 1 and not buffpresent(whirlwind_buff) or 600 < gcd() and not buffpresent(whirlwind_buff) spell(whirlwind_fury)
-  #run_action_list,name=single_target
-  furysingle_targetmainactions()
+  #call_action_list,name=aoe
+  furyaoemainactions()
+
+  unless furyaoemainpostconditions()
+  {
+   #call_action_list,name=single_target
+   furysingle_targetmainactions()
+  }
  }
 }
 
 AddFunction fury_defaultmainpostconditions
 {
- target.distance() > 5 and furymovementmainpostconditions() or furysingle_targetmainpostconditions()
+ target.distance() > 5 and furymovementmainpostconditions() or furyaoemainpostconditions() or furysingle_targetmainpostconditions()
 }
 
 AddFunction fury_defaultshortcdactions
@@ -692,6 +761,8 @@ AddFunction fury_defaultshortcdactions
 
  unless checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) and spell(charge)
  {
+  #variable,name=execute_phase,value=talent.massacre&target.health.pct<35|target.health.pct<20|target.health.pct>80&covenant.venthyr
+  #variable,name=unique_legendaries,value=runeforge.signet_of_tormented_kings|runeforge.sinful_surge|runeforge.elysian_might
   #run_action_list,name=movement,if=movement.distance>5
   if target.distance() > 5 furymovementshortcdactions()
 
@@ -702,15 +773,27 @@ AddFunction fury_defaultshortcdactions
 
    unless spellcooldown(recklessness) < 3 and hastalent(reckless_abandon_talent) and spell(rampage)
    {
-    #recklessness,if=gcd.remains=0&((buff.bloodlust.up|talent.anger_management.enabled|raid_event.adds.in>10)|target.time_to_die>100|(talent.massacre.enabled&target.health.pct<35)|target.health.pct<20|target.time_to_die<15&raid_event.adds.in>10)&(spell_targets.whirlwind=1|buff.meat_cleaver.up)
-    if not gcdremaining() > 0 and { buffpresent(bloodlust) or hastalent(anger_management_talent_fury) or 600 > 10 or target.timetodie() > 100 or hastalent(massacre_talent) and target.healthpercent() < 35 or target.healthpercent() < 20 or target.timetodie() < 15 and 600 > 10 } and { enemies(tagged=1) == 1 or buffpresent(whirlwind_buff) } spell(recklessness)
+    #recklessness,if=runeforge.sinful_surge&gcd.remains=0&(variable.execute_phase|(target.time_to_pct_35>40&talent.anger_management|target.time_to_pct_35>70&!talent.anger_management))&(spell_targets.whirlwind=1|buff.meat_cleaver.up)
+    if runeforge(sinful_surge_runeforge) and not gcdremaining() > 0 and { execute_phase() or target.timetohealthpercent(35) > 40 and hastalent(anger_management_talent_fury) or target.timetohealthpercent(35) > 70 and not hastalent(anger_management_talent_fury) } and { enemies(tagged=1) == 1 or buffpresent(whirlwind_buff) } spell(recklessness)
+    #recklessness,if=runeforge.elysian_might&gcd.remains=0&(cooldown.spear_of_bastion.remains<5|cooldown.spear_of_bastion.remains>20)&((buff.bloodlust.up|talent.anger_management.enabled|raid_event.adds.in>10)|target.time_to_die>100|variable.execute_phase|target.time_to_die<15&raid_event.adds.in>10)&(spell_targets.whirlwind=1|buff.meat_cleaver.up)
+    if runeforge(elysian_might_runeforge) and not gcdremaining() > 0 and { spellcooldown(spear_of_bastion) < 5 or spellcooldown(spear_of_bastion) > 20 } and { buffpresent(bloodlust) or hastalent(anger_management_talent_fury) or 600 > 10 or target.timetodie() > 100 or execute_phase() or target.timetodie() < 15 and 600 > 10 } and { enemies(tagged=1) == 1 or buffpresent(whirlwind_buff) } spell(recklessness)
+    #recklessness,if=!variable.unique_legendaries&gcd.remains=0&((buff.bloodlust.up|talent.anger_management.enabled|raid_event.adds.in>10)|target.time_to_die>100|variable.execute_phase|target.time_to_die<15&raid_event.adds.in>10)&(spell_targets.whirlwind=1|buff.meat_cleaver.up)
+    if not unique_legendaries() and not gcdremaining() > 0 and { buffpresent(bloodlust) or hastalent(anger_management_talent_fury) or 600 > 10 or target.timetodie() > 100 or execute_phase() or target.timetodie() < 15 and 600 > 10 } and { enemies(tagged=1) == 1 or buffpresent(whirlwind_buff) } spell(recklessness)
+    #recklessness,use_off_gcd=1,if=runeforge.signet_of_tormented_kings.equipped&gcd.remains&prev_gcd.1.rampage&((buff.bloodlust.up|talent.anger_management.enabled|raid_event.adds.in>10)|target.time_to_die>100|variable.execute_phase|target.time_to_die<15&raid_event.adds.in>10)&(spell_targets.whirlwind=1|buff.meat_cleaver.up)
+    if equippedruneforge(signet_of_tormented_kings_runeforge) and gcdremaining() and previousgcdspell(rampage) and { buffpresent(bloodlust) or hastalent(anger_management_talent_fury) or 600 > 10 or target.timetodie() > 100 or execute_phase() or target.timetodie() < 15 and 600 > 10 } and { enemies(tagged=1) == 1 or buffpresent(whirlwind_buff) } spell(recklessness)
 
     unless { enemies(tagged=1) > 1 and not buffpresent(whirlwind_buff) or 600 < gcd() and not buffpresent(whirlwind_buff) } and spell(whirlwind_fury)
     {
      #bag_of_tricks,if=buff.recklessness.down&debuff.siegebreaker.down&buff.enrage.up
      if buffexpires(recklessness) and target.debuffexpires(siegebreaker_debuff) and isenraged() spell(bag_of_tricks)
-     #run_action_list,name=single_target
-     furysingle_targetshortcdactions()
+     #call_action_list,name=aoe
+     furyaoeshortcdactions()
+
+     unless furyaoeshortcdpostconditions()
+     {
+      #call_action_list,name=single_target
+      furysingle_targetshortcdactions()
+     }
     }
    }
   }
@@ -719,27 +802,29 @@ AddFunction fury_defaultshortcdactions
 
 AddFunction fury_defaultshortcdpostconditions
 {
- checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) and spell(charge) or target.distance() > 5 and furymovementshortcdpostconditions() or spellcooldown(recklessness) < 3 and hastalent(reckless_abandon_talent) and spell(rampage) or { enemies(tagged=1) > 1 and not buffpresent(whirlwind_buff) or 600 < gcd() and not buffpresent(whirlwind_buff) } and spell(whirlwind_fury) or furysingle_targetshortcdpostconditions()
+ checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) and spell(charge) or target.distance() > 5 and furymovementshortcdpostconditions() or spellcooldown(recklessness) < 3 and hastalent(reckless_abandon_talent) and spell(rampage) or { enemies(tagged=1) > 1 and not buffpresent(whirlwind_buff) or 600 < gcd() and not buffpresent(whirlwind_buff) } and spell(whirlwind_fury) or furyaoeshortcdpostconditions() or furysingle_targetshortcdpostconditions()
 }
 
 AddFunction fury_defaultcdactions
 {
  unless checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) and spell(charge)
  {
+  #variable,name=execute_phase,value=talent.massacre&target.health.pct<35|target.health.pct<20|target.health.pct>80&covenant.venthyr
+  #variable,name=unique_legendaries,value=runeforge.signet_of_tormented_kings|runeforge.sinful_surge|runeforge.elysian_might
   #run_action_list,name=movement,if=movement.distance>5
   if target.distance() > 5 furymovementcdactions()
 
   unless target.distance() > 5 and furymovementcdpostconditions() or target.distance() > 25 and 600 > 45 and { checkboxon(opt_melee_range) and target.distance() >= 8 and target.distance() <= 40 } and spell(heroic_leap)
   {
+   #sequence,if=active_enemies=1&covenant.venthyr.enabled&runeforge.signet_of_tormented_kings.equipped,name=BT&Reck:bloodthirst:recklessness
+   #sequence,if=active_enemies=1&!covenant.venthyr.enabled&runeforge.signet_of_tormented_kings.equipped,name=BT&Charge:bloodthirst:heroic_charge
    #potion
-   if checkboxon(opt_use_consumables) and target.classification(worldboss) item(potion_of_phantom_fire_item usable=1)
+   if checkboxon(opt_use_consumables) and target.classification(worldboss) item(potion_of_spectral_strength_item usable=1)
    #pummel,if=target.debuff.casting.react
    if target.isinterruptible() furyinterruptactions()
 
-   unless spellcooldown(recklessness) < 3 and hastalent(reckless_abandon_talent) and spell(rampage) or not gcdremaining() > 0 and { buffpresent(bloodlust) or hastalent(anger_management_talent_fury) or 600 > 10 or target.timetodie() > 100 or hastalent(massacre_talent) and target.healthpercent() < 35 or target.healthpercent() < 20 or target.timetodie() < 15 and 600 > 10 } and { enemies(tagged=1) == 1 or buffpresent(whirlwind_buff) } and spell(recklessness) or { enemies(tagged=1) > 1 and not buffpresent(whirlwind_buff) or 600 < gcd() and not buffpresent(whirlwind_buff) } and spell(whirlwind_fury)
+   unless spellcooldown(recklessness) < 3 and hastalent(reckless_abandon_talent) and spell(rampage) or runeforge(sinful_surge_runeforge) and not gcdremaining() > 0 and { execute_phase() or target.timetohealthpercent(35) > 40 and hastalent(anger_management_talent_fury) or target.timetohealthpercent(35) > 70 and not hastalent(anger_management_talent_fury) } and { enemies(tagged=1) == 1 or buffpresent(whirlwind_buff) } and spell(recklessness) or runeforge(elysian_might_runeforge) and not gcdremaining() > 0 and { spellcooldown(spear_of_bastion) < 5 or spellcooldown(spear_of_bastion) > 20 } and { buffpresent(bloodlust) or hastalent(anger_management_talent_fury) or 600 > 10 or target.timetodie() > 100 or execute_phase() or target.timetodie() < 15 and 600 > 10 } and { enemies(tagged=1) == 1 or buffpresent(whirlwind_buff) } and spell(recklessness) or not unique_legendaries() and not gcdremaining() > 0 and { buffpresent(bloodlust) or hastalent(anger_management_talent_fury) or 600 > 10 or target.timetodie() > 100 or execute_phase() or target.timetodie() < 15 and 600 > 10 } and { enemies(tagged=1) == 1 or buffpresent(whirlwind_buff) } and spell(recklessness) or equippedruneforge(signet_of_tormented_kings_runeforge) and gcdremaining() and previousgcdspell(rampage) and { buffpresent(bloodlust) or hastalent(anger_management_talent_fury) or 600 > 10 or target.timetodie() > 100 or execute_phase() or target.timetodie() < 15 and 600 > 10 } and { enemies(tagged=1) == 1 or buffpresent(whirlwind_buff) } and spell(recklessness) or { enemies(tagged=1) > 1 and not buffpresent(whirlwind_buff) or 600 < gcd() and not buffpresent(whirlwind_buff) } and spell(whirlwind_fury)
    {
-    #use_item,name=dreadfire_vessel
-    furyuseitemactions()
     #blood_fury
     spell(blood_fury_ap)
     #berserking,if=buff.recklessness.up
@@ -753,8 +838,14 @@ AddFunction fury_defaultcdactions
 
     unless buffexpires(recklessness) and target.debuffexpires(siegebreaker_debuff) and isenraged() and spell(bag_of_tricks)
     {
-     #run_action_list,name=single_target
-     furysingle_targetcdactions()
+     #call_action_list,name=aoe
+     furyaoecdactions()
+
+     unless furyaoecdpostconditions()
+     {
+      #call_action_list,name=single_target
+      furysingle_targetcdactions()
+     }
     }
    }
   }
@@ -763,7 +854,7 @@ AddFunction fury_defaultcdactions
 
 AddFunction fury_defaultcdpostconditions
 {
- checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) and spell(charge) or target.distance() > 5 and furymovementcdpostconditions() or target.distance() > 25 and 600 > 45 and { checkboxon(opt_melee_range) and target.distance() >= 8 and target.distance() <= 40 } and spell(heroic_leap) or spellcooldown(recklessness) < 3 and hastalent(reckless_abandon_talent) and spell(rampage) or not gcdremaining() > 0 and { buffpresent(bloodlust) or hastalent(anger_management_talent_fury) or 600 > 10 or target.timetodie() > 100 or hastalent(massacre_talent) and target.healthpercent() < 35 or target.healthpercent() < 20 or target.timetodie() < 15 and 600 > 10 } and { enemies(tagged=1) == 1 or buffpresent(whirlwind_buff) } and spell(recklessness) or { enemies(tagged=1) > 1 and not buffpresent(whirlwind_buff) or 600 < gcd() and not buffpresent(whirlwind_buff) } and spell(whirlwind_fury) or buffexpires(recklessness) and target.debuffexpires(siegebreaker_debuff) and isenraged() and spell(bag_of_tricks) or furysingle_targetcdpostconditions()
+ checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) and spell(charge) or target.distance() > 5 and furymovementcdpostconditions() or target.distance() > 25 and 600 > 45 and { checkboxon(opt_melee_range) and target.distance() >= 8 and target.distance() <= 40 } and spell(heroic_leap) or spellcooldown(recklessness) < 3 and hastalent(reckless_abandon_talent) and spell(rampage) or runeforge(sinful_surge_runeforge) and not gcdremaining() > 0 and { execute_phase() or target.timetohealthpercent(35) > 40 and hastalent(anger_management_talent_fury) or target.timetohealthpercent(35) > 70 and not hastalent(anger_management_talent_fury) } and { enemies(tagged=1) == 1 or buffpresent(whirlwind_buff) } and spell(recklessness) or runeforge(elysian_might_runeforge) and not gcdremaining() > 0 and { spellcooldown(spear_of_bastion) < 5 or spellcooldown(spear_of_bastion) > 20 } and { buffpresent(bloodlust) or hastalent(anger_management_talent_fury) or 600 > 10 or target.timetodie() > 100 or execute_phase() or target.timetodie() < 15 and 600 > 10 } and { enemies(tagged=1) == 1 or buffpresent(whirlwind_buff) } and spell(recklessness) or not unique_legendaries() and not gcdremaining() > 0 and { buffpresent(bloodlust) or hastalent(anger_management_talent_fury) or 600 > 10 or target.timetodie() > 100 or execute_phase() or target.timetodie() < 15 and 600 > 10 } and { enemies(tagged=1) == 1 or buffpresent(whirlwind_buff) } and spell(recklessness) or equippedruneforge(signet_of_tormented_kings_runeforge) and gcdremaining() and previousgcdspell(rampage) and { buffpresent(bloodlust) or hastalent(anger_management_talent_fury) or 600 > 10 or target.timetodie() > 100 or execute_phase() or target.timetodie() < 15 and 600 > 10 } and { enemies(tagged=1) == 1 or buffpresent(whirlwind_buff) } and spell(recklessness) or { enemies(tagged=1) > 1 and not buffpresent(whirlwind_buff) or 600 < gcd() and not buffpresent(whirlwind_buff) } and spell(whirlwind_fury) or buffexpires(recklessness) and target.debuffexpires(siegebreaker_debuff) and isenraged() and spell(bag_of_tricks) or furyaoecdpostconditions() or furysingle_targetcdpostconditions()
 }
 
 ### Fury icons.
@@ -821,15 +912,19 @@ AddIcon enabled=(checkboxon(opt_warrior_fury_aoe) and specialization(fury)) help
 # cruelty_talent
 # crushing_blow
 # dragon_roar
+# elysian_might_runeforge
 # execute_fury
 # fireblood
+# first_strike_buff
+# first_strike_soulbind
 # frenzy_warrior_buff
 # heroic_leap
 # intimidating_shout
 # lights_judgment
 # massacre_talent
+# merciless_bonegrinder_buff
 # onslaught
-# potion_of_phantom_fire_item
+# potion_of_spectral_strength_item
 # pummel
 # quaking_palm
 # raging_blow
@@ -839,6 +934,9 @@ AddIcon enabled=(checkboxon(opt_warrior_fury_aoe) and specialization(fury)) help
 # shockwave
 # siegebreaker
 # siegebreaker_debuff
+# signet_of_tormented_kings_runeforge
+# sinful_surge_runeforge
+# spear_of_bastion
 # storm_bolt
 # vicious_contempt_conduit
 # war_stomp
@@ -851,13 +949,13 @@ AddIcon enabled=(checkboxon(opt_warrior_fury_aoe) and specialization(fury)) help
     }
 
     {
-        const name = "sc_t26_warrior_protection";
-        const desc = "[9.0] Simulationcraft: T26_Warrior_Protection";
+        const name = "sc_t27_warrior_protection";
+        const desc = "[9.1] Simulationcraft: T27_Warrior_Protection";
         const code = `
-# Based on SimulationCraft profile "T26_Warrior_Protection".
+# Based on SimulationCraft profile "T27_Warrior_Protection".
 #	class=warrior
 #	spec=protection
-#	talents=3020011
+#	talents=3120011
 
 Include(ovale_common)
 Include(ovale_warrior_spells)
@@ -881,8 +979,8 @@ AddFunction protectioninterruptactions
 
 AddFunction protectionuseitemactions
 {
- item(trinket0slot text=13 usable=1)
- item(trinket1slot text=14 usable=1)
+ item("trinket0Slot" text=13 usable=1)
+ item("trinket1Slot" text=14 usable=1)
 }
 
 AddFunction protectiongetinmeleerange
@@ -893,64 +991,6 @@ AddFunction protectiongetinmeleerange
   if spellcharges(intercept) == 0 and target.distance() >= 8 and target.distance() <= 40 spell(heroic_leap)
   texture(misc_arrowlup help=(l(not_in_melee_range)))
  }
-}
-
-### actions.st
-
-AddFunction protectionstmainactions
-{
- #thunder_clap,if=spell_targets.thunder_clap=2&talent.unstoppable_force.enabled&buff.avatar.up
- if enemies(tagged=1) == 2 and hastalent(unstoppable_force_talent) and buffpresent(avatar) spell(thunder_clap)
- #shield_block,if=cooldown.shield_slam.ready&buff.shield_block.down
- if spellcooldown(shield_slam) <= 0 and buffexpires(shield_block_buff) spell(shield_block)
- #shield_slam,if=buff.shield_block.up
- if buffpresent(shield_block_buff) spell(shield_slam)
- #thunder_clap,if=(talent.unstoppable_force.enabled&buff.avatar.up)
- if hastalent(unstoppable_force_talent) and buffpresent(avatar) spell(thunder_clap)
- #shield_slam
- spell(shield_slam)
- #execute
- spell(execute)
- #revenge,if=rage>=70
- if rage() >= 70 spell(revenge)
- #thunder_clap
- spell(thunder_clap)
- #revenge
- spell(revenge)
- #devastate
- spell(devastate)
-}
-
-AddFunction protectionstmainpostconditions
-{
-}
-
-AddFunction protectionstshortcdactions
-{
- #ravager
- spell(ravager_protection)
- #dragon_roar
- spell(dragon_roar)
-
- unless enemies(tagged=1) == 2 and hastalent(unstoppable_force_talent) and buffpresent(avatar) and spell(thunder_clap) or spellcooldown(shield_slam) <= 0 and buffexpires(shield_block_buff) and spell(shield_block) or buffpresent(shield_block_buff) and spell(shield_slam) or hastalent(unstoppable_force_talent) and buffpresent(avatar) and spell(thunder_clap)
- {
-  #demoralizing_shout,if=talent.booming_voice.enabled
-  if hastalent(booming_voice_talent) spell(demoralizing_shout)
- }
-}
-
-AddFunction protectionstshortcdpostconditions
-{
- enemies(tagged=1) == 2 and hastalent(unstoppable_force_talent) and buffpresent(avatar) and spell(thunder_clap) or spellcooldown(shield_slam) <= 0 and buffexpires(shield_block_buff) and spell(shield_block) or buffpresent(shield_block_buff) and spell(shield_slam) or hastalent(unstoppable_force_talent) and buffpresent(avatar) and spell(thunder_clap) or spell(shield_slam) or spell(execute) or rage() >= 70 and spell(revenge) or spell(thunder_clap) or spell(revenge) or spell(devastate)
-}
-
-AddFunction protectionstcdactions
-{
-}
-
-AddFunction protectionstcdpostconditions
-{
- spell(ravager_protection) or spell(dragon_roar) or enemies(tagged=1) == 2 and hastalent(unstoppable_force_talent) and buffpresent(avatar) and spell(thunder_clap) or spellcooldown(shield_slam) <= 0 and buffexpires(shield_block_buff) and spell(shield_block) or buffpresent(shield_block_buff) and spell(shield_slam) or hastalent(unstoppable_force_talent) and buffpresent(avatar) and spell(thunder_clap) or hastalent(booming_voice_talent) and spell(demoralizing_shout) or spell(shield_slam) or spell(execute) or rage() >= 70 and spell(revenge) or spell(thunder_clap) or spell(revenge) or spell(devastate)
 }
 
 ### actions.precombat
@@ -979,6 +1019,54 @@ AddFunction protectionprecombatcdpostconditions
 {
 }
 
+### actions.generic
+
+AddFunction protectiongenericmainactions
+{
+ #shield_slam,if=buff.shield_block.up
+ if buffpresent(shield_block_buff) spell(shield_slam)
+ #thunder_clap,if=(spell_targets.thunder_clap>1|cooldown.shield_slam.remains)&talent.unstoppable_force.enabled&buff.avatar.up
+ if { enemies(tagged=1) > 1 or spellcooldown(shield_slam) > 0 } and hastalent(unstoppable_force_talent) and buffpresent(avatar) spell(thunder_clap)
+ #shield_slam
+ spell(shield_slam)
+ #execute
+ spell(execute)
+ #revenge,if=rage>80&target.health.pct>20|buff.revenge.up
+ if rage() > 80 and target.healthpercent() > 20 or buffpresent(revenge) spell(revenge)
+ #thunder_clap
+ spell(thunder_clap)
+ #revenge
+ spell(revenge)
+ #devastate
+ spell(devastate)
+}
+
+AddFunction protectiongenericmainpostconditions
+{
+}
+
+AddFunction protectiongenericshortcdactions
+{
+ #ravager
+ spell(ravager_protection)
+ #dragon_roar
+ spell(dragon_roar)
+}
+
+AddFunction protectiongenericshortcdpostconditions
+{
+ buffpresent(shield_block_buff) and spell(shield_slam) or { enemies(tagged=1) > 1 or spellcooldown(shield_slam) > 0 } and hastalent(unstoppable_force_talent) and buffpresent(avatar) and spell(thunder_clap) or spell(shield_slam) or spell(execute) or { rage() > 80 and target.healthpercent() > 20 or buffpresent(revenge) } and spell(revenge) or spell(thunder_clap) or spell(revenge) or spell(devastate)
+}
+
+AddFunction protectiongenericcdactions
+{
+}
+
+AddFunction protectiongenericcdpostconditions
+{
+ spell(ravager_protection) or spell(dragon_roar) or buffpresent(shield_block_buff) and spell(shield_slam) or { enemies(tagged=1) > 1 or spellcooldown(shield_slam) > 0 } and hastalent(unstoppable_force_talent) and buffpresent(avatar) and spell(thunder_clap) or spell(shield_slam) or spell(execute) or { rage() > 80 and target.healthpercent() > 20 or buffpresent(revenge) } and spell(revenge) or spell(thunder_clap) or spell(revenge) or spell(devastate)
+}
+
 ### actions.aoe
 
 AddFunction protectionaoemainactions
@@ -987,8 +1075,6 @@ AddFunction protectionaoemainactions
  spell(thunder_clap)
  #revenge
  spell(revenge)
- #shield_block,if=cooldown.shield_slam.ready&buff.shield_block.down
- if spellcooldown(shield_slam) <= 0 and buffexpires(shield_block_buff) spell(shield_block)
  #shield_slam
  spell(shield_slam)
 }
@@ -1003,17 +1089,11 @@ AddFunction protectionaoeshortcdactions
  spell(ravager_protection)
  #dragon_roar
  spell(dragon_roar)
-
- unless spell(thunder_clap)
- {
-  #demoralizing_shout,if=talent.booming_voice.enabled
-  if hastalent(booming_voice_talent) spell(demoralizing_shout)
- }
 }
 
 AddFunction protectionaoeshortcdpostconditions
 {
- spell(thunder_clap) or spell(revenge) or spellcooldown(shield_slam) <= 0 and buffexpires(shield_block_buff) and spell(shield_block) or spell(shield_slam)
+ spell(thunder_clap) or spell(revenge) or spell(shield_slam)
 }
 
 AddFunction protectionaoecdactions
@@ -1022,7 +1102,7 @@ AddFunction protectionaoecdactions
 
 AddFunction protectionaoecdpostconditions
 {
- spell(ravager_protection) or spell(dragon_roar) or spell(thunder_clap) or hastalent(booming_voice_talent) and spell(demoralizing_shout) or spell(revenge) or spellcooldown(shield_slam) <= 0 and buffexpires(shield_block_buff) and spell(shield_block) or spell(shield_slam)
+ spell(ravager_protection) or spell(dragon_roar) or spell(thunder_clap) or spell(revenge) or spell(shield_slam)
 }
 
 ### actions.default
@@ -1031,21 +1111,25 @@ AddFunction protection_defaultmainactions
 {
  #charge,if=time=0
  if timeincombat() == 0 and { checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) } spell(charge)
- #ignore_pain,if=buff.ignore_pain.down
- if buffexpires(ignore_pain) spell(ignore_pain)
+ #ignore_pain,if=target.health.pct>20&!covenant.venthyr,line_cd=15
+ if target.healthpercent() > 20 and not iscovenant("venthyr") and timesincepreviousspell(ignore_pain) > 15 spell(ignore_pain)
+ #ignore_pain,if=target.health.pct>20&target.health.pct<80&covenant.venthyr,line_cd=15
+ if target.healthpercent() > 20 and target.healthpercent() < 80 and iscovenant("venthyr") and timesincepreviousspell(ignore_pain) > 15 spell(ignore_pain)
+ #shield_block,if=buff.shield_block.down
+ if buffexpires(shield_block_buff) spell(shield_block)
  #run_action_list,name=aoe,if=spell_targets.thunder_clap>=3
  if enemies(tagged=1) >= 3 protectionaoemainactions()
 
  unless enemies(tagged=1) >= 3 and protectionaoemainpostconditions()
  {
-  #call_action_list,name=st
-  protectionstmainactions()
+  #call_action_list,name=generic
+  protectiongenericmainactions()
  }
 }
 
 AddFunction protection_defaultmainpostconditions
 {
- enemies(tagged=1) >= 3 and protectionaoemainpostconditions() or protectionstmainpostconditions()
+ enemies(tagged=1) >= 3 and protectionaoemainpostconditions() or protectiongenericmainpostconditions()
 }
 
 AddFunction protection_defaultshortcdactions
@@ -1055,24 +1139,32 @@ AddFunction protection_defaultshortcdactions
 
  unless timeincombat() == 0 and { checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) } and spell(charge)
  {
+  #heroic_charge
+  spell(heroic_leap text=charge)
   #bag_of_tricks
   spell(bag_of_tricks)
 
-  unless buffexpires(ignore_pain) and spell(ignore_pain)
+  unless target.healthpercent() > 20 and not iscovenant("venthyr") and timesincepreviousspell(ignore_pain) > 15 and spell(ignore_pain) or target.healthpercent() > 20 and target.healthpercent() < 80 and iscovenant("venthyr") and timesincepreviousspell(ignore_pain) > 15 and spell(ignore_pain)
   {
+   #demoralizing_shout,if=talent.booming_voice.enabled
+   if hastalent(booming_voice_talent) spell(demoralizing_shout)
+   #avatar
+   spell(avatar)
    #ancient_aftershock
    spell(ancient_aftershock)
    #spear_of_bastion
    spell(spear_of_bastion)
-   #avatar
-   spell(avatar)
-   #run_action_list,name=aoe,if=spell_targets.thunder_clap>=3
-   if enemies(tagged=1) >= 3 protectionaoeshortcdactions()
 
-   unless enemies(tagged=1) >= 3 and protectionaoeshortcdpostconditions()
+   unless buffexpires(shield_block_buff) and spell(shield_block)
    {
-    #call_action_list,name=st
-    protectionstshortcdactions()
+    #run_action_list,name=aoe,if=spell_targets.thunder_clap>=3
+    if enemies(tagged=1) >= 3 protectionaoeshortcdactions()
+
+    unless enemies(tagged=1) >= 3 and protectionaoeshortcdpostconditions()
+    {
+     #call_action_list,name=generic
+     protectiongenericshortcdactions()
+    }
    }
   }
  }
@@ -1080,14 +1172,14 @@ AddFunction protection_defaultshortcdactions
 
 AddFunction protection_defaultshortcdpostconditions
 {
- timeincombat() == 0 and { checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) } and spell(charge) or buffexpires(ignore_pain) and spell(ignore_pain) or enemies(tagged=1) >= 3 and protectionaoeshortcdpostconditions() or protectionstshortcdpostconditions()
+ timeincombat() == 0 and { checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) } and spell(charge) or target.healthpercent() > 20 and not iscovenant("venthyr") and timesincepreviousspell(ignore_pain) > 15 and spell(ignore_pain) or target.healthpercent() > 20 and target.healthpercent() < 80 and iscovenant("venthyr") and timesincepreviousspell(ignore_pain) > 15 and spell(ignore_pain) or buffexpires(shield_block_buff) and spell(shield_block) or enemies(tagged=1) >= 3 and protectionaoeshortcdpostconditions() or protectiongenericshortcdpostconditions()
 }
 
 AddFunction protection_defaultcdactions
 {
  protectioninterruptactions()
 
- unless timeincombat() == 0 and { checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) } and spell(charge)
+ unless timeincombat() == 0 and { checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) } and spell(charge) or spell(heroic_leap text=charge)
  {
   #use_items,if=cooldown.avatar.remains<=gcd|buff.avatar.up
   if spellcooldown(avatar) <= gcd() or buffpresent(avatar) protectionuseitemactions()
@@ -1109,20 +1201,26 @@ AddFunction protection_defaultcdactions
    #potion,if=buff.avatar.up|target.time_to_die<25
    if { buffpresent(avatar) or target.timetodie() < 25 } and { checkboxon(opt_use_consumables) and target.classification(worldboss) } item(potion_of_phantom_fire_item usable=1)
 
-   unless buffexpires(ignore_pain) and spell(ignore_pain) or spell(ancient_aftershock) or spell(spear_of_bastion)
+   unless target.healthpercent() > 20 and not iscovenant("venthyr") and timesincepreviousspell(ignore_pain) > 15 and spell(ignore_pain) or target.healthpercent() > 20 and target.healthpercent() < 80 and iscovenant("venthyr") and timesincepreviousspell(ignore_pain) > 15 and spell(ignore_pain)
    {
     #conquerors_banner
     spell(conquerors_banner)
 
-    unless spell(avatar)
+    unless hastalent(booming_voice_talent) and spell(demoralizing_shout) or spell(avatar) or spell(ancient_aftershock) or spell(spear_of_bastion)
     {
-     #run_action_list,name=aoe,if=spell_targets.thunder_clap>=3
-     if enemies(tagged=1) >= 3 protectionaoecdactions()
+     #conquerors_banner
+     spell(conquerors_banner)
 
-     unless enemies(tagged=1) >= 3 and protectionaoecdpostconditions()
+     unless buffexpires(shield_block_buff) and spell(shield_block)
      {
-      #call_action_list,name=st
-      protectionstcdactions()
+      #run_action_list,name=aoe,if=spell_targets.thunder_clap>=3
+      if enemies(tagged=1) >= 3 protectionaoecdactions()
+
+      unless enemies(tagged=1) >= 3 and protectionaoecdpostconditions()
+      {
+       #call_action_list,name=generic
+       protectiongenericcdactions()
+      }
      }
     }
    }
@@ -1132,7 +1230,7 @@ AddFunction protection_defaultcdactions
 
 AddFunction protection_defaultcdpostconditions
 {
- timeincombat() == 0 and { checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) } and spell(charge) or spell(bag_of_tricks) or buffexpires(ignore_pain) and spell(ignore_pain) or spell(ancient_aftershock) or spell(spear_of_bastion) or spell(avatar) or enemies(tagged=1) >= 3 and protectionaoecdpostconditions() or protectionstcdpostconditions()
+ timeincombat() == 0 and { checkboxon(opt_melee_range) and target.inrange(charge) and not target.inrange(pummel) } and spell(charge) or spell(heroic_leap text=charge) or spell(bag_of_tricks) or target.healthpercent() > 20 and not iscovenant("venthyr") and timesincepreviousspell(ignore_pain) > 15 and spell(ignore_pain) or target.healthpercent() > 20 and target.healthpercent() < 80 and iscovenant("venthyr") and timesincepreviousspell(ignore_pain) > 15 and spell(ignore_pain) or hastalent(booming_voice_talent) and spell(demoralizing_shout) or spell(avatar) or spell(ancient_aftershock) or spell(spear_of_bastion) or buffexpires(shield_block_buff) and spell(shield_block) or enemies(tagged=1) >= 3 and protectionaoecdpostconditions() or protectiongenericcdpostconditions()
 }
 
 ### Protection icons.

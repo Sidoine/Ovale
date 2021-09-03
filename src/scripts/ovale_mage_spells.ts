@@ -8,7 +8,7 @@ export function registerMageSpells(scripts: OvaleScriptsClass) {
 # Invoke the spirits of your ancestors, granting you a random secondary stat for 15 seconds.
   SpellInfo(ancestral_call cd=120 duration=15 gcd=0 offgcd=1)
 Define(arcane_barrage 44425)
-# Launches bolts of arcane energy at the enemy target, causing (72.8 of Spell Power) Arcane damage. rnrnFor each Arcane Charge, deals 36032s2 additional damage?a321526[, grants you 321526s1 of your maximum mana,][]?a231564[ and hits 36032s3 additional nearby Ltarget:targets; for s2 of its damage][].rnrn|cFFFFFFFFConsumes all Arcane Charges.|r
+# Launches bolts of arcane energy at the enemy target, causing (72.8 of Spell Power) Arcane damage. rnrnFor each Arcane Charge, deals 36032s2 additional damage?a321526[, grants you 321526s1/100.1 of your maximum mana,][]?a231564[ and hits 36032s3 additional nearby Ltarget:targets; for s2 of its damage][].rnrn|cFFFFFFFFConsumes all Arcane Charges.|r
   SpellInfo(arcane_barrage cd=3)
 Define(arcane_blast 30451)
 # Blasts the target with energy, dealing (45.7 of Spell Power) Arcane damage.rnrnEach Arcane Charge increases damage by 36032s1 and mana cost by 36032s5, and reduces cast time by 36032s4.rnrn|cFFFFFFFFGenerates 1 Arcane Charge.|r
@@ -25,6 +25,9 @@ Define(arcane_familiar 205022)
 Define(arcane_familiar_buff 210126)
 # Summon a Familiar that attacks your enemies and increases your maximum mana by 210126s1 for 3600 seconds.
   SpellInfo(arcane_familiar_buff duration=3600 gcd=0 offgcd=1)
+Define(arcane_harmony_buff 332777)
+# Each time Arcane Missiles hits an enemy, the damage of your next Arcane Barrage is increased by 332777s1. ?a134735[This effect stacks up to s2 times.][This effect stacks up to 332777u times.]
+  SpellInfo(arcane_harmony_buff max_stacks=18 gcd=0 offgcd=1)
 Define(arcane_intellect 1459)
 # Infuses the target with brilliance, increasing their Intellect by s1 for 3600 seconds.  rnrnIf target is in your party or raid, all party and raid members will be affected.
   SpellInfo(arcane_intellect duration=3600)
@@ -69,13 +72,16 @@ Define(blood_fury_int 33702)
   SpellInfo(blood_fury_int cd=120 duration=15 gcd=0 offgcd=1)
   # Intellect increased by w1.
   SpellAddBuff(blood_fury_int blood_fury_int add=1)
+Define(bloodlust 2825)
+# Increases haste by (25 of Spell Power) for all party and raid members for 40 seconds.rnrnAllies receiving this effect will become Sated and unable to benefit from Bloodlust or Time Warp again for 600 seconds.
+  SpellInfo(bloodlust cd=300 duration=40 gcd=0 offgcd=1)
+  # Haste increased by w1.
+  SpellAddBuff(bloodlust bloodlust add=1)
 Define(brain_freeze_buff 190446)
 # Frostbolt has a m1 chance to empower your next Flurry to be instant cast?a231584[,][ and] deal 190446s2 increased damage?a231584[, and apply Winter's Chill to the target. rnrnWinter's Chill causes the target to take damage from your spells as if it were frozen][].
   SpellInfo(brain_freeze_buff duration=15 max_stacks=1 gcd=0 offgcd=1)
   # Your next Flurry is instant cast?a231584[,][ and] deals s2 increased damage?a231584[, and will apply Winter's Chill on the target][].
   SpellAddBuff(brain_freeze_buff brain_freeze_buff add=1)
-Define(clearcasting_channel_buff 277726)
-  SpellInfo(clearcasting_channel_buff duration=18 gcd=0 offgcd=1)
 Define(clearcasting_mage_buff 263725)
 # For each c*100/s1 mana you spend, you have a 1 chance to gain Clearcasting, making your next Arcane Missiles or Arcane Explosion free and channel 277726s1 faster.?a321758[rnrnArcane Missiles fires 321758s2 additional missile.][]
   SpellInfo(clearcasting_mage_buff duration=15 max_stacks=1 gcd=0 offgcd=1)
@@ -97,9 +103,9 @@ Define(counterspell 2139)
 # Counters the enemy's spellcast, preventing any spell from that school of magic from being cast for 6 seconds?s12598[ and silencing the target for 55021d][].
   SpellInfo(counterspell cd=24 duration=6 gcd=0 offgcd=1 interrupt=1)
 Define(deathborne 324220)
-# Transform into a powerful skeletal mage for 20 seconds. rnrnWhile in the form of a skeletal mage, your Frostbolt, Fireball, and Arcane Blast hit up to s4 enemies near your target and your spell damage is increased by s2.
-  SpellInfo(deathborne cd=180 duration=20)
-  # Transformed into a powerful skeletal mage, greatly enhancing your Frostbolt, Fireball, and Arcane Blast and increasing your spell damage by s2.
+# Transform into a powerful skeletal mage for 25 seconds. rnrnWhile in the form of a skeletal mage, your Frostbolt, Fireball, and Arcane Blast hit up to s4 enemies near your target and your spell damage is increased by s2.
+  SpellInfo(deathborne cd=180 duration=25)
+  # Transformed into a powerful skeletal mage, greatly enhancing your Frostbolt, Fireball, and Arcane Blast and increasing your spell damage by w2.
   SpellAddBuff(deathborne deathborne add=1)
 Define(disciplinary_command 327371)
 # Casting a Frost, Fire and Arcane spell within 10 seconds of each other increases your Critical Strike damage of all your spells by 327371s1. This effect can only occur once every 327371s2 sec.
@@ -111,9 +117,6 @@ Define(dragons_breath 31661)
   SpellInfo(dragons_breath cd=20 duration=4)
   # Disoriented.
   SpellAddTargetDebuff(dragons_breath dragons_breath add=1)
-Define(dreadfire_vessel 344732)
-# Unleash incendiary flames at your target inflicting s1 Fire damage.
-  SpellInfo(dreadfire_vessel cd=90 gcd=0 offgcd=1)
 Define(ebonbolt 257537)
 # Launch a bolt of ice at the enemy, dealing (200 of Spell Power) Frost damage and granting you Brain Freeze.
   SpellInfo(ebonbolt cd=45)
@@ -145,10 +148,10 @@ Define(fire_blast 319836)
   SpellInfo(fire_blast cd=12)
   SpellRequire(fire_blast replaced_by set=fire_blast_fire enabled=(specialization("fire")))
 Define(fire_blast_fire 108853)
-# Blasts the enemy for (79.2 of Spell Power) Fire damage. rnrn|cFFFFFFFFFire:|r Castable while casting other spells.?a231568[ Always deals a critical strike.][]
+# Blasts the enemy for (91.08000000000001 of Spell Power) Fire damage. rnrn|cFFFFFFFFFire:|r Castable while casting other spells.?a231568[ Always deals a critical strike.][]
   SpellInfo(fire_blast_fire cd=12 gcd=0 offgcd=1)
 Define(fireball 133)
-# Throws a fiery ball that causes (65 of Spell Power) Fire damage.?a157642[rnrnEach time your Fireball fails to critically strike a target, it gains a stacking 157644s1 increased critical strike chance. Effect ends when Fireball critically strikes.][]
+# Throws a fiery ball that causes (78 of Spell Power) Fire damage.?a157642[rnrnEach time your Fireball fails to critically strike a target, it gains a stacking 157644s1 increased critical strike chance. Effect ends when Fireball critically strikes.][]
   SpellInfo(fireball)
 Define(fireblood 265221)
 # Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. ?s195710[This effect shares a 30 sec cooldown with other similar effects.][]
@@ -157,10 +160,17 @@ Define(firestorm_buff 333100)
 # When Hot Streak activates, you have a low chance to cause all Pyroblasts and Flamestrikes to have no cast time and be guaranteed critical strikes for 4 seconds.
   SpellInfo(firestorm_buff duration=4 gcd=0 offgcd=1)
 Define(flamestrike 2120)
-# Calls down a pillar of fire, burning all enemies within the area for (60.84 of Spell Power) Fire damage and reducing their movement speed by s2 for 8 seconds.
+# Calls down a pillar of fire, burning all enemies within the area for (54.75600000000001 of Spell Power) Fire damage and reducing their movement speed by s2 for 8 seconds.
   SpellInfo(flamestrike duration=8)
   # Movement speed slowed by s2.
   SpellAddTargetDebuff(flamestrike flamestrike add=1)
+Define(fleshcraft 324631)
+# Form a shield of flesh and bone over 3 seconds that absorbs damage equal to s1 of your maximum health for 120 seconds.rnrnWhile channeling, your damage taken is reduced by s2.rnrn|cFFFFFFFFPassive:|r Moving near an enemy's corpse consumes their essence to reduce Fleshcraft's cooldown by <cdr> sec.
+  SpellInfo(fleshcraft cd=120 duration=3 channel=3 tick=0.5)
+  # Damage taken reduced by w2.
+  SpellAddBuff(fleshcraft fleshcraft add=1)
+  # Immune to crowd control effects.rnHealing s17 health every t17 sec.
+  SpellAddBuff(fleshcraft ultimate_form_buff add=1)
 Define(flurry 44614)
 # Unleash a flurry of ice, striking the target s1 times for a total of (31.6 of Spell Power)*m1 Frost damage. Each hit reduces the target's movement speed by 228354s1 for 1 second.?a231584[rnrnWhile Brain Freeze is active, Flurry applies Winter's Chill, causing your target to take damage from your spells as if it were frozen.][]
   SpellInfo(flurry)
@@ -174,7 +184,7 @@ Define(freezing_rain_buff 270232)
   SpellInfo(freezing_rain_buff duration=12 gcd=0 offgcd=1)
 Define(freezing_winds_buff 327478)
 # While Frozen Orb is active, you gain Fingers of Frost every 327478t1 sec.
-  SpellInfo(freezing_winds_buff duration=30 gcd=0 offgcd=1 tick=3)
+  SpellInfo(freezing_winds_buff duration=30 gcd=0 offgcd=1 tick=2)
   # Your next Ice Lance deals damage as if the target were frozen.
   SpellAddBuff(freezing_winds_buff fingers_of_frost_buff add=1)
   # Gaining Fingers of Frost every t1 sec.
@@ -201,11 +211,6 @@ Define(glacial_spike 199786)
   SpellRequire(glacial_spike unusable set=1 enabled=(not hastalent(glacial_spike_talent)))
   # Frozen in place.
   SpellAddBuff(glacial_spike glacial_spike add=1)
-Define(gladiators_badge 277185)
-# Increases primary stat by s1 for 15 seconds.rn
-  SpellInfo(gladiators_badge cd=120 duration=15 gcd=0 offgcd=1)
-  # Primary stat increased by s4.
-  SpellAddBuff(gladiators_badge gladiators_badge add=1)
 Define(grisly_icicle_debuff 348007)
 # Your spells no longer break Frost Nova, and enemies damaged by Frost Nova take 348007s1 increased damage from your Fire and Arcane spells for 8 seconds. 
   SpellInfo(grisly_icicle_debuff duration=8 gcd=0 offgcd=1)
@@ -236,6 +241,11 @@ Define(ice_nova 157997)
   SpellRequire(ice_nova unusable set=1 enabled=(not hastalent(ice_nova_talent)))
   # Frozen.
   SpellAddTargetDebuff(ice_nova ice_nova add=1)
+Define(icicles_buff 205473)
+# Casting Frostbolt or Flurry grants you an Icicle. Casting Ice Lance causes all Icicles stored to begin launching at the target, each dealing (0.1 of Spell Power) Frost damage.rnrnUp to s2 Icicles can be stored. Any excess Icicles gained will be automatically launched.?a321684[rnrnIncreases the damage of Frozen Orb by (190 of Spell Power)][]
+  SpellInfo(icicles_buff duration=60 max_stacks=5 gcd=0 offgcd=1)
+  # w1 |4Icicle:Icicles; stored.
+  SpellAddBuff(icicles_buff icicles_buff add=1)
 Define(icy_veins 12472)
 # Accelerates your spellcasting for 20 seconds, granting m1 haste and preventing damage from delaying your spellcasts.
   SpellInfo(icy_veins cd=180 duration=20 gcd=0 offgcd=1)
@@ -269,12 +279,12 @@ Define(meteor 153561)
   SpellInfo(meteor cd=45)
   SpellRequire(meteor unusable set=1 enabled=(not hastalent(meteor_talent)))
 Define(mirror_image 55342)
-# Creates s2 copies of you nearby for 40 seconds, which cast spells and attack your enemies.rnrnWhile your images are active damage taken is reduced by s3, taking direct damage will cause one of your images to dissipate.
+# Creates s2 copies of you nearby for 40 seconds, which cast spells and attack your enemies.rnrnWhile your images are active damage taken is reduced by s3. Taking direct damage will cause one of your images to dissipate.
   SpellInfo(mirror_image cd=120 duration=40)
   # Damage taken is reduced by s3 while your images are active.
   SpellAddBuff(mirror_image mirror_image add=1)
 Define(mirrors_of_torment 314793)
-# Conjure n mirrors to torment the enemy for 25 seconds. Whenever the target attacks, casts a spell, or uses an ability, a mirror is consumed to inflict (60 of Spell Power) Shadow damage and their movement and cast speed are slowed by 320035s3. This effect cannot be triggered more often than once per 6 seconds.rnrnThe final mirror will instead inflict (151 of Spell Power) Shadow damage to the enemy, Rooting and Silencing them for 4 seconds.rnrnWhenever a mirror is consumed ?c1[you gain 345417s1 mana][]?c2[your Fire Blast cooldown is reduced by s2 sec][]?c3[you gain Brain Freeze][].
+# Conjure n mirrors to torment the enemy for 25 seconds. Whenever the target attacks, casts a spell, or uses an ability, a mirror is consumed to inflict (60 of Spell Power) Shadow damage and their movement and cast speed are slowed by 320035s3. This effect cannot be triggered more often than once per 6 seconds.rnrnThe final mirror will instead inflict (151 of Spell Power) Shadow damage to the enemy, Rooting and Silencing them for 4 seconds.rnrnWhenever a mirror is consumed ?c1[you gain Clearcasting][]?c2[your Fire Blast cooldown is reduced by s2 sec][]?c3[you gain Brain Freeze][].
   SpellInfo(mirrors_of_torment cd=90 duration=25)
   # Attacking, casting a spell or ability, consumes a mirror to inflict Shadow damage and reduce cast and movement speed by 320035s3. rnrnYour final mirror will instead Root and Silence you for 317589d.
   SpellAddTargetDebuff(mirrors_of_torment mirrors_of_torment add=1)
@@ -284,16 +294,26 @@ Define(nether_tempest 114923)
   SpellRequire(nether_tempest unusable set=1 enabled=(not hastalent(nether_tempest_talent)))
   # Deals w1 Arcane damage and an additional w1 Arcane damage to all enemies within 114954A1 yards every t sec.
   SpellAddTargetDebuff(nether_tempest nether_tempest add=1)
+Define(newfound_resolve_buff 352917)
+# At any moment during combat, there is a low chance your Doubt will manifest for 10 seconds. Directly facing your Doubt will overcome it, granting 352917s1 pri and Stamina for 15 seconds.
+  SpellInfo(newfound_resolve_buff duration=15 gcd=0 offgcd=1)
+  # w1 increased pri and Stamina.
+  SpellAddBuff(newfound_resolve_buff newfound_resolve_buff add=1)
 Define(phoenix_flames 257541)
 # Hurls a Phoenix that deals (90 of Spell Power) Fire damage to the target and reduced damage to other nearby enemies.
   SpellInfo(phoenix_flames cd=25)
+Define(power_infusion 10060)
+# Infuses the target with power for 20 seconds, increasing haste by (25 of Spell Power).
+  SpellInfo(power_infusion cd=120 duration=20 gcd=0 offgcd=1)
+  # Haste increased by w1.
+  SpellAddBuff(power_infusion power_infusion add=1)
 Define(presence_of_mind 205025)
-# Causes your next n Arcane Blasts to be instant cast.
+# Causes your next n Arcane LBlast:Blasts; to be instant cast.
   SpellInfo(presence_of_mind cd=60 gcd=0 offgcd=1)
   # Arcane Blast is instant cast.
   SpellAddBuff(presence_of_mind presence_of_mind add=1)
 Define(pyroblast 11366)
-# Hurls an immense fiery boulder that causes (136.3 of Spell Power) Fire damage?a321711[ and an additional 321712o2 Fire damage over 6 seconds][].
+# Hurls an immense fiery boulder that causes (143.12 of Spell Power) Fire damage?a321711[ and an additional 321712o2 Fire damage over 6 seconds][].
   SpellInfo(pyroblast)
 Define(pyroclasm_buff 269651)
 # Consuming Hot Streak has a s1 chance to make your next non-instant Pyroblast cast within 15 seconds deal 269651s1 additional damage.rnrnMaximum 269651u stacks.
@@ -306,14 +326,14 @@ Define(quaking_palm 107079)
   # Incapacitated.
   SpellAddTargetDebuff(quaking_palm quaking_palm add=1)
 Define(radiant_spark 307443)
-# Conjure a radiant spark that causes (76 of Spell Power) Arcane damage instantly, and an additional o2 damage over 10 seconds.rnrnThe target takes 307454s1 increased damage from your direct damage spells, stacking each time they are struck. This effect ends after 307454u spells.rn
+# Conjure a radiant spark that causes (91.2 of Spell Power) Arcane damage instantly, and an additional o2 damage over 10 seconds.rnrnThe target takes 307454s1 increased damage from your direct damage spells, stacking each time they are struck. This effect ends after 307454u spells.rn
   SpellInfo(radiant_spark cd=30 duration=10 interrupt=1 tick=2)
   # Damage taken from @auracaster  increased by w1.
   SpellAddBuff(radiant_spark radiant_spark_vulnerability_debuff add=1)
   # Suffering w2 Arcane damage every t2 sec.
   SpellAddTargetDebuff(radiant_spark radiant_spark add=1)
 Define(radiant_spark_vulnerability_debuff 307454)
-# Conjure a radiant spark that causes (76 of Spell Power) Arcane damage instantly, and an additional o2 damage over 10 seconds.rnrnThe target takes 307454s1 increased damage from your direct damage spells, stacking each time they are struck. This effect ends after 307454u spells.rn
+# Conjure a radiant spark that causes (91.2 of Spell Power) Arcane damage instantly, and an additional o2 damage over 10 seconds.rnrnThe target takes 307454s1 increased damage from your direct damage spells, stacking each time they are struck. This effect ends after 307454u spells.rn
   SpellInfo(radiant_spark_vulnerability_debuff duration=8 max_stacks=4 gcd=0 offgcd=1)
 Define(ray_of_frost 205021)
 # Channel an icy beam at the enemy for 5 seconds, dealing (120 of Spell Power) Frost damage every t2 sec and slowing movement by s4. Each time Ray of Frost deals damage, its damage and snare increases by 208141s1.rnrnGenerates s3 charges of Fingers of Frost over its duration.
@@ -373,6 +393,11 @@ Define(summon_water_elemental 31687)
 # Summons a Water Elemental to follow and fight for you.
   SpellInfo(summon_water_elemental cd=30)
   SpellRequire(summon_water_elemental replaced_by set=lonely_winter_unused_0 enabled=(hastalent(lonely_winter_talent)))
+Define(sun_kings_blessing_buff 333314)
+# After consuming s1 Hot Streaks, your next non-instant Pyroblast cast within 15 seconds grants you Combustion for s2 sec.
+  SpellInfo(sun_kings_blessing_buff duration=30 max_stacks=8 gcd=0 offgcd=1)
+  # Building up a Combustion.
+  SpellAddBuff(sun_kings_blessing_buff sun_kings_blessing_buff add=1)
 Define(sun_kings_blessing_ready_buff 333315)
 # After consuming s1 Hot Streaks, your next non-instant Pyroblast cast within 15 seconds grants you Combustion for s2 sec.
   SpellInfo(sun_kings_blessing_ready_buff duration=15 max_stacks=5 gcd=0 offgcd=1)
@@ -383,9 +408,9 @@ Define(supernova 157980)
   SpellInfo(supernova cd=25)
   SpellRequire(supernova unusable set=1 enabled=(not hastalent(supernova_talent)))
 Define(time_warp 80353)
-# Warp the flow of time, increasing haste by (25 of Spell Power) ?a320919[and time rate by s4 ][]for all party and raid members for 40 seconds.rnrnAllies will be unable to benefit from Bloodlust, Heroism, or Time Warp again for 600 seconds.?a320920[rnrnWhen the effect ends, you die.][]
+# Warp the flow of time, increasing haste by (25 of Spell Power) ?a320919[and time rate by s4 ][]for all party and raid members for 40 seconds.rnrnAllies will be unable to benefit from Bloodlust, Heroism, or Time Warp again for 600 seconds.?a320920[rnrnWhen the effect ends, all affected players are frozen in time for 10 seconds.][]
   SpellInfo(time_warp cd=300 duration=40 gcd=0 offgcd=1)
-  # Haste increased by w1. ?W4>0[Time rate increased by w4.][]?W3=1[rnrnWhen the effect ends, you die.][]
+  # Haste increased by w1. ?W4>0[Time rate increased by w4.][]?W3=1[rnrnWhen the effect ends, all affected players are frozen in time for 356346d.][]
   SpellAddBuff(time_warp time_warp add=1)
 Define(touch_of_the_magi 321507)
 # Applies Touch of the Magi to your current target, accumulating s1 of the damage you deal to the target for 8 seconds, and then exploding for that amount of Arcane damage to the target and reduced damage to all nearby enemies.?a343215[rnrn|cFFFFFFFFGenerates s2 Arcane Charges.|r][]
@@ -395,6 +420,9 @@ Define(touch_of_the_magi 321507)
 Define(touch_of_the_magi_debuff 210824)
 # Arcane Blast has a h chance to apply Touch of the Magi, accumulating s1 of the damage you deal to the target for 8 seconds, and then exploding for that amount of Arcane damage to the target and all nearby enemies.
   SpellInfo(touch_of_the_magi_debuff duration=8 gcd=0 offgcd=1)
+Define(ultimate_form_buff 323524)
+# While channeling Fleshcraft, you are immune to crowd control and you regenerate 323524s17 health every 323524t17 sec. rnrnIf you finish the full channel, you gain 3 seconds of crowd control immunity, during which you regenerate 323524s17 health every 323524t17 sec.
+  SpellInfo(ultimate_form_buff duration=3 gcd=0 offgcd=1 tick=1)
 Define(winters_chill_debuff 228358)
 # Unleash a flurry of ice, striking the target s1 times for a total of (31.6 of Spell Power)*m1 Frost damage. Each hit reduces the target's movement speed by 228354s1 for 1 second.?a231584[rnrnWhile Brain Freeze is active, Flurry applies Winter's Chill, causing your target to take damage from your spells as if it were frozen.][]
   SpellInfo(winters_chill_debuff duration=6 max_stacks=2 gcd=0 offgcd=1)
@@ -420,7 +448,7 @@ Define(enlightened_talent 21145)
 Define(firestarter_talent 22456)
 # Your Fireball and Pyroblast spells always deal a critical strike when the target is above s1 health.
 Define(flame_patch_talent 22451)
-# Flamestrike leaves behind a patch of flames which burns enemies within it for 8*(6 of Spell Power) Fire damage over 8 seconds. 
+# Flamestrike leaves behind a patch of flames which burns enemies within it for 8*(5.4 of Spell Power) Fire damage over 8 seconds. 
 Define(from_the_ashes_talent 22468)
 # Increases Mastery by s3 for each charge of Phoenix Flames off cooldown and your direct-damage critical strikes reduce its cooldown by s2/-1000 sec.
 Define(glacial_spike_talent 21634)
@@ -457,6 +485,10 @@ Define(supernova_talent 22474)
 # Pulses arcane energy around the target enemy or ally, dealing (30 of Spell Power) Arcane damage to all enemies within A2 yards, and knocking them upward. A primary enemy target will take s1 increased damage.
 Define(darkmoon_deck_putrescence_item 173069)
     ItemInfo(darkmoon_deck_putrescence_item cd=90 proc=333885)
+Define(dreadfire_vessel_item 184030)
+    ItemInfo(dreadfire_vessel_item cd=90 proc=349857)
+Define(empyreal_ordnance_item 180117)
+    ItemInfo(empyreal_ordnance_item cd=180 proc=345543)
 Define(flame_of_battle_item 181501)
     ItemInfo(flame_of_battle_item cd=90 proc=346746)
 Define(dread_gladiators_badge_item 161902)
@@ -469,41 +501,47 @@ Define(corrupted_gladiators_badge_item 172669)
     ItemInfo(corrupted_gladiators_badge_item cd=120 proc=277185)
 Define(gladiators_medallion_item 184269)
     ItemInfo(gladiators_medallion_item cd=120 shared_cd="item_cd_1182" proc=42292)
+Define(glyph_of_assimilation_item 184021)
+    ItemInfo(glyph_of_assimilation_item cd=90 proc=345500)
 Define(inscrutable_quantum_device_item 179350)
     ItemInfo(inscrutable_quantum_device_item cd=180 proc=348098)
 Define(macabre_sheet_music_item 184024)
     ItemInfo(macabre_sheet_music_item cd=90 proc=345431)
 Define(potion_of_spectral_intellect_item 171273)
     ItemInfo(potion_of_spectral_intellect_item cd=1 shared_cd="item_cd_4" proc=307162)
+Define(shadowed_orb_of_torment_item 186428)
+    ItemInfo(shadowed_orb_of_torment_item cd=120 proc=356334)
+Define(soul_igniter_item 184019)
+    ItemInfo(soul_igniter_item cd=0.5 proc=345214)
 Define(soulletting_ruby_item 178809)
     ItemInfo(soulletting_ruby_item cd=120 proc=345807)
 Define(sunblood_amethyst_item 178826)
     ItemInfo(sunblood_amethyst_item cd=90 proc=343397)
 Define(wakeners_frond_item 183850)
     ItemInfo(wakeners_frond_item cd=120 proc=336588)
-Define(dreadfire_vessel_item 184030)
-    ItemInfo(dreadfire_vessel_item cd=90 proc=344732)
-Define(empyreal_ordnance_item 180117)
-    ItemInfo(empyreal_ordnance_item cd=180 proc=345543)
-Define(potion_of_phantom_fire_item 171349)
-    ItemInfo(potion_of_phantom_fire_item cd=300 shared_cd="item_cd_4" rppm=6 proc=307495)
-Define(arcane_pummeling_trait 270669)
-Define(vision_of_perfection_essence_id 22)
+Define(instructors_divine_bell_item 184842)
+    ItemInfo(instructors_divine_bell_item proc=348139 cd=90)
 Define(arcane_bombardment_runeforge 6927)
 Define(arcane_infinity_runeforge 6926)
 Define(disciplinary_command_runeforge 6832)
 Define(grisly_icicle_runeforge 6937)
 Define(siphon_storm_runeforge 6928)
 Define(temporal_warp_runeforge 6834)
+Define(deaths_fathom_runeforge 7475)
 Define(firestorm_runeforge 6932)
 Define(sun_kings_blessing_runeforge 6934)
 Define(freezing_winds_runeforge 6829)
 Define(glacial_fragments_runeforge 6830)
+Define(heart_of_the_fae_runeforge 7727)
 Define(arcane_prodigy_conduit 34)
+Define(gift_of_the_lich_conduit 39)
 Define(flame_accretion_conduit 53)
 Define(infernal_cascade_conduit 30)
 Define(ire_of_the_ascended_conduit 40)
 Define(siphoned_malice_conduit 43)
+Define(pustule_eruption_soulbind 351094)
+Define(volatile_solvent_soulbind 323074)
+Define(combat_meditation_soulbind 328266)
 Define(field_of_blossoms_soulbind 319191)
 Define(grove_invigoration_soulbind 322721)
 Define(wasteland_propriety_soulbind 319983)

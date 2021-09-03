@@ -15,6 +15,9 @@ Define(ancient_aftershock 325886)
 Define(arcane_torrent 25046)
 # Remove s1 beneficial effect from all enemies within A1 yards and restore m2 Energy.
   SpellInfo(arcane_torrent cd=120 gcd=1 energy=-15)
+Define(ashen_juggernaut_buff 335234)
+# ?a317320[Condemn][Execute] increases the critical strike chance of ?a317320[Condemn][Execute] by |cFFFFFFFF<val>.1|r for 8 seconds, stacking up to 335234u times.
+  SpellInfo(ashen_juggernaut_buff duration=8 max_stacks=8 gcd=0 offgcd=1)
 Define(avatar 107574)
 # Transform into a colossus for 20 seconds, causing you to deal s1 increased damage and removing all roots and snares.rnrn|cFFFFFFFFGenerates s5/10 Rage.|r
   SpellInfo(avatar cd=90 duration=20 gcd=0 offgcd=1 rage=-20)
@@ -24,6 +27,9 @@ Define(avatar 107574)
 Define(bag_of_tricks 312411)
 # Pull your chosen trick from the bag and use it on target enemy or ally. Enemies take <damage> damage, while allies are healed for <healing>. 
   SpellInfo(bag_of_tricks cd=90)
+Define(battlelord_buff 346369)
+# Your Overpower has a h chance to reset the cooldown of Mortal Strike and reduce the Rage cost of your next Mortal Strike by 346369s1/-10.
+  SpellInfo(battlelord_buff duration=10 gcd=0 offgcd=1)
 Define(berserking 26297)
 # Increases your haste by s1 for 12 seconds.
   SpellInfo(berserking cd=180 duration=12 gcd=0 offgcd=1)
@@ -73,15 +79,23 @@ Define(colossus_smash_debuff 208086)
   SpellInfo(colossus_smash_debuff duration=10 gcd=0 offgcd=1)
   # Taking w1 additional damage from @auracaster.
   SpellAddTargetDebuff(colossus_smash_debuff colossus_smash_debuff add=1)
-Define(condemn 317349)
-# Condemn a foe to suffer for their sins, causing up to <damage> Shadow damage. Only usable on enemies who are above 80 health or below 20 health.rnrnThe primary target is weakened, preventing up to <absorb> damage they would deal to you.?s231830[rnrnIf your foe survives, s2 of the Rage spent is refunded.][]
-  SpellInfo(condemn rage=20 max_rage=20 cd=6)
 Define(condemn_fury 317485)
 # Condemn a foe to suffer for their sins, causing 317488sw1+317489sw1 Shadow damage. Only usable on enemies who are above 80 health or below 20 health.rnrnThe primary target is weakened, preventing <absorb> damage they would deal to you.?s316403[rnrn|cFFFFFFFFGenerates m3/10 Rage.|r][]
   SpellInfo(condemn_fury rage=0 max_rage=20 cd=6)
 Define(conquerors_banner 324143)
-# Plant the Conqueror's Banner in the ground, granting 325862s1 maximum health and 325862s2 critical strike chance to you and 325862i allies within s1 yds of the banner for 20 seconds.rnrnWhile active, spending ?c1[<armsRage>]?c2[<furyRage>][<protRage>] Rage and killing enemies grants you Glory. Glory increases your critical strike damage by 325787s1 per stack, up to 325787s1*325787u, for 30 seconds.
-  SpellInfo(conquerors_banner cd=180 duration=20)
+# Brandish the Conqueror's Banner, granting s1 Mastery and s2 increased movement speed to you and your 325862s6 nearest allies, and preventing movement speed from being reduced below s3. Lasts 15 seconds.rnrn|cFFFFFFFFGenerates <rage> Rage per sec.|r
+  SpellInfo(conquerors_banner cd=120 duration=15 tick=1)
+  # Mastery increased by w1.rnMovement speed increased by w2.rnLess hindered by movement impairing effects.rnGenerating w4/10 Rage per sec.rn?w8!=0[rnStrength increased by w8.][]?w9!=0[rnCritical strike chance increased by w9.][]
+  SpellAddBuff(conquerors_banner conquerors_banner add=1)
+  # Leech increased by w1.rnImmune to crowd control effects.
+  SpellAddBuff(conquerors_banner hateful_fetish_unused_0 add=1)
+  # Dealing Shadow damage to nearby enemies every t1 sec.
+  SpellAddBuff(conquerors_banner repulsive_pennant_unused_1 add=1)
+  # Mastery increased by w1.rnMovement speed increased by w2.rnLess hindered by movement impairing effects.?w5!=0[rnCritical strike chance increased by w5.][]
+  SpellAddBuff(conquerors_banner conquerors_banner_unused_1 add=1)
+Define(conquerors_banner_unused_1 325862)
+# Brandish the Conqueror's Banner, granting s1 Mastery and s2 increased movement speed to you and your 325862s6 nearest allies, and preventing movement speed from being reduced below s3. Lasts 15 seconds.rnrn|cFFFFFFFFGenerates <rage> Rage per sec.|r
+  SpellInfo(conquerors_banner_unused_1 duration=15 gcd=0 offgcd=1)
 Define(crushing_blow 335097)
 # Charge to an enemy and strike a mighty blow with both weapons that deals a total of 335098s1+335100s1 Physical damage.?s316452[rnrnCrushing Blow has a s1 chance to instantly reset its own cooldown.][]rnrn|cFFFFFFFFGenerates m2/10 Rage.|r
   SpellInfo(crushing_blow cd=8 rage=-12)
@@ -118,14 +132,25 @@ Define(execute 163201)
 Define(execute_fury 5308)
 # Attempt to finish off a wounded foe, causing 280849s1+163558s1 Physical damage. Only usable on enemies that have less than 20 health.?s316403[rnrn|cFFFFFFFFGenerates m3/10 Rage.|r][]
   SpellInfo(execute_fury rage=0 max_rage=20 cd=6)
+Define(exploiter_debuff 335452)
+# ?a317320[Condemn][Execute] causes the target to take s1 more damage from your next Mortal Strike, stacking up to 335452u times.
+  SpellInfo(exploiter_debuff duration=30 max_stacks=2 gcd=0 offgcd=1)
 Define(fireblood 265221)
 # Removes all poison, disease, curse, magic, and bleed effects and increases your ?a162700[Agility]?a162702[Strength]?a162697[Agility]?a162698[Strength]?a162699[Intellect]?a162701[Intellect][primary stat] by 265226s1*3 and an additional 265226s1 for each effect removed. Lasts 8 seconds. ?s195710[This effect shares a 30 sec cooldown with other similar effects.][]
   SpellInfo(fireblood cd=120 gcd=0 offgcd=1)
+Define(first_strike_buff 325381)
+# Damaging an enemy before they damage you increases your chance to critical strike by 325381s1 for 5 seconds.
+  SpellInfo(first_strike_buff duration=5 gcd=0 offgcd=1)
+  # Critical Strike increased by w.
+  SpellAddBuff(first_strike_buff first_strike_buff add=1)
 Define(frenzy_warrior_buff 335082)
 # Rampage increases your Haste by 335082s1 for 12 seconds, stacking up to 335082u times. This effect is reset if you Rampage a different primary target.
   SpellInfo(frenzy_warrior_buff duration=12 max_stacks=4 gcd=0 offgcd=1)
   # Haste increased by w1.
   SpellAddBuff(frenzy_warrior_buff frenzy_warrior_buff add=1)
+Define(hateful_fetish_unused_0 333892)
+# Conqueror's Banner makes you immune to crowd control effects and grants you 333892s1 Leech.
+  SpellInfo(hateful_fetish_unused_0 gcd=0 offgcd=1)
 Define(heroic_leap 6544)
 # Leap through the air toward a target location, slamming down with destructive force to deal 52174s1 Physical damage to all enemies within 52174a1 yards?c3[, and resetting the remaining cooldown on Taunt][].
   SpellInfo(heroic_leap cd=45 gcd=0 offgcd=1)
@@ -194,6 +219,9 @@ Define(rend 772)
   SpellRequire(rend unusable set=1 enabled=(not hastalent(rend_talent)))
   # Bleeding for w2 damage every t2 sec. Taking w3 increased critical damage from @auracaster.
   SpellAddTargetDebuff(rend rend add=1)
+Define(repulsive_pennant_unused_1 350605)
+# While Conqueror's Banner is active, deal 333860s1 Shadow damage to all enemies within 333860A1 yds of you every 350605t1 sec.
+  SpellInfo(repulsive_pennant_unused_1 gcd=0 offgcd=1 tick=3)
 Define(revenge 6572)
 # Swing in a wide arc, dealing s1 Physical damage to all enemies in front of you. Deals reduced damage beyond <cap> targets.rnrnYour successful dodges and parries have a chance to make your next Revenge cost no Rage.
   SpellInfo(revenge rage=20)
@@ -276,8 +304,8 @@ Define(whirlwind_fury 190411)
 # Unleashes a whirlwind of steel, striking up to s3 nearby enemies for <damage> Physical damage.?s12950[rnrnCauses your next 85739u single-target melee lattack:attacks; to strike up to 85739s1 additional targets for 85739s3 damage.][]?s316435[rnrn|cFFFFFFFFGenerates s1 Rage, plus an additional s2 per target hit.|r][]
   SpellInfo(whirlwind_fury rage=30)
 Define(will_of_the_berserker_buff 335597)
-# When Recklessness expires, your Critical Strike is increased by 335597s1 for 8 seconds. Your Raging Blow will refresh the duration of this effect.
-  SpellInfo(will_of_the_berserker_buff duration=8 gcd=0 offgcd=1)
+# When Recklessness expires, your Critical Strike is increased by 335597s1 for 12 seconds. Your Raging Blow will refresh the duration of this effect.
+  SpellInfo(will_of_the_berserker_buff duration=12 gcd=0 offgcd=1)
   # Critical Strike increased by w1. Raging Blow refreshes this duration.
   SpellAddBuff(will_of_the_berserker_buff will_of_the_berserker_buff add=1)
 Define(anger_management_talent_fury 22405)
@@ -336,9 +364,16 @@ Define(sudden_death_buff 280776)
 Define(potion_of_spectral_strength_item 171275)
     ItemInfo(potion_of_spectral_strength_item cd=1 shared_cd="item_cd_4" proc=307164)
 Define(potion_of_phantom_fire_item 171349)
-    ItemInfo(potion_of_phantom_fire_item cd=300 shared_cd="item_cd_4" rppm=6 proc=307495)
+    ItemInfo(potion_of_phantom_fire_item cd=300 shared_cd="item_cd_4" rppm=12 proc=307495)
+Define(battlelord_runeforge 6960)
+Define(enduring_blow_runeforge 6962)
+Define(sinful_surge_runeforge 7470)
+Define(elysian_might_runeforge 7730)
+Define(signet_of_tormented_kings_runeforge 6959)
 Define(will_of_the_berserker_runeforge 6966)
+Define(ashen_juggernaut_conduit 11)
 Define(vicious_contempt_conduit 64)
+Define(first_strike_soulbind 325069)
     `;
     // END
 
