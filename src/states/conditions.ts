@@ -5643,7 +5643,7 @@ l    */
             "buffpresent",
             this.buffPresent,
             { type: "number" },
-            { name: "aura", type: "number", isSpell: true, optional: false },
+            { name: "aura", type: "number", optional: false },
             targetParameter,
             filterParameter,
             mineParameter,
