@@ -313,7 +313,7 @@ export class OvaleEquipmentClass {
     getEquippedItemId(slot: SlotName): number | undefined {
         const invSlot = slotNameByName[slot];
         const item = this.equippedItem[invSlot];
-        return (item.exists && item.id) || undefined;
+        return (item && item.exists && item.id) || undefined;
     }
 
     getEquippedItemIdBySharedCooldown(
@@ -325,7 +325,7 @@ export class OvaleEquipmentClass {
     getEquippedItemLocation(slot: SlotName): ItemLocationMixin | undefined {
         const invSlot = slotNameByName[slot];
         const item = this.equippedItem[invSlot];
-        if (item.exists) {
+        if (item && item.exists) {
             if (item.location && item.location.IsValid()) {
                 return item.location;
             }
@@ -336,14 +336,14 @@ export class OvaleEquipmentClass {
     getEquippedItemQuality(slot: SlotName): number | undefined {
         const invSlot = slotNameByName[slot];
         const item = this.equippedItem[invSlot];
-        return (item.exists && item.quality) || undefined;
+        return (item && item.exists && item.quality) || undefined;
     }
 
     getEquippedItemBonusIds(slot: SlotName): LuaArray<number> {
         // Returns the array of bonus IDs for the slot.
         const invSlot = slotNameByName[slot];
         const item = this.equippedItem[invSlot];
-        return item.bonus;
+        return (item && item.bonus) || {};
     }
 
     hasRangedWeapon() {
