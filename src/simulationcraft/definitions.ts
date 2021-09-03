@@ -849,6 +849,17 @@ export const miscOperands: LuaObj<MiscOperand> = {
         symbol: "runeforge",
     },
     ["runic_power"]: { name: "runicpower", modifiers: powerModifiers },
+    ["searing_touch"]: {
+        modifiers: {
+            active: {
+                type: MiscOperandModifierType.Code,
+                code: "talent(searing_touch_talent) and target.healthpercent() < 30",
+                symbolsInCode: {
+                    1: "searing_touch_talent",
+                },
+            },
+        },
+    },
     ["soul_fragments"]: { name: "soulfragments", modifiers: powerModifiers },
     ["soul_shard"]: { name: "soulshards", modifiers: powerModifiers },
     ["soulbind"]: {
