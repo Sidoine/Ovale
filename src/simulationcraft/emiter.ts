@@ -2783,7 +2783,12 @@ export class Emiter {
             property == "execute_time" ||
             property == "execute_remains"
         ) {
-            code = format("ExecuteTime(%s)", name);
+            if (name == "use_item") {
+                // Assume that items have an execute time of 0 seconds.
+                code = "0";
+            } else {
+                code = format("ExecuteTime(%s)", name);
+            }
         } else if (property == "executing") {
             code = format("ExecuteTime(%s) > 0", name);
         } else if (
