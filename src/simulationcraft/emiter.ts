@@ -575,15 +575,14 @@ export class Emiter {
                     for (const [_, symbol] of ipairs(info.symbolsInCode)) {
                         annotation.addSymbol(symbol);
                     }
-                    const [result] = this.ovaleAst.parseCode(
-                        "expression",
-                        info.code,
-                        nodeList,
-                        annotation.astAnnotation
-                    );
-                    if (result) return result;
-                    return undefined;
                 }
+                const [result] = this.ovaleAst.parseCode(
+                    "expression",
+                    info.code,
+                    nodeList,
+                    annotation.astAnnotation
+                );
+                return result;
             }
 
             const result = this.ovaleAst.newNodeWithParameters(
