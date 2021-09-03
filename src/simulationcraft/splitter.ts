@@ -1,4 +1,12 @@
-import { LuaObj, LuaArray, lualength, ipairs, truthy, wipe } from "@wowts/lua";
+import {
+    LuaArray,
+    LuaObj,
+    ipairs,
+    lualength,
+    tostring,
+    truthy,
+    wipe,
+} from "@wowts/lua";
 import {
     AstAddFunctionNode,
     AstAnnotation,
@@ -7,7 +15,10 @@ import {
     AstGroupNode,
     AstIfNode,
     AstNode,
+    AstStringNode,
     AstUnlessNode,
+    AstValueNode,
+    AstVariableNode,
     OperatorType,
     OvaleASTClass,
 } from "../engine/ast";
@@ -132,31 +143,48 @@ export class Splitter {
     ) => {
         let bodyNode, conditionNode;
         let actionTag, invokesGCD;
-        const name = "UNKNOWN";
+        let name = "UNKNOWN";
         const actionType = node.name;
-        if (actionType == "item" || actionType == "spell") {
+        if (actionType == "item") {
             const firstParamNode = node.rawPositionalParams[1];
-            let id, name;
+            let id, slot;
             if (firstParamNode.type == "variable") {
-                name = firstParamNode.name;
+                const paramNode = firstParamNode as AstVariableNode;
+                name = paramNode.name;
                 id = annotation.dictionary && annotation.dictionary[name];
             } else if (firstParamNode.type === "value") {
-                name = firstParamNode.value;
-                id = <number>firstParamNode.value;
+                const paramNode = firstParamNode as AstValueNode;
+                id = paramNode.value;
+                name = tostring(id);
+            } else if (firstParamNode.type == "string") {
+                const paramNode = firstParamNode as AstStringNode;
+                name = paramNode.value;
+                slot = name;
             }
             if (id) {
-                if (actionType == "item") {
-                    [actionTag, invokesGCD] = this.ovaleData.getItemTagInfo(id);
-                } else if (actionType == "spell") {
-                    [actionTag, invokesGCD] =
-                        this.ovaleData.getSpellTagInfo(id);
-                }
+                [actionTag, invokesGCD] = this.ovaleData.getItemTagInfo(id);
+            } else if (slot) {
+                // Equipped items by slot are assumed to hvae the "cd" tag.
+                [actionTag, invokesGCD] = ["cd", false];
             } else {
-                this.tracer.print(
-                    "Warning: Unable to find %s '%s'",
-                    actionType,
-                    name
-                );
+                this.tracer.print(`Warning: Unable to find item '${name}'`);
+            }
+        } else if (actionType == "spell") {
+            const firstParamNode = node.rawPositionalParams[1];
+            let id;
+            if (firstParamNode.type == "variable") {
+                const paramNode = firstParamNode as AstVariableNode;
+                name = paramNode.name;
+                id = annotation.dictionary && annotation.dictionary[name];
+            } else if (firstParamNode.type === "value") {
+                const paramNode = firstParamNode as AstValueNode;
+                id = paramNode.value;
+                name = tostring(id);
+            }
+            if (id) {
+                [actionTag, invokesGCD] = this.ovaleData.getSpellTagInfo(id);
+            } else {
+                this.tracer.print(`Warning: Unable to find spell '${name}'`);
             }
         } else if (actionType == "texture") {
             const firstParamNode = node.rawPositionalParams[1];
