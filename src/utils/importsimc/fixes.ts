@@ -87,6 +87,11 @@ export function getFixes(spellData: ReturnType<typeof getSpellData>) {
         "berserk_cat"
     );
     addSpellList(
+        "ca_inc_buff",
+        "celestial_alignment",
+        "incarnation_chosen_of_elune"
+    );
+    addSpellList(
         "gladiators_badge_item",
         "dread_gladiators_badge_item",
         "sinister_gladiators_badge_item",
