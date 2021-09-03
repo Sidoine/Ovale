@@ -806,6 +806,7 @@ export const miscOperands: LuaObj<MiscOperand> = {
     },
     ["energy"]: { name: "energy", modifiers: powerModifiers },
     ["expected_combat_length"]: { name: "expectedcombatlength" },
+    ["expected_kindling_reduction"]: { code: "1" }, //todo
     ["exsanguinated"]: {
         name: "targetdebuffremaining",
         symbol: "exsanguinated",
