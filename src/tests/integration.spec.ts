@@ -91,72 +91,93 @@ function integrationTest(name: string) {
     }
     checkNoMessage();
 }
-test("sc_t26_death_knight_blood", () =>
-    integrationTest("sc_t26_death_knight_blood"));
-test("sc_t26_death_knight_frost", () =>
-    integrationTest("sc_t26_death_knight_frost"));
-test("sc_t26_death_knight_unholy", () =>
-    integrationTest("sc_t26_death_knight_unholy"));
-test("sc_t26_demon_hunter_havoc", () =>
-    integrationTest("sc_t26_demon_hunter_havoc"));
-test("sc_t26_demon_hunter_vengeance", () =>
-    integrationTest("sc_t26_demon_hunter_vengeance"));
-test("sc_t26_druid_balance", () => integrationTest("sc_t26_druid_balance"));
-test("sc_t26_druid_feral", () => integrationTest("sc_t26_druid_feral"));
-test("sc_t26_druid_guardian", () => integrationTest("sc_t26_druid_guardian"));
-test("sc_t26_hunter_beast_mastery", () =>
-    integrationTest("sc_t26_hunter_beast_mastery"));
-test("sc_t26_hunter_marksmanship", () =>
-    integrationTest("sc_t26_hunter_marksmanship"));
-test("sc_t26_hunter_survival", () => integrationTest("sc_t26_hunter_survival"));
-test("sc_t26_mage_arcane", () => integrationTest("sc_t26_mage_arcane"));
-test("sc_t26_mage_fire", () => integrationTest("sc_t26_mage_fire"));
-test("sc_t26_mage_frost", () => integrationTest("sc_t26_mage_frost"));
-test("sc_t26_monk_brewmaster", () => integrationTest("sc_t26_monk_brewmaster"));
-test("sc_t26_monk_windwalker", () => integrationTest("sc_t26_monk_windwalker"));
-test("sc_t26_monk_windwalker_serenity", () =>
-    integrationTest("sc_t26_monk_windwalker_serenity"));
-test("sc_t26_paladin_protection", () =>
-    integrationTest("sc_t26_paladin_protection"));
-test("sc_t26_paladin_retribution", () =>
-    integrationTest("sc_t26_paladin_retribution"));
-test("sc_t26_priest_discipline", () =>
-    integrationTest("sc_t26_priest_discipline"));
-test("sc_t26_priest_shadow", () => integrationTest("sc_t26_priest_shadow"));
-test("sc_t26_rogue_assassination", () =>
-    integrationTest("sc_t26_rogue_assassination"));
-test("sc_t26_rogue_outlaw", () => integrationTest("sc_t26_rogue_outlaw"));
-test("sc_t26_rogue_subtlety", () => integrationTest("sc_t26_rogue_subtlety"));
-test("sc_t26_shaman_elemental", () =>
-    integrationTest("sc_t26_shaman_elemental"));
-test("sc_t26_shaman_enhancement", () =>
-    integrationTest("sc_t26_shaman_enhancement"));
-test("sc_t26_shaman_restoration", () =>
-    integrationTest("sc_t26_shaman_restoration"));
-test("sc_t26_warlock_affliction", () =>
-    integrationTest("sc_t26_warlock_affliction"));
-test("sc_t26_warlock_demonology", () =>
-    integrationTest("sc_t26_warlock_demonology"));
-test("sc_t26_warlock_destruction", () =>
-    integrationTest("sc_t26_warlock_destruction"));
-test("sc_t26_warrior_arms", () => integrationTest("sc_t26_warrior_arms"));
-test("sc_t26_warrior_fury", () => {
-    integrationTest("sc_t26_warrior_fury");
-});
-test("sc_t26_demon_hunter_havoc_momentum", () =>
-    integrationTest("sc_t26_demon_hunter_havoc_momentum"));
-test("sc_t26_druid_feral_owlweave", () =>
-    integrationTest("sc_t26_druid_feral_owlweave"));
-test("sc_t26_priest_shadow_necrolord", () =>
-    integrationTest("sc_t26_priest_shadow_necrolord"));
-test("sc_t26_shaman_elemental_nf", () =>
-    integrationTest("sc_t26_shaman_elemental_nf"));
-test("sc_t26_shaman_enhancement_vdw", () =>
-    integrationTest("sc_t26_shaman_enhancement_vdw"));
-test("sc_t26_warrior_protection", () =>
-    integrationTest("sc_t26_warrior_protection"));
-test("sc_t26_mage_frost_fm_trade", () =>
-    integrationTest("sc_t26_mage_frost_fm_trade"));
+test("sc_t27_death_knight_blood", () =>
+    integrationTest("sc_t27_death_knight_blood"));
+test("sc_t27_death_knight_frost", () =>
+    integrationTest("sc_t27_death_knight_frost"));
+test("sc_t27_death_knight_frost_2h", () =>
+    integrationTest("sc_t27_death_knight_frost_2h"));
+test("sc_t27_death_knight_frost_breath", () =>
+    integrationTest("sc_t27_death_knight_frost_breath"));
+test("sc_t27_death_knight_frost_icecap", () =>
+    integrationTest("sc_t27_death_knight_frost_icecap"));
+test("sc_t27_death_knight_unholy", () =>
+    integrationTest("sc_t27_death_knight_unholy"));
+test("sc_t27_demon_hunter_havoc", () =>
+    integrationTest("sc_t27_demon_hunter_havoc"));
+test("sc_t27_demon_hunter_havoc_momentum", () =>
+    integrationTest("sc_t27_demon_hunter_havoc_momentum"));
+test("sc_t27_demon_hunter_vengeance", () =>
+    integrationTest("sc_t27_demon_hunter_vengeance"));
+test("sc_t27_druid_balance", () => integrationTest("sc_t27_druid_balance"));
+test("sc_t27_druid_feral", () => integrationTest("sc_t27_druid_feral"));
+test("sc_t27_druid_feral_owlweave", () =>
+    integrationTest("sc_t27_druid_feral_owlweave"));
+test("sc_t27_druid_guardian", () => integrationTest("sc_t27_druid_guardian"));
+test("sc_t27_druid_guardian_venthyr", () =>
+    integrationTest("sc_t27_druid_guardian_venthyr"));
+test("sc_t27_hunter_beast_mastery", () =>
+    integrationTest("sc_t27_hunter_beast_mastery"));
+test("sc_t27_hunter_marksmanship", () =>
+    integrationTest("sc_t27_hunter_marksmanship"));
+test("sc_t27_hunter_survival", () => integrationTest("sc_t27_hunter_survival"));
+test("sc_t27_mage_arcane", () => integrationTest("sc_t27_mage_arcane"));
+test("sc_t27_mage_arcane_kyrian", () =>
+    integrationTest("sc_t27_mage_arcane_kyrian"));
+test("sc_t27_mage_fire", () => integrationTest("sc_t27_mage_fire"));
+test("sc_t27_mage_frost", () => integrationTest("sc_t27_mage_frost"));
+test("sc_t27_monk_brewmaster", () => integrationTest("sc_t27_monk_brewmaster"));
+test("sc_t27_monk_windwalker", () => integrationTest("sc_t27_monk_windwalker"));
+test("sc_t27_monk_windwalker_necrolord", () =>
+    integrationTest("sc_t27_monk_windwalker_necrolord"));
+test("sc_t27_monk_windwalker_night_fae", () =>
+    integrationTest("sc_t27_monk_windwalker_night_fae"));
+test("sc_t27_paladin_holy", () => integrationTest("sc_t27_paladin_holy"));
+test("sc_t27_paladin_protection", () =>
+    integrationTest("sc_t27_paladin_protection"));
+test("sc_t27_paladin_retribution", () =>
+    integrationTest("sc_t27_paladin_retribution"));
+test("sc_t27_priest_discipline", () =>
+    integrationTest("sc_t27_priest_discipline"));
+test("sc_t27_priest_shadow", () => integrationTest("sc_t27_priest_shadow"));
+test("sc_t27_priest_shadow_kyrian", () =>
+    integrationTest("sc_t27_priest_shadow_kyrian"));
+test("sc_t27_priest_shadow_necrolord", () =>
+    integrationTest("sc_t27_priest_shadow_necrolord"));
+test("sc_t27_priest_shadow_venthyr", () =>
+    integrationTest("sc_t27_priest_shadow_venthyr"));
+test("sc_t27_rogue_assassination", () =>
+    integrationTest("sc_t27_rogue_assassination"));
+test("sc_t27_rogue_outlaw", () => integrationTest("sc_t27_rogue_outlaw"));
+test("sc_t27_rogue_subtlety", () => integrationTest("sc_t27_rogue_subtlety"));
+test("sc_t27_shaman_elemental", () =>
+    integrationTest("sc_t27_shaman_elemental"));
+test("sc_t27_shaman_elemental_kyrian", () =>
+    integrationTest("sc_t27_shaman_elemental_kyrian"));
+test("sc_t27_shaman_elemental_necrolord", () =>
+    integrationTest("sc_t27_shaman_elemental_necrolord"));
+test("sc_t27_shaman_elemental_venthyr", () =>
+    integrationTest("sc_t27_shaman_elemental_venthyr"));
+test("sc_t27_shaman_enhancement", () =>
+    integrationTest("sc_t27_shaman_enhancement"));
+test("sc_t27_shaman_enhancement_sorg", () =>
+    integrationTest("sc_t27_shaman_enhancement_sorg"));
+test("sc_t27_shaman_enhancement_vdw", () =>
+    integrationTest("sc_t27_shaman_enhancement_vdw"));
+test("sc_t27_shaman_restoration", () =>
+    integrationTest("sc_t27_shaman_restoration"));
+test("sc_t27_warlock_affliction", () =>
+    integrationTest("sc_t27_warlock_affliction"));
+test("sc_t27_warlock_demonology", () =>
+    integrationTest("sc_t27_warlock_demonology"));
+test("sc_t27_warlock_demonology_necrolord", () =>
+    integrationTest("sc_t27_warlock_demonology_necrolord"));
+test("sc_t27_warlock_destruction", () =>
+    integrationTest("sc_t27_warlock_destruction"));
+test("sc_t27_warrior_arms", () => integrationTest("sc_t27_warrior_arms"));
+test("sc_t27_warrior_fury", () => integrationTest("sc_t27_warrior_fury"));
+test("sc_t27_warrior_protection", () =>
+    integrationTest("sc_t27_warrior_protection"));
 test("All scripts are tested", () => {
     const missingScripts: string[] = [];
     for (const [name, script] of pairs(mainIoC.scripts.script)) {
