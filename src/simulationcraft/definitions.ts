@@ -626,6 +626,18 @@ export const miscOperands: LuaObj<MiscOperand> = {
     ["animacharged_cp"]: { name: "maxcombopoints" },
     ["arcane_charges"]: { name: "arcanecharges", modifiers: powerModifiers },
     ["astral_power"]: { name: "astralpower", modifiers: powerModifiers },
+    ["bloodseeker"]: {
+        modifiers: {
+            remains: {
+                type: MiscOperandModifierType.Code,
+                code: "target.debuffremains(kill_command_debuff)",
+                symbolsInCode: {
+                    1: "kill_command_debuff",
+                    2: "bloodseeker_talent",
+                },
+            },
+        },
+    },
     ["ca_active"]: {
         code: "talent(careful_aim_talent) and target.healthpercent() > 70",
         symbolsInCode: {

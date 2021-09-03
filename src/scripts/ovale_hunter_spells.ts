@@ -402,6 +402,7 @@ Define(niyas_tools_poison_soulbind 320660)
     code += `
 SpellRequire(kill_command unusable set=1 enabled=(not pet.Present() or pet.IsIncapacitated() or pet.IsFeared() or pet.IsStunned()))
 SpellRequire(kill_command_survival unusable set=1 enabled=(not pet.Present() or pet.IsIncapacitated() or pet.IsFeared() or pet.IsStunned()))
+SpellAddTargetDebuff(kill_command_survival kill_command_debuff enabled=(HasTalent(bloodseeker_talent)))
 SpellRequire(kill_shot unusable set=1 enabled=(target.healthpercent() > 20))
 SpellRequire(kill_shot_survival unusable set=1 enabled=(target.healthpercent() > 20))
 SpellRequire(harpoon unusable set=1 enabled=(target.distance() < 8))
