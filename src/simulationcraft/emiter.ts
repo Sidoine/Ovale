@@ -4291,6 +4291,12 @@ export class Emiter {
             this.addSymbol(annotation, "frozen_orb");
         } else if (
             className == "MONK" &&
+            operand == "buff.recent_purifies.value"
+        ) {
+            // TODO assume that we've always recently purified 5% max health
+            code = "MaxHealth() * 0.05";
+        } else if (
+            className == "MONK" &&
             sub(operand, 1, 35) == "debuff.storm_earth_and_fire_target."
         ) {
             const property = sub(operand, 36);
