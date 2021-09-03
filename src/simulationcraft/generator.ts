@@ -1021,8 +1021,8 @@ export class Generator {
             const fmt = `
                 AddFunction %sUseItemActions
                 {
-                    Item(Trinket0Slot usable=1 text=13)
-                    Item(Trinket1Slot usable=1 text=14)
+                    Item("trinket0Slot" usable=1 text=13)
+                    Item("trinket1Slot" usable=1 text=14)
                 }
             `;
             const code = format(fmt, camelSpecialization);

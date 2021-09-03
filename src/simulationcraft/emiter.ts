@@ -1787,13 +1787,21 @@ export class Emiter {
                 if (modifiers.slot) {
                     // use this slot only?
                     const slot = this.unparser.unparse(modifiers.slot);
-                    if (slot && truthy(match(slot, "finger"))) {
-                        [legendaryRing] = this.disambiguate(
-                            annotation,
-                            "legendary_ring",
-                            className,
-                            specialization
-                        );
+                    if (slot) {
+                        if (truthy(match(slot, "^finger"))) {
+                            [legendaryRing] = this.disambiguate(
+                                annotation,
+                                "legendary_ring",
+                                className,
+                                specialization
+                            );
+                        } else if (slot == "trinket1") {
+                            bodyCode = `Item("trinket0slot" text=13 usable=1)`;
+                            annotation[action] = true;
+                        } else if (slot == "trinket2") {
+                            bodyCode = `Item("trinket1slot" text=14 usable=1)`;
+                            annotation[action] = true;
+                        }
                     }
                 } else if (modifiers.name) {
                     let name = this.unparser.unparse(modifiers.name);
@@ -1806,12 +1814,22 @@ export class Emiter {
                         );
                         if (truthy(match(name, "legendary_ring"))) {
                             legendaryRing = name;
+                        } else {
+                            [name] = this.disambiguate(
+                                annotation,
+                                name,
+                                className,
+                                specialization,
+                                "item",
+                                "item"
+                            );
+                            if (name) {
+                                conditionCode = `HasTrinket(${name})`;
+                                bodyCode = `Item(${name} usable=1)`;
+                                this.addSymbol(annotation, name);
+                            }
                         }
                     }
-                    // } else if (false) {
-                    //     bodyCode = format("Item(%s usable=1)", name);
-                    //     AddSymbol(annotation, name);
-                    // }
                 } else if (modifiers.effect_name) {
                     // TODO use any item that has this effect
                 }
@@ -1820,7 +1838,7 @@ export class Emiter {
                     bodyCode = format("Item(%s usable=1)", legendaryRing);
                     this.addSymbol(annotation, legendaryRing);
                     annotation.use_legendary_ring = legendaryRing;
-                } else {
+                } else if (!bodyCode) {
                     bodyCode = `${camelSpecialization}UseItemActions()`;
                     annotation[action] = true;
                 }

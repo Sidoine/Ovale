@@ -240,6 +240,7 @@ export class Parser {
             stream = gsub(stream, "target%.target%.", "target.");
             stream = gsub(stream, "name=name=", "name=");
             stream = gsub(stream, "name=BT&", "name=BT_");
+            stream = gsub(stream, "ebonsoul_vice", "ebonsoul_vise");
         }
         {
             // From the Shadows is a target debuff, not a player buff.
@@ -254,6 +255,8 @@ export class Parser {
                 "tormented_insight_355321",
                 "shadowed_orb_of_torment_355321"
             );
+            // Strip consecutive underscores from Darkmoon Deck item names.
+            stream = gsub(stream, "darkmoon_deck_+", "darkmoon_deck_");
         }
         {
             stream = gsub(stream, "(active_dot%.[%w_]+)=0", "!(%1>0)");
