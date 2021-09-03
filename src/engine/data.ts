@@ -8,7 +8,7 @@ import {
     LuaObj,
 } from "@wowts/lua";
 import { find } from "@wowts/string";
-import { isNumber } from "../tools/tools";
+import { isNumber, oneTimeMessage } from "../tools/tools";
 import { HasteType } from "../states/PaperDoll";
 import { PowerType } from "../states/Power";
 import { GetSpellInfo, SpellId } from "@wowts/wow-mock";
@@ -734,6 +734,33 @@ export class OvaleDataClass {
             return [value, ratio];
         }
         return [value * ratio];
+    }
+
+    resolveSpell(
+        spellId: number,
+        atTime: number | undefined,
+        targetGUID: string | undefined
+    ): number | undefined {
+        const maxGuard = 20;
+        let guard = 0;
+        let nextId;
+        let id: number | undefined = spellId;
+        while (id && guard < maxGuard) {
+            guard += 1;
+            nextId = id;
+            id = this.getSpellInfoProperty(
+                nextId,
+                atTime,
+                "replaced_by",
+                targetGUID
+            );
+        }
+        if (guard >= maxGuard) {
+            oneTimeMessage(
+                `Recursive 'replaced_by' chain for spell ID '${spellId}'.`
+            );
+        }
+        return nextId;
     }
 
     getDamage(
