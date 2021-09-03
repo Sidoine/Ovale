@@ -386,6 +386,8 @@ export class Emiter {
             "DRUID",
             "feral"
         );
+        this.addDisambiguation("berserk", "berserk_bear", "DRUID", "guardian");
+        this.addDisambiguation("berserk", "berserk_cat", "DRUID", "feral");
         this.addDisambiguation("bs_inc", "berserk_bear", "DRUID", "guardian");
         this.addDisambiguation("bs_inc", "berserk_cat", "DRUID", "feral");
         this.addDisambiguation("ca_inc", "celestial_alignment", "DRUID");
