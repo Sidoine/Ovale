@@ -265,10 +265,11 @@ export interface Modifiers {
     only_cwc?: ParseNode;
     op?: ParseNode;
     pct_health?: ParseNode;
+    precast_etf_equip?: ParseNode; //todo
+    precast_time?: ParseNode; //todo
     precombat?: ParseNode;
     precombat_seconds?: ParseNode; //todo
     precombat_time?: ParseNode;
-    precast_time?: ParseNode; //todo
     range?: ParseNode;
     sec?: ParseNode;
     slot?: ParseNode;
@@ -481,10 +482,11 @@ export const modifierKeywords: TypeCheck<Modifiers> = {
     ["op"]: true,
     only_cwc: true,
     ["pct_health"]: true,
+    ["precast_etf_equip"]: true, //todo
+    ["precast_time"]: true, //todo
     ["precombat"]: true,
     ["precombat_seconds"]: true, //todo
     precombat_time: true,
-    ["precast_time"]: true, //todo
     ["range"]: true,
     ["sec"]: true,
     ["slot"]: true,

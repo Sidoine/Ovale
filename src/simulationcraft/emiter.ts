@@ -846,6 +846,15 @@ export class Emiter {
                 this.addSymbol(annotation, buffName);
                 code = format("pet.BuffStacks(%s) >= %d", buffName, value);
             }
+        } else if (modifier == "precast_etf_equip" && action == "trueshot") {
+            const value = tonumber(this.unparser.unparse(parseNode));
+            const symbol = "eagletalons_true_focus_runeforge";
+            if (value > 0) {
+                code = `equippedruneforge(${symbol})`;
+            } else {
+                code = `not equippedruneforge(${symbol})`;
+            }
+            this.addSymbol(annotation, symbol);
         } else if (modifier == "moving") {
             const value = tonumber(this.unparser.unparse(parseNode));
             if (value == 0) {
