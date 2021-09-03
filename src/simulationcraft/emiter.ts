@@ -3877,6 +3877,14 @@ export class Emiter {
             } else if (property === "exists") {
                 code = "never(raid_event_invulnerable_exists)";
             }
+        } else if (name == "vulnerable") {
+            if (property == "exists") {
+                code = "always(raid_event_vulnerable_exists)";
+            } else if (property == "in") {
+                code = "0";
+            } else if (property == "up") {
+                code = "always(raid_event_vulnerable_up)";
+            }
         }
         if (code) {
             [node] = this.ovaleAst.parseCode(
