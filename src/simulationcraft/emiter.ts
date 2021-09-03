@@ -386,6 +386,30 @@ export class Emiter {
             "DRUID",
             "feral"
         );
+        this.addDisambiguation(
+            "incarnation",
+            "incarnation_chosen_of_elune",
+            "DRUID",
+            "balance"
+        );
+        this.addDisambiguation(
+            "incarnation",
+            "incarnation_guardian_of_ursoc",
+            "DRUID",
+            "guardian"
+        );
+        this.addDisambiguation(
+            "incarnation",
+            "incarnation_king_of_the_jungle",
+            "DRUID",
+            "feral"
+        );
+        this.addDisambiguation(
+            "incarnation",
+            "incarnation_tree_of_life",
+            "DRUID",
+            "restoration"
+        );
         this.addDisambiguation("berserk", "berserk_bear", "DRUID", "guardian");
         this.addDisambiguation("berserk", "berserk_cat", "DRUID", "feral");
         this.addDisambiguation("bs_inc", "berserk_bear", "DRUID", "guardian");
