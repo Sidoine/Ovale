@@ -248,6 +248,12 @@ export class Parser {
                 "buff%.from_the_shadows%.",
                 "target.debuff.from_the_shadows."
             );
+            // Alter buff name so the emitter picks the right trinket name.
+            stream = gsub(
+                stream,
+                "tormented_insight_355321",
+                "shadowed_orb_of_torment_355321"
+            );
         }
         {
             stream = gsub(stream, "(active_dot%.[%w_]+)=0", "!(%1>0)");
