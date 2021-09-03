@@ -4730,6 +4730,11 @@ export class Emiter {
                         `ItemCooldownDuration(slot="%s")`,
                         slot
                     );
+                } else if (statName === "ready") {
+                    code = emitTrinketCondition(
+                        `not ItemCooldown(slot="%s") > 0`,
+                        slot
+                    );
                 }
             } else if (procType === "ready_cooldown") {
                 // TODO The item internal cooldown is ready
@@ -4739,11 +4744,40 @@ export class Emiter {
                     `ItemCooldownDuration(slot="%s")`,
                     slot
                 );
-            } else if (procType == "has_proc") {
+            } else if (procType === "has_buff") {
+                // TODO trinket.has_buff.<stat>
+                code = "true";
+            } else if (procType === "has_proc") {
                 code = emitTrinketCondition(`ItemRppm(slot="%s") > 0`, slot);
             } else if (procType === "has_stat") {
                 // TODO
                 code = "false";
+            } else if (procType === "has_use_buff") {
+                /* TODO item has an on-use ability that applies a buff;
+                 * if the item has a cooldown duration, then it is on-use;
+                 * need to detect if it applies a buff.
+                 */
+                code = emitTrinketCondition(
+                    `ItemCooldownDuration(slot="%s") > 0`,
+                    slot
+                );
+            } else if (procType === "proc") {
+                if (statName === "any_dps") {
+                    const property = tokenIterator();
+                    if (property == "duration") {
+                        /* TODO duration of the on-use buff granted by the item;
+                         * approximate as 30s for 3 minute CD.
+                         */
+                        code = emitTrinketCondition(
+                            `30 * ItemCooldownDuration(slot="%s") / 180`,
+                            slot
+                        );
+                    }
+                }
+                if (!code) {
+                    // TODO trinket.proc.<stat>.<property>
+                    code = "false";
+                }
             } else {
                 const property = statName;
                 const [buffName] = this.disambiguate(
