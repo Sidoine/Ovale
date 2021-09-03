@@ -4294,20 +4294,23 @@ l    */
         if (!targetGuid) return [];
         let earliest = INFINITY;
         for (const [, spellId] of ipairs(positionalParams)) {
-            if (
-                !usable ||
-                this.spells.isUsableSpell(spellId, atTime, targetGuid)
-            ) {
-                const [start, duration] = this.cooldown.getSpellCooldown(
-                    spellId,
-                    atTime
-                );
-                let t = 0;
-                if (start > 0 && duration > 0) {
-                    t = start + duration;
-                }
-                if (earliest > t) {
-                    earliest = t;
+            const id = this.data.resolveSpell(spellId, atTime, targetGuid);
+            if (id) {
+                if (
+                    !usable ||
+                    this.spells.isUsableSpell(id, atTime, targetGuid)
+                ) {
+                    const [start, duration] = this.cooldown.getSpellCooldown(
+                        id,
+                        atTime
+                    );
+                    let t = 0;
+                    if (start > 0 && duration > 0) {
+                        t = start + duration;
+                    }
+                    if (earliest > t) {
+                        earliest = t;
+                    }
                 }
             }
         }
