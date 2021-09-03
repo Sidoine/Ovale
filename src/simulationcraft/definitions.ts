@@ -838,7 +838,7 @@ export const miscOperands: LuaObj<MiscOperand> = {
     },
     ["rage"]: { name: "rage", modifiers: powerModifiers },
     ["remaining_winters_chill"]: {
-        name: "debuffstacks",
+        code: "target.debuffstacks(winters_chill_debuff)",
         extraSymbol: "winters_chill_debuff",
     },
     ["rune"]: { name: "rune", modifiers: powerModifiers },
