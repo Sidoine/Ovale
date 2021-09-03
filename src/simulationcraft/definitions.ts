@@ -692,6 +692,10 @@ export const miscOperands: LuaObj<MiscOperand> = {
                 type: MiscOperandModifierType.Replace,
                 name: "buffremains",
             },
+            active_remains: {
+                type: MiscOperandModifierType.Replace,
+                name: "buffremains",
+            },
         },
         extraSymbol: "death_and_decay",
     },
