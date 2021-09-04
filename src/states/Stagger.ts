@@ -23,9 +23,9 @@ import { isNumber } from "../tools/tools";
 import { BaseState } from "./BaseState";
 import { AstFunctionNode, NamedParametersOf } from "../engine/ast";
 
-const lightStagger = SpellId.light_stagger;
-const moderateStagger = SpellId.moderate_stagger;
-const heavyStagger = SpellId.heavy_stagger;
+const lightStagger = SpellId.light_stagger_buff;
+const moderateStagger = SpellId.moderate_stagger_buff;
+const heavyStagger = SpellId.heavy_stagger_buff;
 const staggerDoT = 124255;
 
 let serial = 1;
