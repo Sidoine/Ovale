@@ -3,7 +3,13 @@ import { LuaArray } from "@wowts/lua";
 import { huge as infinity } from "@wowts/math";
 import { concat, insert } from "@wowts/table";
 import { AceModule } from "@wowts/tsaddon";
-import { GetSpellCount, GetTime, UnitCastingInfo } from "@wowts/wow-mock";
+import {
+    GetSpellCount,
+    GetTime,
+    SpellId,
+    TalentId,
+    UnitCastingInfo,
+} from "@wowts/wow-mock";
 import {
     ConditionFunction,
     ConditionResult,
@@ -39,19 +45,20 @@ class EclipseData {
 }
 
 const balanceSpellId = {
-    starfire: 194153,
-    wrath: 190984,
+    starfire: SpellId.starfire,
+    wrath: SpellId.wrath_balance,
 };
 
 const balanceAffinitySpellId = {
-    talent: 22163,
+    talent: TalentId.balance_affinity_talent,
     starfire: 197628,
-    wrath: 5176,
+    wrath: SpellId.wrath,
 };
 
-const celestialAlignmentId = 194223;
-const eclipseLunarId = 48518;
-const eclipseSolarId = 48517;
+const celestialAlignmentId = SpellId.celestial_alignment;
+const incarnationId = SpellId.incarnation_chosen_of_elune;
+const eclipseLunarId = SpellId.eclipse_lunar_buff;
+const eclipseSolarId = SpellId.eclipse_solar_buff;
 const leafOnTheWaterId = 334604;
 
 export class Eclipse extends States<EclipseData> implements StateModule {
@@ -270,6 +277,7 @@ export class Eclipse extends States<EclipseData> implements StateModule {
         if (
             unit == "player" &&
             (spellId == celestialAlignmentId ||
+                spellId == incarnationId ||
                 spellId == this.starfireId ||
                 spellId == this.wrathId)
         ) {
@@ -425,6 +433,20 @@ export class Eclipse extends States<EclipseData> implements StateModule {
                     undefined,
                     endCast
                 ) || 20;
+            this.triggerEclipse(endCast, "lunar", duration);
+            this.triggerEclipse(endCast, "solar", duration);
+        } else if (spellId == incarnationId) {
+            // Incarnation triggers both Eclipse states.
+            starfire = 0;
+            wrath = 0;
+            this.tracer.log(
+                "Spell ID '%d' Incarnation: Chosen of Elune resets counts to 0.",
+                spellId
+            );
+            // Incarnation has a default base duration of 20 seconds.
+            const duration =
+                this.aura.getBaseDuration(incarnationId, undefined, endCast) ||
+                30;
             this.triggerEclipse(endCast, "lunar", duration);
             this.triggerEclipse(endCast, "solar", duration);
         } else {

@@ -23,11 +23,6 @@ import { isNumber } from "../tools/tools";
 import { BaseState } from "./BaseState";
 import { AstFunctionNode, NamedParametersOf } from "../engine/ast";
 
-const lightStagger = SpellId.light_stagger_buff;
-const moderateStagger = SpellId.moderate_stagger_buff;
-const heavyStagger = SpellId.heavy_stagger_buff;
-const staggerDoT = 124255;
-
 let serial = 1;
 const maxLength = 30;
 export class OvaleStaggerClass implements StateModule {
@@ -95,7 +90,7 @@ export class OvaleStaggerClass implements StateModule {
         if (cleu.sourceGUID == this.ovale.playerGUID) {
             serial = serial + 1;
             const header = cleu.header as SpellPeriodicPayloadHeader;
-            if (header.spellId == staggerDoT) {
+            if (header.spellId == SpellId.stagger_buff) {
                 const payload = cleu.payload as DamagePayload;
                 insert(this.staggerTicks, payload.amount);
                 if (lualength(this.staggerTicks) > maxLength) {
@@ -149,17 +144,27 @@ export class OvaleStaggerClass implements StateModule {
     };
 
     private getAnyStaggerAura(target: string, atTime: number): ConditionResult {
-        let aura = this.aura.getAura(target, heavyStagger, atTime, "HARMFUL");
+        let aura = this.aura.getAura(
+            target,
+            SpellId.heavy_stagger_buff,
+            atTime,
+            "HARMFUL"
+        );
         if (!aura || !this.aura.isActiveAura(aura, atTime)) {
             aura = this.aura.getAura(
                 target,
-                moderateStagger,
+                SpellId.moderate_stagger_buff,
                 atTime,
                 "HARMFUL"
             );
         }
         if (!aura || !this.aura.isActiveAura(aura, atTime)) {
-            aura = this.aura.getAura(target, lightStagger, atTime, "HARMFUL");
+            aura = this.aura.getAura(
+                target,
+                SpellId.light_stagger_buff,
+                atTime,
+                "HARMFUL"
+            );
         }
         if (aura && this.aura.isActiveAura(aura, atTime)) {
             const [gain, start, ending] = [aura.gain, aura.start, aura.ending];

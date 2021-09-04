@@ -17,6 +17,7 @@ export type ClassType = string;
 export type Result<T> = T | undefined;
 
 export type Interrupts =
+    | "pet_interrupt"
     | "mind_freeze"
     | "pummel"
     | "disrupt"
@@ -32,6 +33,7 @@ export type Interrupts =
     | "counterspell"
     | "spear_hand_strike";
 export const interruptsClasses: { [k in Interrupts]: ClassId } = {
+    pet_interrupt: "WARLOCK",
     mind_freeze: "DEATHKNIGHT",
     pummel: "WARRIOR",
     disrupt: "DEMONHUNTER",
@@ -99,7 +101,11 @@ export const classInfos: { [key in ClassId]: ClassInfo } = {
         elemental: { interrupt: "wind_shear" },
         enhancement: { interrupt: "wind_shear" },
     },
-    WARLOCK: {},
+    WARLOCK: {
+        affliction: { interrupt: "pet_interrupt" },
+        demonology: { interrupt: "pet_interrupt" },
+        destruction: { interrupt: "pet_interrupt" },
+    },
     WARRIOR: {
         fury: { interrupt: "pummel" },
         protection: { interrupt: "pummel" },
@@ -259,10 +265,11 @@ export interface Modifiers {
     only_cwc?: ParseNode;
     op?: ParseNode;
     pct_health?: ParseNode;
+    precast_etf_equip?: ParseNode; //todo
+    precast_time?: ParseNode; //todo
     precombat?: ParseNode;
     precombat_seconds?: ParseNode; //todo
     precombat_time?: ParseNode;
-    precast_time?: ParseNode; //todo
     range?: ParseNode;
     sec?: ParseNode;
     slot?: ParseNode;
@@ -272,9 +279,6 @@ export interface Modifiers {
     sync_weapons?: ParseNode;
     target?: ParseNode;
     target_if?: ParseNode;
-    target_if_first?: ParseNode;
-    target_if_max?: ParseNode;
-    target_if_min?: ParseNode;
     toggle?: ParseNode;
     travel_speed?: ParseNode;
     type?: ParseNode;
@@ -322,9 +326,12 @@ export type SimcBinaryOperatorType =
 export type SimcUnaryOperatorType = "!" | "-" | "@";
 export type SimcOperatorType = SimcUnaryOperatorType | SimcBinaryOperatorType;
 
+export type TargetIfType = "first" | "max" | "min";
+
 interface BaseParseNode {
     nodeId: number;
     asType: NodeType;
+    targetIf?: TargetIfType;
 
     // TODO Used by ActionParseNode, ActionListParseNode, and FunctionParseNode
     name?: string;
@@ -340,6 +347,7 @@ export interface ActionParseNode extends BaseParseNode {
     name: string;
     action: string;
     modifiers: Modifiers;
+    sequence?: LuaArray<ActionParseNode>;
     actionListName: string;
 }
 
@@ -474,10 +482,11 @@ export const modifierKeywords: TypeCheck<Modifiers> = {
     ["op"]: true,
     only_cwc: true,
     ["pct_health"]: true,
+    ["precast_etf_equip"]: true, //todo
+    ["precast_time"]: true, //todo
     ["precombat"]: true,
     ["precombat_seconds"]: true, //todo
     precombat_time: true,
-    ["precast_time"]: true, //todo
     ["range"]: true,
     ["sec"]: true,
     ["slot"]: true,
@@ -487,9 +496,6 @@ export const modifierKeywords: TypeCheck<Modifiers> = {
     ["sync_weapons"]: true,
     ["target"]: true,
     ["target_if"]: true,
-    ["target_if_first"]: true,
-    ["target_if_max"]: true,
-    ["target_if_min"]: true,
     ["toggle"]: true,
     ["travel_speed"]: true,
     ["type"]: true,
@@ -503,10 +509,16 @@ export const modifierKeywords: TypeCheck<Modifiers> = {
 };
 export const litteralModifiers: LuaObj<boolean> = {
     ["name"]: true,
+    ["op"]: true,
 };
 export const functionKeywords: LuaObj<boolean> = {
     ["ceil"]: true,
     ["floor"]: true,
+};
+export const targetIfKeywords: LuaObj<boolean> = {
+    ["first"]: true,
+    ["max"]: true,
+    ["min"]: true,
 };
 export const specialActions: LuaObj<boolean> = {
     ["apply_poison"]: true,
@@ -519,8 +531,10 @@ export const specialActions: LuaObj<boolean> = {
     ["flask"]: true,
     ["food"]: true,
     ["health_stone"]: true,
+    ["interrupt"]: true,
     ["pool_resource"]: true,
     ["potion"]: true,
+    ["retarget_auto_attack"]: true,
     ["run_action_list"]: true,
     ["sequence"]: true,
     ["snapshot_stats"]: true,
@@ -534,6 +548,10 @@ export const specialActions: LuaObj<boolean> = {
     ["use_item"]: true,
     ["variable"]: true,
     ["wait"]: true,
+};
+export const sequenceActions: LuaObj<boolean> = {
+    ["sequence"]: true,
+    ["strict_sequence"]: true,
 };
 
 export const enum MiscOperandModifierType {
@@ -562,6 +580,11 @@ const powerModifiers: LuaObj<MiscOperandModifier> = {
     ["deficit"]: { type: MiscOperandModifierType.Suffix },
     ["pct"]: { name: "percent", type: MiscOperandModifierType.Suffix },
     ["regen"]: { name: "regenrate", type: MiscOperandModifierType.Suffix },
+    ["regen_combined"]: {
+        // TODO: "regen_combined" should incorporate regen from buffs
+        name: "regenrate",
+        type: MiscOperandModifierType.Suffix,
+    },
     ["time_to_40"]: {
         name: "timeto",
         type: MiscOperandModifierType.Prefix,
@@ -573,6 +596,11 @@ const powerModifiers: LuaObj<MiscOperandModifier> = {
         extraParameter: 50,
     },
     ["time_to_max"]: {
+        name: "timetomax",
+        type: MiscOperandModifierType.Prefix,
+    },
+    ["time_to_max_combined"]: {
+        // TODO: "time_to_max_combined" should incorporate regen from buffs
         name: "timetomax",
         type: MiscOperandModifierType.Prefix,
     },
@@ -598,6 +626,18 @@ export const miscOperands: LuaObj<MiscOperand> = {
     ["animacharged_cp"]: { name: "maxcombopoints" },
     ["arcane_charges"]: { name: "arcanecharges", modifiers: powerModifiers },
     ["astral_power"]: { name: "astralpower", modifiers: powerModifiers },
+    ["bloodseeker"]: {
+        modifiers: {
+            remains: {
+                type: MiscOperandModifierType.Code,
+                code: "target.debuffremains(kill_command_debuff)",
+                symbolsInCode: {
+                    1: "kill_command_debuff",
+                    2: "bloodseeker_talent",
+                },
+            },
+        },
+    },
     ["ca_active"]: {
         code: "talent(careful_aim_talent) and target.healthpercent() > 70",
         symbolsInCode: {
@@ -663,6 +703,10 @@ export const miscOperands: LuaObj<MiscOperand> = {
                 name: "buffpresent",
             },
             remains: {
+                type: MiscOperandModifierType.Replace,
+                name: "buffremains",
+            },
+            active_remains: {
                 type: MiscOperandModifierType.Replace,
                 name: "buffremains",
             },
@@ -762,6 +806,7 @@ export const miscOperands: LuaObj<MiscOperand> = {
     },
     ["energy"]: { name: "energy", modifiers: powerModifiers },
     ["expected_combat_length"]: { name: "expectedcombatlength" },
+    ["expected_kindling_reduction"]: { code: "1" }, //todo
     ["exsanguinated"]: {
         name: "targetdebuffremaining",
         symbol: "exsanguinated",
@@ -808,7 +853,7 @@ export const miscOperands: LuaObj<MiscOperand> = {
     },
     ["rage"]: { name: "rage", modifiers: powerModifiers },
     ["remaining_winters_chill"]: {
-        name: "debuffstacks",
+        code: "target.debuffstacks(winters_chill_debuff)",
         extraSymbol: "winters_chill_debuff",
     },
     ["rune"]: { name: "rune", modifiers: powerModifiers },
@@ -819,6 +864,17 @@ export const miscOperands: LuaObj<MiscOperand> = {
         symbol: "runeforge",
     },
     ["runic_power"]: { name: "runicpower", modifiers: powerModifiers },
+    ["searing_touch"]: {
+        modifiers: {
+            active: {
+                type: MiscOperandModifierType.Code,
+                code: "talent(searing_touch_talent) and target.healthpercent() < 30",
+                symbolsInCode: {
+                    1: "searing_touch_talent",
+                },
+            },
+        },
+    },
     ["soul_fragments"]: { name: "soulfragments", modifiers: powerModifiers },
     ["soul_shard"]: { name: "soulshards", modifiers: powerModifiers },
     ["soulbind"]: {
@@ -893,6 +949,9 @@ export const consumableItems: LuaObj<boolean> = {
         keywords[keyword] = value;
     }
     for (const [keyword, value] of pairs(functionKeywords)) {
+        keywords[keyword] = value;
+    }
+    for (const [keyword, value] of pairs(targetIfKeywords)) {
         keywords[keyword] = value;
     }
     for (const [keyword, value] of pairs(specialActions)) {
@@ -1103,6 +1162,8 @@ export interface DbcData {
 }
 
 export class Annotation implements InterruptAnnotation {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    pet_interrupt?: ClassId;
     // eslint-disable-next-line @typescript-eslint/naming-convention
     mind_freeze?: ClassId;
     pummel?: ClassId;

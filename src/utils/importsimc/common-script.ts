@@ -1,4 +1,4 @@
-import { getItemProps } from "./ast-helpers";
+import { getItemDefinition } from "./ast-helpers";
 import { convertFromItemData } from "./customspell";
 import { replaceInFile } from "./file-tools";
 import { DbcData } from "./importspells";
@@ -44,9 +44,10 @@ export function exportCommon(dbc: DbcData) {
             item.inventory_type === InventoryType.INVTYPE_TRINKET
         ) {
             const itemData = convertFromItemData(item, dbc.spellDataById);
-            const itemInfos = getItemProps(itemData);
-            if (itemInfos.length > 0) {
-                lines.push(`ItemInfo(${item.id}${itemInfos})`);
+            lines.push(`Define(${itemData.identifier} ${itemData.id})`);
+            const itemDefinition = getItemDefinition(itemData);
+            if (itemDefinition) {
+                lines.push(itemDefinition);
             }
         }
     }

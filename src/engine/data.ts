@@ -8,7 +8,7 @@ import {
     LuaObj,
 } from "@wowts/lua";
 import { find } from "@wowts/string";
-import { isNumber } from "../tools/tools";
+import { isNumber, oneTimeMessage } from "../tools/tools";
 import { HasteType } from "../states/PaperDoll";
 import { PowerType } from "../states/Power";
 import { GetSpellInfo, SpellId } from "@wowts/wow-mock";
@@ -306,147 +306,86 @@ export class OvaleDataClass {
 
     buffSpellList: LuaObj<LuaArray<boolean>> = {
         attack_power_multiplier_buff: {
-            [6673]: true,
-            [19506]: true,
-            [57330]: true,
+            [SpellId.battle_shout]: true,
         },
         critical_strike_buff: {
-            [1459]: true,
-            [24604]: true,
-            [24932]: true,
-            [61316]: true,
-            [90309]: true,
-            [90363]: true,
-            [97229]: true,
-            [116781]: true,
-            [126309]: true,
-            [126373]: true,
-            [128997]: true,
-            [160052]: true,
-            [160200]: true,
+            [SpellId.arcane_intellect]: true,
         },
-        haste_buff: {
-            [49868]: true,
-            [55610]: true,
-            [113742]: true,
-            [128432]: true,
-            [135678]: true,
-            [160003]: true,
-            [160074]: true,
-            [160203]: true,
-        },
-        mastery_buff: {
-            [19740]: true,
-            [24907]: true,
-            [93435]: true,
-            [116956]: true,
-            [128997]: true,
-            [155522]: true,
-            [160073]: true,
-            [160198]: true,
-        },
+        haste_buff: {},
+        mastery_buff: {},
         spell_power_multiplier_buff: {
-            [1459]: true,
-            [61316]: true,
-            [90364]: true,
-            [109773]: true,
-            [126309]: true,
-            [128433]: true,
-            [160205]: true,
+            [SpellId.arcane_intellect]: true,
         },
         stamina_buff: {
-            [469]: true,
-            [21562]: true,
-            [50256]: true,
-            [90364]: true,
-            [160003]: true,
-            [160014]: true,
-            [166928]: true,
-            [160199]: true,
+            [SpellId.power_word_fortitude]: true,
         },
-        str_agi_int_buff: {
-            [1126]: true,
-            [20217]: true,
-            [90363]: true,
-            [115921]: true,
-            [116781]: true,
-            [159988]: true,
-            [160017]: true,
-            [160077]: true,
-            [160206]: true,
-        },
-        versatility_buff: {
-            [1126]: true,
-            [35290]: true,
-            [50518]: true,
-            [55610]: true,
-            [57386]: true,
-            [159735]: true,
-            [160045]: true,
-            [160077]: true,
-            [167187]: true,
-            [167188]: true,
-            [172967]: true,
-        },
+        str_agi_int_buff: {},
+        versatility_buff: {},
         bleed_debuff: {
-            [1079]: true,
-            [16511]: true,
-            [33745]: true,
-            [77758]: true,
-            [113344]: true,
-            [115767]: true,
-            [122233]: true,
-            [154953]: true,
-            [155722]: true,
+            [SpellId.bloodbath_debuff]: true,
+            [SpellId.crimson_tempest]: true,
+            [SpellId.deep_wounds_debuff]: true,
+            [SpellId.garrote]: true,
+            [SpellId.internal_bleeding_debuff]: true,
+            [SpellId.rake_debuff]: true,
+            [SpellId.rend]: true,
+            [SpellId.rip]: true,
+            [SpellId.rupture]: true,
+            [SpellId.thrash_debuff]: true,
+            [SpellId.serrated_bone_spike]: true,
         },
         healing_reduced_debuff: {
-            [8680]: true,
-            [54680]: true,
-            [115625]: true,
-            [115804]: true,
+            [8680]: true, // Wound Poison debuff
+            [SpellId.mortal_wounds_debuff]: true,
         },
         stealthed_buff: {
-            [SpellId.stealth]: true,
-            [115191]: true,
-            [SpellId.prowl]: true,
-            [SpellId.vanish]: true,
-            [11327]: true,
-            [SpellId.shadowmeld]: true,
             [SpellId.incarnation_king_of_the_jungle]: true,
+            [SpellId.prowl]: true,
+            [SpellId.shadowmeld]: true,
+            [SpellId.shadow_dance_buff]: true,
+            [SpellId.stealth]: true,
             [SpellId.subterfuge_buff]: true,
-            [115193]: true,
-            [SpellId.shadow_dance]: true,
-            [185422]: true,
-            [347037]: true,
+            [SpellId.vanish]: true,
+            [11327]: true, // Vanish buff
+            [115191]: true, // Stealth (Subterfuge)
+            [115193]: true, // Vanish buff
+            [347037]: true, // Sepsis debuff
         },
         rogue_stealthed_buff: {
             [SpellId.stealth]: true,
-            [115191]: true,
-            [SpellId.vanish]: true,
-            [11327]: true,
-            [SpellId.shadow_dance]: true,
-            [185422]: true,
+            [SpellId.shadow_dance_buff]: true,
             [SpellId.subterfuge_buff]: true,
-            [347037]: true,
+            [SpellId.vanish]: true,
+            [11327]: true, // Vanish buff
+            [115191]: true, // Stealth (Subterfuge)
+            [115193]: true, // Vanish buff
+            [347037]: true, // Sepsis debuff
         },
         mantle_stealthed_buff: {
             [SpellId.stealth]: true,
             [SpellId.vanish]: true,
+            [11327]: true, // Vanish buff
+            [115193]: true, // Vanish buff
         },
         burst_haste_buff: {
-            [2825]: true,
-            [32182]: true,
-            [80353]: true,
-            [90355]: true,
+            [SpellId.bloodlust]: true,
+            [SpellId.drums_of_deathly_ferocity]: true,
+            [SpellId.drums_of_fury]: true,
+            [SpellId.drums_of_rage]: true,
+            [SpellId.drums_of_the_maelstrom]: true,
+            [SpellId.drums_of_the_mountain]: true,
+            [SpellId.heroism]: true,
+            [SpellId.primal_rage_pet]: true,
+            [SpellId.time_warp]: true,
         },
         burst_haste_debuff: {
-            [57723]: true,
-            [57724]: true,
-            [80354]: true,
-            [95809]: true,
+            [SpellId.exhaustion_debuff]: true,
+            [SpellId.sated_debuff]: true,
+            [SpellId.temporal_displacement_debuff]: true,
         },
         raid_movement_buff: {
-            [106898]: true,
+            [SpellId.stampeding_roar]: true,
+            [SpellId.wind_rush_buff]: true,
         },
         roll_the_bones_buff: {
             [SpellId.broadside_buff]: true,
@@ -458,8 +397,12 @@ export class OvaleDataClass {
         },
         lethal_poison_buff: {
             [SpellId.deadly_poison]: true,
-            [8679]: true,
-            [315584]: true,
+            [SpellId.instant_poison]: true,
+            [SpellId.wound_poison]: true,
+        },
+        non_lethal_poison_buff: {
+            [SpellId.crippling_poison]: true,
+            [SpellId.numbing_poison]: true,
         },
     };
     constructor(private runner: Runner, ovaleDebug: DebugTools) {
@@ -791,6 +734,33 @@ export class OvaleDataClass {
             return [value, ratio];
         }
         return [value * ratio];
+    }
+
+    resolveSpell(
+        spellId: number,
+        atTime: number | undefined,
+        targetGUID: string | undefined
+    ): number | undefined {
+        const maxGuard = 20;
+        let guard = 0;
+        let nextId;
+        let id: number | undefined = spellId;
+        while (id && guard < maxGuard) {
+            guard += 1;
+            nextId = id;
+            id = this.getSpellInfoProperty(
+                nextId,
+                atTime,
+                "replaced_by",
+                targetGUID
+            );
+        }
+        if (guard >= maxGuard) {
+            oneTimeMessage(
+                `Recursive 'replaced_by' chain for spell ID '${spellId}'.`
+            );
+        }
+        return nextId;
     }
 
     getDamage(

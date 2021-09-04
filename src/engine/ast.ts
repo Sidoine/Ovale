@@ -2651,7 +2651,10 @@ export class OvaleASTClass {
         return node;
     };
 
-    private parseGroup(tokenStream: OvaleLexer, annotation: AstAnnotation) {
+    private parseGroup = (
+        tokenStream: OvaleLexer,
+        annotation: AstAnnotation
+    ): AstNode | undefined => {
         const group = this.innerParseGroup(tokenStream, annotation);
         if (group && lualength(group.child) === 1) {
             const result = group.child[1];
@@ -2659,7 +2662,7 @@ export class OvaleASTClass {
             return result;
         }
         return group;
-    }
+    };
 
     private innerParseGroup: ParserFunction<AstGroupNode> = (
         tokenStream,

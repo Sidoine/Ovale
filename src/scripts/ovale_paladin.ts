@@ -5,13 +5,293 @@ export function registerPaladin(scripts: OvaleScriptsClass) {
     // ANY CHANGES MADE BELOW THIS POINT WILL BE LOST
 
     {
-        const name = "sc_t26_paladin_protection";
-        const desc = "[9.0] Simulationcraft: T26_Paladin_Protection";
+        const name = "sc_t27_paladin_holy";
+        const desc = "[9.1] Simulationcraft: T27_Paladin_Holy";
         const code = `
-# Based on SimulationCraft profile "T26_Paladin_Protection".
+# Based on SimulationCraft profile "T27_Paladin_Holy".
+#	class=paladin
+#	spec=holy
+#	talents=1212331
+
+Include(ovale_common)
+Include(ovale_paladin_spells)
+
+AddCheckBox(opt_melee_range l(not_in_melee_range) enabled=(specialization(holy)))
+AddCheckBox(opt_use_consumables l(opt_use_consumables) default enabled=(specialization(holy)))
+
+AddFunction holyuseitemactions
+{
+ item("trinket0Slot" text=13 usable=1)
+ item("trinket1Slot" text=14 usable=1)
+}
+
+AddFunction holygetinmeleerange
+{
+ if checkboxon(opt_melee_range) and not target.inrange(rebuke) texture(misc_arrowlup help=(l(not_in_melee_range)))
+}
+
+### actions.priority
+
+AddFunction holyprioritymainactions
+{
+ #shield_of_the_righteous
+ spell(shield_of_the_righteous)
+ #hammer_of_wrath
+ spell(hammer_of_wrath)
+ #holy_shock,damage=1
+ spell(holy_shock)
+ #judgment
+ spell(judgment_holy)
+ #crusader_strike
+ spell(crusader_strike)
+ #holy_prism,target=self,if=active_enemies>=2
+ if enemies() >= 2 spell(holy_prism text=self)
+ #holy_prism
+ spell(holy_prism)
+ #consecration
+ spell(consecration)
+ #light_of_dawn
+ spell(light_of_dawn)
+}
+
+AddFunction holyprioritymainpostconditions
+{
+}
+
+AddFunction holypriorityshortcdactions
+{
+}
+
+AddFunction holypriorityshortcdpostconditions
+{
+ spell(shield_of_the_righteous) or spell(hammer_of_wrath) or spell(holy_shock) or spell(judgment_holy) or spell(crusader_strike) or enemies() >= 2 and spell(holy_prism text=self) or spell(holy_prism) or spell(consecration) or spell(light_of_dawn)
+}
+
+AddFunction holyprioritycdactions
+{
+}
+
+AddFunction holyprioritycdpostconditions
+{
+ spell(shield_of_the_righteous) or spell(hammer_of_wrath) or spell(holy_shock) or spell(judgment_holy) or spell(crusader_strike) or enemies() >= 2 and spell(holy_prism text=self) or spell(holy_prism) or spell(consecration) or spell(light_of_dawn)
+}
+
+### actions.precombat
+
+AddFunction holyprecombatmainactions
+{
+}
+
+AddFunction holyprecombatmainpostconditions
+{
+}
+
+AddFunction holyprecombatshortcdactions
+{
+}
+
+AddFunction holyprecombatshortcdpostconditions
+{
+}
+
+AddFunction holyprecombatcdactions
+{
+ #flask
+ #food
+ #augmentation
+ #snapshot_stats
+ #potion
+ if checkboxon(opt_use_consumables) and target.classification(worldboss) item(potion_of_phantom_fire_item usable=1)
+}
+
+AddFunction holyprecombatcdpostconditions
+{
+}
+
+### actions.cooldowns
+
+AddFunction holycooldownsmainactions
+{
+ #blessing_of_the_seasons
+ spell(blessing_of_the_seasons)
+}
+
+AddFunction holycooldownsmainpostconditions
+{
+}
+
+AddFunction holycooldownsshortcdactions
+{
+ unless spell(blessing_of_the_seasons)
+ {
+  #vanquishers_hammer
+  spell(vanquishers_hammer)
+  #divine_toll
+  spell(divine_toll)
+  #seraphim
+  spell(seraphim)
+ }
+}
+
+AddFunction holycooldownsshortcdpostconditions
+{
+ spell(blessing_of_the_seasons)
+}
+
+AddFunction holycooldownscdactions
+{
+ #avenging_wrath
+ spell(avenging_wrath)
+ #ashen_hallow
+ spell(ashen_hallow)
+
+ unless spell(blessing_of_the_seasons) or spell(vanquishers_hammer) or spell(divine_toll)
+ {
+  #potion,if=(buff.avenging_wrath.up)
+  if buffpresent(avenging_wrath) and { checkboxon(opt_use_consumables) and target.classification(worldboss) } item(potion_of_phantom_fire_item usable=1)
+  #blood_fury,if=(buff.avenging_wrath.up)
+  if buffpresent(avenging_wrath) spell(blood_fury_ap_int)
+  #berserking,if=(buff.avenging_wrath.up)
+  if buffpresent(avenging_wrath) spell(berserking)
+  #holy_avenger,if=(buff.avenging_wrath.up)
+  if buffpresent(avenging_wrath) spell(holy_avenger)
+  #use_items,if=(buff.avenging_wrath.up)
+  if buffpresent(avenging_wrath) holyuseitemactions()
+ }
+}
+
+AddFunction holycooldownscdpostconditions
+{
+ spell(blessing_of_the_seasons) or spell(vanquishers_hammer) or spell(divine_toll) or spell(seraphim)
+}
+
+### actions.default
+
+AddFunction holy_defaultmainactions
+{
+ #call_action_list,name=cooldowns
+ holycooldownsmainactions()
+
+ unless holycooldownsmainpostconditions()
+ {
+  #call_action_list,name=priority
+  holyprioritymainactions()
+ }
+}
+
+AddFunction holy_defaultmainpostconditions
+{
+ holycooldownsmainpostconditions() or holyprioritymainpostconditions()
+}
+
+AddFunction holy_defaultshortcdactions
+{
+ #auto_attack
+ holygetinmeleerange()
+ #call_action_list,name=cooldowns
+ holycooldownsshortcdactions()
+
+ unless holycooldownsshortcdpostconditions()
+ {
+  #call_action_list,name=priority
+  holypriorityshortcdactions()
+ }
+}
+
+AddFunction holy_defaultshortcdpostconditions
+{
+ holycooldownsshortcdpostconditions() or holypriorityshortcdpostconditions()
+}
+
+AddFunction holy_defaultcdactions
+{
+ #call_action_list,name=cooldowns
+ holycooldownscdactions()
+
+ unless holycooldownscdpostconditions()
+ {
+  #call_action_list,name=priority
+  holyprioritycdactions()
+ }
+}
+
+AddFunction holy_defaultcdpostconditions
+{
+ holycooldownscdpostconditions() or holyprioritycdpostconditions()
+}
+
+### Holy icons.
+
+AddCheckBox(opt_paladin_holy_aoe l(aoe) default enabled=(specialization(holy)))
+
+AddIcon enabled=(not checkboxon(opt_paladin_holy_aoe) and specialization(holy)) enemies=1 help=shortcd
+{
+ if not incombat() holyprecombatshortcdactions()
+ holy_defaultshortcdactions()
+}
+
+AddIcon enabled=(checkboxon(opt_paladin_holy_aoe) and specialization(holy)) help=shortcd
+{
+ if not incombat() holyprecombatshortcdactions()
+ holy_defaultshortcdactions()
+}
+
+AddIcon enabled=(specialization(holy)) enemies=1 help=main
+{
+ if not incombat() holyprecombatmainactions()
+ holy_defaultmainactions()
+}
+
+AddIcon enabled=(checkboxon(opt_paladin_holy_aoe) and specialization(holy)) help=aoe
+{
+ if not incombat() holyprecombatmainactions()
+ holy_defaultmainactions()
+}
+
+AddIcon enabled=(not checkboxon(opt_paladin_holy_aoe) and specialization(holy)) enemies=1 help=cd
+{
+ if not incombat() holyprecombatcdactions()
+ holy_defaultcdactions()
+}
+
+AddIcon enabled=(checkboxon(opt_paladin_holy_aoe) and specialization(holy)) help=cd
+{
+ if not incombat() holyprecombatcdactions()
+ holy_defaultcdactions()
+}
+
+### Required symbols
+# ashen_hallow
+# avenging_wrath
+# berserking
+# blessing_of_the_seasons
+# blood_fury_ap_int
+# consecration
+# crusader_strike
+# divine_toll
+# hammer_of_wrath
+# holy_avenger
+# holy_prism
+# holy_shock
+# judgment_holy
+# light_of_dawn
+# potion_of_phantom_fire_item
+# rebuke
+# seraphim
+# shield_of_the_righteous
+# vanquishers_hammer
+`;
+        scripts.registerScript("PALADIN", "holy", name, desc, code, "script");
+    }
+
+    {
+        const name = "sc_t27_paladin_protection";
+        const desc = "[9.1] Simulationcraft: T27_Paladin_Protection";
+        const code = `
+# Based on SimulationCraft profile "T27_Paladin_Protection".
 #	class=paladin
 #	spec=protection
-#	talents=2200202
+#	talents=2200302
 
 Include(ovale_common)
 Include(ovale_paladin_spells)
@@ -34,8 +314,8 @@ AddFunction protectioninterruptactions
 
 AddFunction protectionuseitemactions
 {
- item(trinket0slot text=13 usable=1)
- item(trinket1slot text=14 usable=1)
+ item("trinket0Slot" text=13 usable=1)
+ item("trinket1Slot" text=14 usable=1)
 }
 
 AddFunction protectiongetinmeleerange
@@ -163,6 +443,8 @@ AddFunction protectionprecombatcdactions
   {
    #lights_judgment
    spell(lights_judgment)
+   #ashen_hallow
+   spell(ashen_hallow)
   }
  }
 }
@@ -176,8 +458,6 @@ AddFunction protectionprecombatcdpostconditions
 
 AddFunction protectioncooldownsmainactions
 {
- #heart_essence
- if hasequippeditem(158075) and level() < 50 spell(296208)
 }
 
 AddFunction protectioncooldownsmainpostconditions
@@ -194,7 +474,6 @@ AddFunction protectioncooldownsshortcdactions
 
 AddFunction protectioncooldownsshortcdpostconditions
 {
- hasequippeditem(158075) and level() < 50 and spell(296208)
 }
 
 AddFunction protectioncooldownscdactions
@@ -217,7 +496,7 @@ AddFunction protectioncooldownscdactions
 
 AddFunction protectioncooldownscdpostconditions
 {
- spell(seraphim) or previousgcdspell(avengers_shield) and spellcooldown(avengers_shield) > 0 and spell(moment_of_glory) or hasequippeditem(158075) and level() < 50 and spell(296208)
+ spell(seraphim) or previousgcdspell(avengers_shield) and spellcooldown(avengers_shield) > 0 and spell(moment_of_glory)
 }
 
 ### actions.default
@@ -358,13 +637,13 @@ AddIcon enabled=(checkboxon(opt_paladin_protection_aoe) and specialization(prote
     }
 
     {
-        const name = "sc_t26_paladin_retribution";
-        const desc = "[9.0] Simulationcraft: T26_Paladin_Retribution";
+        const name = "sc_t27_paladin_retribution";
+        const desc = "[9.1] Simulationcraft: T27_Paladin_Retribution";
         const code = `
-# Based on SimulationCraft profile "T26_Paladin_Retribution".
+# Based on SimulationCraft profile "T27_Paladin_Retribution".
 #	class=paladin
 #	spec=retribution
-#	talents=2201102
+#	talents=3200303
 
 Include(ovale_common)
 Include(ovale_paladin_spells)
@@ -372,7 +651,7 @@ Include(ovale_paladin_spells)
 
 AddFunction ds_castable
 {
- enemies(tagged=1) >= 2 or buffpresent(empyrean_power_buff) and target.debuffexpires(judgment_debuff) and buffexpires(divine_purpose_buff)
+ enemies(tagged=1) == 2 and not { runeforge(final_verdict_runeforge) and hastalent(righteous_verdict_talent) and conduit(templars_vindication_conduit) } or enemies(tagged=1) > 2 or buffpresent(empyrean_power_buff) and target.debuffexpires(judgment_debuff) and buffexpires(divine_purpose_buff)
 }
 
 AddCheckBox(opt_interrupt l(interrupt) default enabled=(specialization(retribution)))
@@ -388,12 +667,6 @@ AddFunction retributioninterruptactions
   if target.inrange(hammer_of_justice) and not target.classification(worldboss) spell(hammer_of_justice)
   if target.distance() < 5 and not target.classification(worldboss) spell(war_stomp)
  }
-}
-
-AddFunction retributionuseitemactions
-{
- item(trinket0slot text=13 usable=1)
- item(trinket1slot text=14 usable=1)
 }
 
 AddFunction retributiongetinmeleerange
@@ -433,10 +706,14 @@ AddFunction retributionprecombatcdactions
  #food
  #augmentation
  #snapshot_stats
- #potion
- if checkboxon(opt_use_consumables) and target.classification(worldboss) item(potion_of_spectral_strength_item usable=1)
- #arcane_torrent
- spell(arcane_torrent)
+ #arcane_torrent,if=talent.final_reckoning.enabled&talent.seraphim.enabled
+ if hastalent(final_reckoning_talent) and hastalent(seraphim_talent) spell(arcane_torrent)
+
+ unless spell(blessing_of_the_seasons)
+ {
+  #shield_of_vengeance
+  if checkboxon(opt_shield_of_vengeance) spell(shield_of_vengeance)
+ }
 }
 
 AddFunction retributionprecombatcdpostconditions
@@ -453,34 +730,48 @@ AddFunction retributiongeneratorsmainactions
 
  unless { holypower() == 5 or buffpresent(holy_avenger) or target.debuffpresent(final_reckoning) or target.debuffpresent(execution_sentence) } and retributionfinishersmainpostconditions()
  {
-  #blade_of_justice,if=holy_power<=3&talent.execution_sentence.enabled&(debuff.execution_sentence.up|cooldown.execution_sentence.remains=0)
-  if holypower() <= 3 and hastalent(execution_sentence_talent) and { target.debuffpresent(execution_sentence) or not spellcooldown(execution_sentence) > 0 } spell(blade_of_justice)
-  #hammer_of_wrath
-  spell(hammer_of_wrath)
-  #blade_of_justice,if=holy_power<=3
-  if holypower() <= 3 spell(blade_of_justice)
-  #judgment,if=!debuff.judgment.up
-  if not target.debuffpresent(judgment_debuff) spell(judgment)
-  #call_action_list,name=finishers,if=(target.health.pct<=20|buff.avenging_wrath.up|buff.crusade.up|buff.empyrean_power.up)
-  if target.healthpercent() <= 20 or buffpresent(avenging_wrath) or buffpresent(crusade) or buffpresent(empyrean_power_buff) retributionfinishersmainactions()
+  #hammer_of_wrath,if=runeforge.the_mad_paragon|runeforge.vanguards_momentum&talent.execution_sentence.enabled|covenant.venthyr&cooldown.ashen_hallow.remains>210
+  if runeforge(the_mad_paragon_runeforge) or runeforge(vanguards_momentum_runeforge) and hastalent(execution_sentence_talent) or iscovenant("venthyr") and spellcooldown(ashen_hallow) > 210 spell(hammer_of_wrath)
+  #judgment,if=!debuff.judgment.up&buff.holy_avenger.up
+  if not target.debuffpresent(judgment_debuff) and buffpresent(holy_avenger) spell(judgment)
+  #blade_of_justice,if=holy_power<=3&talent.blade_of_wrath.enabled&(talent.final_reckoning.enabled&debuff.final_reckoning.remains>gcd*2|talent.execution_sentence.enabled&!talent.final_reckoning.enabled&(debuff.execution_sentence.up|cooldown.execution_sentence.remains=0))
+  if holypower() <= 3 and hastalent(blade_of_wrath_talent) and { hastalent(final_reckoning_talent) and target.debuffremaining(final_reckoning) > gcd() * 2 or hastalent(execution_sentence_talent) and not hastalent(final_reckoning_talent) and { target.debuffpresent(execution_sentence) or not spellcooldown(execution_sentence) > 0 } } spell(blade_of_justice)
+  #judgment,if=!debuff.judgment.up&talent.seraphim.enabled&(holy_power>=1&runeforge.the_magistrates_judgment|holy_power>=2)
+  if not target.debuffpresent(judgment_debuff) and hastalent(seraphim_talent) and { holypower() >= 1 and runeforge(the_magistrates_judgment_runeforge) or holypower() >= 2 } spell(judgment)
+  #call_action_list,name=finishers,if=holy_power>=3&buff.crusade.up&buff.crusade.stack<10
+  if holypower() >= 3 and buffpresent(crusade) and buffstacks(crusade) < 10 retributionfinishersmainactions()
 
-  unless { target.healthpercent() <= 20 or buffpresent(avenging_wrath) or buffpresent(crusade) or buffpresent(empyrean_power_buff) } and retributionfinishersmainpostconditions()
+  unless holypower() >= 3 and buffpresent(crusade) and buffstacks(crusade) < 10 and retributionfinishersmainpostconditions()
   {
-   #crusader_strike,if=cooldown.crusader_strike.charges_fractional>=1.75&(holy_power<=2|holy_power<=3&cooldown.blade_of_justice.remains>gcd*2|holy_power=4&cooldown.blade_of_justice.remains>gcd*2&cooldown.judgment.remains>gcd*2)
-   if spellcharges(crusader_strike count=0) >= 1.75 and { holypower() <= 2 or holypower() <= 3 and spellcooldown(blade_of_justice) > gcd() * 2 or holypower() == 4 and spellcooldown(blade_of_justice) > gcd() * 2 and spellcooldown(judgment) > gcd() * 2 } spell(crusader_strike)
-   #consecration,if=!consecration.up&spell_targets.divine_storm>=2
-   if not buffpresent(consecration) and enemies(tagged=1) >= 2 spell(consecration)
-   #call_action_list,name=finishers
-   retributionfinishersmainactions()
+   #blade_of_justice,if=holy_power<=3&conduit.expurgation.enabled&!covenant.venthyr
+   if holypower() <= 3 and conduit(expurgation_conduit) and not iscovenant("venthyr") spell(blade_of_justice)
+   #judgment,if=!debuff.judgment.up
+   if not target.debuffpresent(judgment_debuff) spell(judgment)
+   #hammer_of_wrath
+   spell(hammer_of_wrath)
+   #blade_of_justice,if=holy_power<=3
+   if holypower() <= 3 spell(blade_of_justice)
+   #call_action_list,name=finishers,if=(target.health.pct<=20|buff.avenging_wrath.up|buff.crusade.up|buff.empyrean_power.up)
+   if target.healthpercent() <= 20 or buffpresent(avenging_wrath) or buffpresent(crusade) or buffpresent(empyrean_power_buff) retributionfinishersmainactions()
 
-   unless retributionfinishersmainpostconditions()
+   unless { target.healthpercent() <= 20 or buffpresent(avenging_wrath) or buffpresent(crusade) or buffpresent(empyrean_power_buff) } and retributionfinishersmainpostconditions()
    {
-    #consecration,if=!consecration.up
-    if not buffpresent(consecration) spell(consecration)
-    #crusader_strike
-    spell(crusader_strike)
-    #consecration,if=time_to_hpg>gcd
-    if retributiontimetohpg() > gcd() spell(consecration)
+    #crusader_strike,if=cooldown.crusader_strike.charges_fractional>=1.75&(holy_power<=2|holy_power<=3&cooldown.blade_of_justice.remains>gcd*2|holy_power=4&cooldown.blade_of_justice.remains>gcd*2&cooldown.judgment.remains>gcd*2)
+    if spellcharges(crusader_strike count=0) >= 1.75 and { holypower() <= 2 or holypower() <= 3 and spellcooldown(blade_of_justice) > gcd() * 2 or holypower() == 4 and spellcooldown(blade_of_justice) > gcd() * 2 and spellcooldown(judgment) > gcd() * 2 } spell(crusader_strike)
+    #consecration,if=!consecration.up&spell_targets.divine_storm>=2
+    if not buffpresent(consecration) and enemies(tagged=1) >= 2 spell(consecration)
+    #call_action_list,name=finishers
+    retributionfinishersmainactions()
+
+    unless retributionfinishersmainpostconditions()
+    {
+     #consecration,if=!consecration.up
+     if not buffpresent(consecration) spell(consecration)
+     #crusader_strike
+     spell(crusader_strike)
+     #consecration
+     spell(consecration)
+    }
    }
   }
  }
@@ -488,7 +779,7 @@ AddFunction retributiongeneratorsmainactions
 
 AddFunction retributiongeneratorsmainpostconditions
 {
- { holypower() == 5 or buffpresent(holy_avenger) or target.debuffpresent(final_reckoning) or target.debuffpresent(execution_sentence) } and retributionfinishersmainpostconditions() or { target.healthpercent() <= 20 or buffpresent(avenging_wrath) or buffpresent(crusade) or buffpresent(empyrean_power_buff) } and retributionfinishersmainpostconditions() or retributionfinishersmainpostconditions()
+ { holypower() == 5 or buffpresent(holy_avenger) or target.debuffpresent(final_reckoning) or target.debuffpresent(execution_sentence) } and retributionfinishersmainpostconditions() or holypower() >= 3 and buffpresent(crusade) and buffstacks(crusade) < 10 and retributionfinishersmainpostconditions() or { target.healthpercent() <= 20 or buffpresent(avenging_wrath) or buffpresent(crusade) or buffpresent(empyrean_power_buff) } and retributionfinishersmainpostconditions() or retributionfinishersmainpostconditions()
 }
 
 AddFunction retributiongeneratorsshortcdactions
@@ -498,20 +789,34 @@ AddFunction retributiongeneratorsshortcdactions
 
  unless { holypower() == 5 or buffpresent(holy_avenger) or target.debuffpresent(final_reckoning) or target.debuffpresent(execution_sentence) } and retributionfinishersshortcdpostconditions()
  {
-  #divine_toll,if=!debuff.judgment.up&(!raid_event.adds.exists|raid_event.adds.in>30)&(holy_power<=2|holy_power<=4&(cooldown.blade_of_justice.remains>gcd*2|(debuff.execution_sentence.up|target.time_to_die<8)|debuff.final_reckoning.up))&(!talent.final_reckoning.enabled|cooldown.final_reckoning.remains>gcd*10)&(!talent.execution_sentence.enabled|(cooldown.execution_sentence.remains>gcd*10|target.time_to_die<8))&(cooldown.avenging_wrath.remains>0|cooldown.crusade.remains>0)
-  if not target.debuffpresent(judgment_debuff) and { not never(raid_event_adds_exists) or 600 > 30 } and { holypower() <= 2 or holypower() <= 4 and { spellcooldown(blade_of_justice) > gcd() * 2 or target.debuffpresent(execution_sentence) or target.timetodie() < 8 or target.debuffpresent(final_reckoning) } } and { not hastalent(final_reckoning_talent) or spellcooldown(final_reckoning) > gcd() * 10 } and { not hastalent(execution_sentence_talent) or spellcooldown(execution_sentence) > gcd() * 10 or target.timetodie() < 8 } and { spellcooldown(avenging_wrath) > 0 or spellcooldown(crusade) > 0 } spell(divine_toll)
-  #wake_of_ashes,if=(holy_power=0|holy_power<=2&(cooldown.blade_of_justice.remains>gcd*2|(debuff.execution_sentence.up|target.time_to_die<8)|debuff.final_reckoning.up))&(!raid_event.adds.exists|raid_event.adds.in>20)&(!talent.execution_sentence.enabled|cooldown.execution_sentence.remains>15)&(!talent.final_reckoning.enabled|cooldown.final_reckoning.remains>15)&(cooldown.avenging_wrath.remains>0|cooldown.crusade.remains>0)
-  if { holypower() == 0 or holypower() <= 2 and { spellcooldown(blade_of_justice) > gcd() * 2 or target.debuffpresent(execution_sentence) or target.timetodie() < 8 or target.debuffpresent(final_reckoning) } } and { not never(raid_event_adds_exists) or 600 > 20 } and { not hastalent(execution_sentence_talent) or spellcooldown(execution_sentence) > 15 } and { not hastalent(final_reckoning_talent) or spellcooldown(final_reckoning) > 15 } and { spellcooldown(avenging_wrath) > 0 or spellcooldown(crusade) > 0 } spell(wake_of_ashes)
+  #vanquishers_hammer
+  spell(vanquishers_hammer)
+  #divine_toll,if=!debuff.judgment.up&(!talent.seraphim.enabled|buff.seraphim.up)&(!raid_event.adds.exists|raid_event.adds.in>30|raid_event.adds.up)&(holy_power<=2|holy_power<=4&(cooldown.blade_of_justice.remains>gcd*2|debuff.execution_sentence.up|debuff.final_reckoning.up))&(!talent.final_reckoning.enabled|cooldown.final_reckoning.remains>gcd*10)&(!talent.execution_sentence.enabled|cooldown.execution_sentence.remains>gcd*10|target.time_to_die<8)&(cooldown.avenging_wrath.remains|cooldown.crusade.remains)
+  if not target.debuffpresent(judgment_debuff) and { not hastalent(seraphim_talent) or buffpresent(seraphim) } and { not never(raid_event_adds_exists) or 600 > 30 or never(raid_event_adds_exists) } and { holypower() <= 2 or holypower() <= 4 and { spellcooldown(blade_of_justice) > gcd() * 2 or target.debuffpresent(execution_sentence) or target.debuffpresent(final_reckoning) } } and { not hastalent(final_reckoning_talent) or spellcooldown(final_reckoning) > gcd() * 10 } and { not hastalent(execution_sentence_talent) or spellcooldown(execution_sentence) > gcd() * 10 or target.timetodie() < 8 } and { spellcooldown(avenging_wrath) > 0 or spellcooldown(crusade) > 0 } spell(divine_toll)
 
-  unless holypower() <= 3 and hastalent(execution_sentence_talent) and { target.debuffpresent(execution_sentence) or not spellcooldown(execution_sentence) > 0 } and spell(blade_of_justice) or spell(hammer_of_wrath) or holypower() <= 3 and spell(blade_of_justice) or not target.debuffpresent(judgment_debuff) and spell(judgment)
+  unless { runeforge(the_mad_paragon_runeforge) or runeforge(vanguards_momentum_runeforge) and hastalent(execution_sentence_talent) or iscovenant("venthyr") and spellcooldown(ashen_hallow) > 210 } and spell(hammer_of_wrath) or not target.debuffpresent(judgment_debuff) and buffpresent(holy_avenger) and spell(judgment)
   {
-   #call_action_list,name=finishers,if=(target.health.pct<=20|buff.avenging_wrath.up|buff.crusade.up|buff.empyrean_power.up)
-   if target.healthpercent() <= 20 or buffpresent(avenging_wrath) or buffpresent(crusade) or buffpresent(empyrean_power_buff) retributionfinishersshortcdactions()
+   #wake_of_ashes,if=(holy_power<=2&talent.execution_sentence.enabled&debuff.execution_sentence.remains>0&debuff.execution_sentence.remains<gcd*2)
+   if holypower() <= 2 and hastalent(execution_sentence_talent) and target.debuffremaining(execution_sentence) > 0 and target.debuffremaining(execution_sentence) < gcd() * 2 spell(wake_of_ashes)
 
-   unless { target.healthpercent() <= 20 or buffpresent(avenging_wrath) or buffpresent(crusade) or buffpresent(empyrean_power_buff) } and retributionfinishersshortcdpostconditions() or spellcharges(crusader_strike count=0) >= 1.75 and { holypower() <= 2 or holypower() <= 3 and spellcooldown(blade_of_justice) > gcd() * 2 or holypower() == 4 and spellcooldown(blade_of_justice) > gcd() * 2 and spellcooldown(judgment) > gcd() * 2 } and spell(crusader_strike) or not buffpresent(consecration) and enemies(tagged=1) >= 2 and spell(consecration)
+   unless holypower() <= 3 and hastalent(blade_of_wrath_talent) and { hastalent(final_reckoning_talent) and target.debuffremaining(final_reckoning) > gcd() * 2 or hastalent(execution_sentence_talent) and not hastalent(final_reckoning_talent) and { target.debuffpresent(execution_sentence) or not spellcooldown(execution_sentence) > 0 } } and spell(blade_of_justice) or not target.debuffpresent(judgment_debuff) and hastalent(seraphim_talent) and { holypower() >= 1 and runeforge(the_magistrates_judgment_runeforge) or holypower() >= 2 } and spell(judgment)
    {
-    #call_action_list,name=finishers
-    retributionfinishersshortcdactions()
+    #wake_of_ashes,if=(holy_power=0|holy_power<=2&(cooldown.blade_of_justice.remains>gcd*2|debuff.execution_sentence.up|target.time_to_die<8|debuff.final_reckoning.up))&(!raid_event.adds.exists|raid_event.adds.in>20|raid_event.adds.up)&(!talent.execution_sentence.enabled|cooldown.execution_sentence.remains>15|target.time_to_die<8)&(!talent.final_reckoning.enabled|cooldown.final_reckoning.remains>15|target.time_to_die<8)&(cooldown.avenging_wrath.remains|cooldown.crusade.remains)
+    if { holypower() == 0 or holypower() <= 2 and { spellcooldown(blade_of_justice) > gcd() * 2 or target.debuffpresent(execution_sentence) or target.timetodie() < 8 or target.debuffpresent(final_reckoning) } } and { not never(raid_event_adds_exists) or 600 > 20 or never(raid_event_adds_exists) } and { not hastalent(execution_sentence_talent) or spellcooldown(execution_sentence) > 15 or target.timetodie() < 8 } and { not hastalent(final_reckoning_talent) or spellcooldown(final_reckoning) > 15 or target.timetodie() < 8 } and { spellcooldown(avenging_wrath) > 0 or spellcooldown(crusade) > 0 } spell(wake_of_ashes)
+    #call_action_list,name=finishers,if=holy_power>=3&buff.crusade.up&buff.crusade.stack<10
+    if holypower() >= 3 and buffpresent(crusade) and buffstacks(crusade) < 10 retributionfinishersshortcdactions()
+
+    unless holypower() >= 3 and buffpresent(crusade) and buffstacks(crusade) < 10 and retributionfinishersshortcdpostconditions() or holypower() <= 3 and conduit(expurgation_conduit) and not iscovenant("venthyr") and spell(blade_of_justice) or not target.debuffpresent(judgment_debuff) and spell(judgment) or spell(hammer_of_wrath) or holypower() <= 3 and spell(blade_of_justice)
+    {
+     #call_action_list,name=finishers,if=(target.health.pct<=20|buff.avenging_wrath.up|buff.crusade.up|buff.empyrean_power.up)
+     if target.healthpercent() <= 20 or buffpresent(avenging_wrath) or buffpresent(crusade) or buffpresent(empyrean_power_buff) retributionfinishersshortcdactions()
+
+     unless { target.healthpercent() <= 20 or buffpresent(avenging_wrath) or buffpresent(crusade) or buffpresent(empyrean_power_buff) } and retributionfinishersshortcdpostconditions() or spellcharges(crusader_strike count=0) >= 1.75 and { holypower() <= 2 or holypower() <= 3 and spellcooldown(blade_of_justice) > gcd() * 2 or holypower() == 4 and spellcooldown(blade_of_justice) > gcd() * 2 and spellcooldown(judgment) > gcd() * 2 } and spell(crusader_strike) or not buffpresent(consecration) and enemies(tagged=1) >= 2 and spell(consecration)
+     {
+      #call_action_list,name=finishers
+      retributionfinishersshortcdactions()
+     }
+    }
    }
   }
  }
@@ -519,7 +824,7 @@ AddFunction retributiongeneratorsshortcdactions
 
 AddFunction retributiongeneratorsshortcdpostconditions
 {
- { holypower() == 5 or buffpresent(holy_avenger) or target.debuffpresent(final_reckoning) or target.debuffpresent(execution_sentence) } and retributionfinishersshortcdpostconditions() or holypower() <= 3 and hastalent(execution_sentence_talent) and { target.debuffpresent(execution_sentence) or not spellcooldown(execution_sentence) > 0 } and spell(blade_of_justice) or spell(hammer_of_wrath) or holypower() <= 3 and spell(blade_of_justice) or not target.debuffpresent(judgment_debuff) and spell(judgment) or { target.healthpercent() <= 20 or buffpresent(avenging_wrath) or buffpresent(crusade) or buffpresent(empyrean_power_buff) } and retributionfinishersshortcdpostconditions() or spellcharges(crusader_strike count=0) >= 1.75 and { holypower() <= 2 or holypower() <= 3 and spellcooldown(blade_of_justice) > gcd() * 2 or holypower() == 4 and spellcooldown(blade_of_justice) > gcd() * 2 and spellcooldown(judgment) > gcd() * 2 } and spell(crusader_strike) or not buffpresent(consecration) and enemies(tagged=1) >= 2 and spell(consecration) or retributionfinishersshortcdpostconditions() or not buffpresent(consecration) and spell(consecration) or spell(crusader_strike) or retributiontimetohpg() > gcd() and spell(consecration)
+ { holypower() == 5 or buffpresent(holy_avenger) or target.debuffpresent(final_reckoning) or target.debuffpresent(execution_sentence) } and retributionfinishersshortcdpostconditions() or { runeforge(the_mad_paragon_runeforge) or runeforge(vanguards_momentum_runeforge) and hastalent(execution_sentence_talent) or iscovenant("venthyr") and spellcooldown(ashen_hallow) > 210 } and spell(hammer_of_wrath) or not target.debuffpresent(judgment_debuff) and buffpresent(holy_avenger) and spell(judgment) or holypower() <= 3 and hastalent(blade_of_wrath_talent) and { hastalent(final_reckoning_talent) and target.debuffremaining(final_reckoning) > gcd() * 2 or hastalent(execution_sentence_talent) and not hastalent(final_reckoning_talent) and { target.debuffpresent(execution_sentence) or not spellcooldown(execution_sentence) > 0 } } and spell(blade_of_justice) or not target.debuffpresent(judgment_debuff) and hastalent(seraphim_talent) and { holypower() >= 1 and runeforge(the_magistrates_judgment_runeforge) or holypower() >= 2 } and spell(judgment) or holypower() >= 3 and buffpresent(crusade) and buffstacks(crusade) < 10 and retributionfinishersshortcdpostconditions() or holypower() <= 3 and conduit(expurgation_conduit) and not iscovenant("venthyr") and spell(blade_of_justice) or not target.debuffpresent(judgment_debuff) and spell(judgment) or spell(hammer_of_wrath) or holypower() <= 3 and spell(blade_of_justice) or { target.healthpercent() <= 20 or buffpresent(avenging_wrath) or buffpresent(crusade) or buffpresent(empyrean_power_buff) } and retributionfinishersshortcdpostconditions() or spellcharges(crusader_strike count=0) >= 1.75 and { holypower() <= 2 or holypower() <= 3 and spellcooldown(blade_of_justice) > gcd() * 2 or holypower() == 4 and spellcooldown(blade_of_justice) > gcd() * 2 and spellcooldown(judgment) > gcd() * 2 } and spell(crusader_strike) or not buffpresent(consecration) and enemies(tagged=1) >= 2 and spell(consecration) or retributionfinishersshortcdpostconditions() or not buffpresent(consecration) and spell(consecration) or spell(crusader_strike) or spell(consecration)
 }
 
 AddFunction retributiongeneratorscdactions
@@ -527,20 +832,26 @@ AddFunction retributiongeneratorscdactions
  #call_action_list,name=finishers,if=holy_power=5|buff.holy_avenger.up|debuff.final_reckoning.up|debuff.execution_sentence.up
  if holypower() == 5 or buffpresent(holy_avenger) or target.debuffpresent(final_reckoning) or target.debuffpresent(execution_sentence) retributionfinisherscdactions()
 
- unless { holypower() == 5 or buffpresent(holy_avenger) or target.debuffpresent(final_reckoning) or target.debuffpresent(execution_sentence) } and retributionfinisherscdpostconditions() or not target.debuffpresent(judgment_debuff) and { not never(raid_event_adds_exists) or 600 > 30 } and { holypower() <= 2 or holypower() <= 4 and { spellcooldown(blade_of_justice) > gcd() * 2 or target.debuffpresent(execution_sentence) or target.timetodie() < 8 or target.debuffpresent(final_reckoning) } } and { not hastalent(final_reckoning_talent) or spellcooldown(final_reckoning) > gcd() * 10 } and { not hastalent(execution_sentence_talent) or spellcooldown(execution_sentence) > gcd() * 10 or target.timetodie() < 8 } and { spellcooldown(avenging_wrath) > 0 or spellcooldown(crusade) > 0 } and spell(divine_toll) or { holypower() == 0 or holypower() <= 2 and { spellcooldown(blade_of_justice) > gcd() * 2 or target.debuffpresent(execution_sentence) or target.timetodie() < 8 or target.debuffpresent(final_reckoning) } } and { not never(raid_event_adds_exists) or 600 > 20 } and { not hastalent(execution_sentence_talent) or spellcooldown(execution_sentence) > 15 } and { not hastalent(final_reckoning_talent) or spellcooldown(final_reckoning) > 15 } and { spellcooldown(avenging_wrath) > 0 or spellcooldown(crusade) > 0 } and spell(wake_of_ashes) or holypower() <= 3 and hastalent(execution_sentence_talent) and { target.debuffpresent(execution_sentence) or not spellcooldown(execution_sentence) > 0 } and spell(blade_of_justice) or spell(hammer_of_wrath) or holypower() <= 3 and spell(blade_of_justice) or not target.debuffpresent(judgment_debuff) and spell(judgment)
+ unless { holypower() == 5 or buffpresent(holy_avenger) or target.debuffpresent(final_reckoning) or target.debuffpresent(execution_sentence) } and retributionfinisherscdpostconditions() or spell(vanquishers_hammer) or not target.debuffpresent(judgment_debuff) and { not hastalent(seraphim_talent) or buffpresent(seraphim) } and { not never(raid_event_adds_exists) or 600 > 30 or never(raid_event_adds_exists) } and { holypower() <= 2 or holypower() <= 4 and { spellcooldown(blade_of_justice) > gcd() * 2 or target.debuffpresent(execution_sentence) or target.debuffpresent(final_reckoning) } } and { not hastalent(final_reckoning_talent) or spellcooldown(final_reckoning) > gcd() * 10 } and { not hastalent(execution_sentence_talent) or spellcooldown(execution_sentence) > gcd() * 10 or target.timetodie() < 8 } and { spellcooldown(avenging_wrath) > 0 or spellcooldown(crusade) > 0 } and spell(divine_toll) or { runeforge(the_mad_paragon_runeforge) or runeforge(vanguards_momentum_runeforge) and hastalent(execution_sentence_talent) or iscovenant("venthyr") and spellcooldown(ashen_hallow) > 210 } and spell(hammer_of_wrath) or not target.debuffpresent(judgment_debuff) and buffpresent(holy_avenger) and spell(judgment) or holypower() <= 2 and hastalent(execution_sentence_talent) and target.debuffremaining(execution_sentence) > 0 and target.debuffremaining(execution_sentence) < gcd() * 2 and spell(wake_of_ashes) or holypower() <= 3 and hastalent(blade_of_wrath_talent) and { hastalent(final_reckoning_talent) and target.debuffremaining(final_reckoning) > gcd() * 2 or hastalent(execution_sentence_talent) and not hastalent(final_reckoning_talent) and { target.debuffpresent(execution_sentence) or not spellcooldown(execution_sentence) > 0 } } and spell(blade_of_justice) or not target.debuffpresent(judgment_debuff) and hastalent(seraphim_talent) and { holypower() >= 1 and runeforge(the_magistrates_judgment_runeforge) or holypower() >= 2 } and spell(judgment) or { holypower() == 0 or holypower() <= 2 and { spellcooldown(blade_of_justice) > gcd() * 2 or target.debuffpresent(execution_sentence) or target.timetodie() < 8 or target.debuffpresent(final_reckoning) } } and { not never(raid_event_adds_exists) or 600 > 20 or never(raid_event_adds_exists) } and { not hastalent(execution_sentence_talent) or spellcooldown(execution_sentence) > 15 or target.timetodie() < 8 } and { not hastalent(final_reckoning_talent) or spellcooldown(final_reckoning) > 15 or target.timetodie() < 8 } and { spellcooldown(avenging_wrath) > 0 or spellcooldown(crusade) > 0 } and spell(wake_of_ashes)
  {
-  #call_action_list,name=finishers,if=(target.health.pct<=20|buff.avenging_wrath.up|buff.crusade.up|buff.empyrean_power.up)
-  if target.healthpercent() <= 20 or buffpresent(avenging_wrath) or buffpresent(crusade) or buffpresent(empyrean_power_buff) retributionfinisherscdactions()
+  #call_action_list,name=finishers,if=holy_power>=3&buff.crusade.up&buff.crusade.stack<10
+  if holypower() >= 3 and buffpresent(crusade) and buffstacks(crusade) < 10 retributionfinisherscdactions()
 
-  unless { target.healthpercent() <= 20 or buffpresent(avenging_wrath) or buffpresent(crusade) or buffpresent(empyrean_power_buff) } and retributionfinisherscdpostconditions() or spellcharges(crusader_strike count=0) >= 1.75 and { holypower() <= 2 or holypower() <= 3 and spellcooldown(blade_of_justice) > gcd() * 2 or holypower() == 4 and spellcooldown(blade_of_justice) > gcd() * 2 and spellcooldown(judgment) > gcd() * 2 } and spell(crusader_strike) or not buffpresent(consecration) and enemies(tagged=1) >= 2 and spell(consecration)
+  unless holypower() >= 3 and buffpresent(crusade) and buffstacks(crusade) < 10 and retributionfinisherscdpostconditions() or holypower() <= 3 and conduit(expurgation_conduit) and not iscovenant("venthyr") and spell(blade_of_justice) or not target.debuffpresent(judgment_debuff) and spell(judgment) or spell(hammer_of_wrath) or holypower() <= 3 and spell(blade_of_justice)
   {
-   #call_action_list,name=finishers
-   retributionfinisherscdactions()
+   #call_action_list,name=finishers,if=(target.health.pct<=20|buff.avenging_wrath.up|buff.crusade.up|buff.empyrean_power.up)
+   if target.healthpercent() <= 20 or buffpresent(avenging_wrath) or buffpresent(crusade) or buffpresent(empyrean_power_buff) retributionfinisherscdactions()
 
-   unless retributionfinisherscdpostconditions() or not buffpresent(consecration) and spell(consecration) or spell(crusader_strike)
+   unless { target.healthpercent() <= 20 or buffpresent(avenging_wrath) or buffpresent(crusade) or buffpresent(empyrean_power_buff) } and retributionfinisherscdpostconditions() or spellcharges(crusader_strike count=0) >= 1.75 and { holypower() <= 2 or holypower() <= 3 and spellcooldown(blade_of_justice) > gcd() * 2 or holypower() == 4 and spellcooldown(blade_of_justice) > gcd() * 2 and spellcooldown(judgment) > gcd() * 2 } and spell(crusader_strike) or not buffpresent(consecration) and enemies(tagged=1) >= 2 and spell(consecration)
    {
-    #arcane_torrent
-    spell(arcane_torrent)
+    #call_action_list,name=finishers
+    retributionfinisherscdactions()
+
+    unless retributionfinisherscdpostconditions() or not buffpresent(consecration) and spell(consecration) or spell(crusader_strike)
+    {
+     #arcane_torrent
+     spell(arcane_torrent)
+    }
    }
   }
  }
@@ -548,17 +859,17 @@ AddFunction retributiongeneratorscdactions
 
 AddFunction retributiongeneratorscdpostconditions
 {
- { holypower() == 5 or buffpresent(holy_avenger) or target.debuffpresent(final_reckoning) or target.debuffpresent(execution_sentence) } and retributionfinisherscdpostconditions() or not target.debuffpresent(judgment_debuff) and { not never(raid_event_adds_exists) or 600 > 30 } and { holypower() <= 2 or holypower() <= 4 and { spellcooldown(blade_of_justice) > gcd() * 2 or target.debuffpresent(execution_sentence) or target.timetodie() < 8 or target.debuffpresent(final_reckoning) } } and { not hastalent(final_reckoning_talent) or spellcooldown(final_reckoning) > gcd() * 10 } and { not hastalent(execution_sentence_talent) or spellcooldown(execution_sentence) > gcd() * 10 or target.timetodie() < 8 } and { spellcooldown(avenging_wrath) > 0 or spellcooldown(crusade) > 0 } and spell(divine_toll) or { holypower() == 0 or holypower() <= 2 and { spellcooldown(blade_of_justice) > gcd() * 2 or target.debuffpresent(execution_sentence) or target.timetodie() < 8 or target.debuffpresent(final_reckoning) } } and { not never(raid_event_adds_exists) or 600 > 20 } and { not hastalent(execution_sentence_talent) or spellcooldown(execution_sentence) > 15 } and { not hastalent(final_reckoning_talent) or spellcooldown(final_reckoning) > 15 } and { spellcooldown(avenging_wrath) > 0 or spellcooldown(crusade) > 0 } and spell(wake_of_ashes) or holypower() <= 3 and hastalent(execution_sentence_talent) and { target.debuffpresent(execution_sentence) or not spellcooldown(execution_sentence) > 0 } and spell(blade_of_justice) or spell(hammer_of_wrath) or holypower() <= 3 and spell(blade_of_justice) or not target.debuffpresent(judgment_debuff) and spell(judgment) or { target.healthpercent() <= 20 or buffpresent(avenging_wrath) or buffpresent(crusade) or buffpresent(empyrean_power_buff) } and retributionfinisherscdpostconditions() or spellcharges(crusader_strike count=0) >= 1.75 and { holypower() <= 2 or holypower() <= 3 and spellcooldown(blade_of_justice) > gcd() * 2 or holypower() == 4 and spellcooldown(blade_of_justice) > gcd() * 2 and spellcooldown(judgment) > gcd() * 2 } and spell(crusader_strike) or not buffpresent(consecration) and enemies(tagged=1) >= 2 and spell(consecration) or retributionfinisherscdpostconditions() or not buffpresent(consecration) and spell(consecration) or spell(crusader_strike) or retributiontimetohpg() > gcd() and spell(consecration)
+ { holypower() == 5 or buffpresent(holy_avenger) or target.debuffpresent(final_reckoning) or target.debuffpresent(execution_sentence) } and retributionfinisherscdpostconditions() or spell(vanquishers_hammer) or not target.debuffpresent(judgment_debuff) and { not hastalent(seraphim_talent) or buffpresent(seraphim) } and { not never(raid_event_adds_exists) or 600 > 30 or never(raid_event_adds_exists) } and { holypower() <= 2 or holypower() <= 4 and { spellcooldown(blade_of_justice) > gcd() * 2 or target.debuffpresent(execution_sentence) or target.debuffpresent(final_reckoning) } } and { not hastalent(final_reckoning_talent) or spellcooldown(final_reckoning) > gcd() * 10 } and { not hastalent(execution_sentence_talent) or spellcooldown(execution_sentence) > gcd() * 10 or target.timetodie() < 8 } and { spellcooldown(avenging_wrath) > 0 or spellcooldown(crusade) > 0 } and spell(divine_toll) or { runeforge(the_mad_paragon_runeforge) or runeforge(vanguards_momentum_runeforge) and hastalent(execution_sentence_talent) or iscovenant("venthyr") and spellcooldown(ashen_hallow) > 210 } and spell(hammer_of_wrath) or not target.debuffpresent(judgment_debuff) and buffpresent(holy_avenger) and spell(judgment) or holypower() <= 2 and hastalent(execution_sentence_talent) and target.debuffremaining(execution_sentence) > 0 and target.debuffremaining(execution_sentence) < gcd() * 2 and spell(wake_of_ashes) or holypower() <= 3 and hastalent(blade_of_wrath_talent) and { hastalent(final_reckoning_talent) and target.debuffremaining(final_reckoning) > gcd() * 2 or hastalent(execution_sentence_talent) and not hastalent(final_reckoning_talent) and { target.debuffpresent(execution_sentence) or not spellcooldown(execution_sentence) > 0 } } and spell(blade_of_justice) or not target.debuffpresent(judgment_debuff) and hastalent(seraphim_talent) and { holypower() >= 1 and runeforge(the_magistrates_judgment_runeforge) or holypower() >= 2 } and spell(judgment) or { holypower() == 0 or holypower() <= 2 and { spellcooldown(blade_of_justice) > gcd() * 2 or target.debuffpresent(execution_sentence) or target.timetodie() < 8 or target.debuffpresent(final_reckoning) } } and { not never(raid_event_adds_exists) or 600 > 20 or never(raid_event_adds_exists) } and { not hastalent(execution_sentence_talent) or spellcooldown(execution_sentence) > 15 or target.timetodie() < 8 } and { not hastalent(final_reckoning_talent) or spellcooldown(final_reckoning) > 15 or target.timetodie() < 8 } and { spellcooldown(avenging_wrath) > 0 or spellcooldown(crusade) > 0 } and spell(wake_of_ashes) or holypower() >= 3 and buffpresent(crusade) and buffstacks(crusade) < 10 and retributionfinisherscdpostconditions() or holypower() <= 3 and conduit(expurgation_conduit) and not iscovenant("venthyr") and spell(blade_of_justice) or not target.debuffpresent(judgment_debuff) and spell(judgment) or spell(hammer_of_wrath) or holypower() <= 3 and spell(blade_of_justice) or { target.healthpercent() <= 20 or buffpresent(avenging_wrath) or buffpresent(crusade) or buffpresent(empyrean_power_buff) } and retributionfinisherscdpostconditions() or spellcharges(crusader_strike count=0) >= 1.75 and { holypower() <= 2 or holypower() <= 3 and spellcooldown(blade_of_justice) > gcd() * 2 or holypower() == 4 and spellcooldown(blade_of_justice) > gcd() * 2 and spellcooldown(judgment) > gcd() * 2 } and spell(crusader_strike) or not buffpresent(consecration) and enemies(tagged=1) >= 2 and spell(consecration) or retributionfinisherscdpostconditions() or not buffpresent(consecration) and spell(consecration) or spell(crusader_strike) or spell(consecration)
 }
 
 ### actions.finishers
 
 AddFunction retributionfinishersmainactions
 {
- #divine_storm,if=variable.ds_castable&!buff.vanquishers_hammer.up&((!talent.crusade.enabled|cooldown.crusade.remains>gcd*3)&(!talent.execution_sentence.enabled|(cooldown.execution_sentence.remains%gcd+holy_power>7|target.time_to_die<8))&(!talent.final_reckoning.enabled|cooldown.final_reckoning.remains%gcd+holy_power>7)|spell_targets.divine_storm>=2&(talent.holy_avenger.enabled&cooldown.holy_avenger.remains<gcd*3|buff.crusade.up&buff.crusade.stack<10))
- if ds_castable() and not buffpresent(vanquishers_hammer) and { { not hastalent(crusade_talent) or spellcooldown(crusade) > gcd() * 3 } and { not hastalent(execution_sentence_talent) or spellcooldown(execution_sentence) / gcd() + holypower() > 7 or target.timetodie() < 8 } and { not hastalent(final_reckoning_talent) or spellcooldown(final_reckoning) / gcd() + holypower() > 7 } or enemies(tagged=1) >= 2 and { hastalent(holy_avenger_talent) and spellcooldown(holy_avenger) < gcd() * 3 or buffpresent(crusade) and buffstacks(crusade) < 10 } } spell(divine_storm)
- #templars_verdict,if=(!talent.crusade.enabled|cooldown.crusade.remains>gcd*3)&(!talent.execution_sentence.enabled|(cooldown.execution_sentence.remains%gcd+holy_power>7|target.time_to_die<8))&(!talent.final_reckoning.enabled|cooldown.final_reckoning.remains%gcd+holy_power>7)&(!covenant.necrolord.enabled|cooldown.vanquishers_hammer.remains>gcd)|talent.holy_avenger.enabled&cooldown.holy_avenger.remains<gcd*3|buff.holy_avenger.up|buff.crusade.up&buff.crusade.stack<10|buff.vanquishers_hammer.up
- if { not hastalent(crusade_talent) or spellcooldown(crusade) > gcd() * 3 } and { not hastalent(execution_sentence_talent) or spellcooldown(execution_sentence) / gcd() + holypower() > 7 or target.timetodie() < 8 } and { not hastalent(final_reckoning_talent) or spellcooldown(final_reckoning) / gcd() + holypower() > 7 } and { not iscovenant("necrolord") or spellcooldown(vanquishers_hammer) > gcd() } or hastalent(holy_avenger_talent) and spellcooldown(holy_avenger) < gcd() * 3 or buffpresent(holy_avenger) or buffpresent(crusade) and buffstacks(crusade) < 10 or buffpresent(vanquishers_hammer) spell(templars_verdict)
+ #divine_storm,if=variable.ds_castable&!buff.vanquishers_hammer.up&((!talent.crusade.enabled|cooldown.crusade.remains>gcd*3)&(!talent.execution_sentence.enabled|cooldown.execution_sentence.remains>gcd*6|cooldown.execution_sentence.remains>gcd*5&holy_power>=4|target.time_to_die<8|!talent.seraphim.enabled&cooldown.execution_sentence.remains>gcd*2)&(!talent.final_reckoning.enabled|cooldown.final_reckoning.remains>gcd*6|cooldown.final_reckoning.remains>gcd*5&holy_power>=4|!talent.seraphim.enabled&cooldown.final_reckoning.remains>gcd*2)&(!talent.seraphim.enabled|cooldown.seraphim.remains%gcd+holy_power>3|talent.final_reckoning.enabled|talent.execution_sentence.enabled|covenant.kyrian)|(talent.holy_avenger.enabled&cooldown.holy_avenger.remains<gcd*3|buff.holy_avenger.up|buff.crusade.up&buff.crusade.stack<10))
+ if ds_castable() and not buffpresent(vanquishers_hammer) and { { not hastalent(crusade_talent) or spellcooldown(crusade) > gcd() * 3 } and { not hastalent(execution_sentence_talent) or spellcooldown(execution_sentence) > gcd() * 6 or spellcooldown(execution_sentence) > gcd() * 5 and holypower() >= 4 or target.timetodie() < 8 or not hastalent(seraphim_talent) and spellcooldown(execution_sentence) > gcd() * 2 } and { not hastalent(final_reckoning_talent) or spellcooldown(final_reckoning) > gcd() * 6 or spellcooldown(final_reckoning) > gcd() * 5 and holypower() >= 4 or not hastalent(seraphim_talent) and spellcooldown(final_reckoning) > gcd() * 2 } and { not hastalent(seraphim_talent) or spellcooldown(seraphim) / gcd() + holypower() > 3 or hastalent(final_reckoning_talent) or hastalent(execution_sentence_talent) or iscovenant("kyrian") } or { hastalent(holy_avenger_talent) and spellcooldown(holy_avenger) < gcd() * 3 or buffpresent(holy_avenger) } or buffpresent(crusade) and buffstacks(crusade) < 10 } spell(divine_storm)
+ #templars_verdict,if=(!talent.crusade.enabled|cooldown.crusade.remains>gcd*3)&(!talent.execution_sentence.enabled|cooldown.execution_sentence.remains>gcd*6|cooldown.execution_sentence.remains>gcd*5&holy_power>=4|target.time_to_die<8|!talent.seraphim.enabled&cooldown.execution_sentence.remains>gcd*2)&(!talent.final_reckoning.enabled|cooldown.final_reckoning.remains>gcd*6|cooldown.final_reckoning.remains>gcd*5&holy_power>=4|!talent.seraphim.enabled&cooldown.final_reckoning.remains>gcd*2)&(!talent.seraphim.enabled|cooldown.seraphim.remains%gcd+holy_power>3|talent.final_reckoning.enabled|talent.execution_sentence.enabled|covenant.kyrian)|talent.holy_avenger.enabled&cooldown.holy_avenger.remains<gcd*3|buff.holy_avenger.up|buff.crusade.up&buff.crusade.stack<10
+ if { not hastalent(crusade_talent) or spellcooldown(crusade) > gcd() * 3 } and { not hastalent(execution_sentence_talent) or spellcooldown(execution_sentence) > gcd() * 6 or spellcooldown(execution_sentence) > gcd() * 5 and holypower() >= 4 or target.timetodie() < 8 or not hastalent(seraphim_talent) and spellcooldown(execution_sentence) > gcd() * 2 } and { not hastalent(final_reckoning_talent) or spellcooldown(final_reckoning) > gcd() * 6 or spellcooldown(final_reckoning) > gcd() * 5 and holypower() >= 4 or not hastalent(seraphim_talent) and spellcooldown(final_reckoning) > gcd() * 2 } and { not hastalent(seraphim_talent) or spellcooldown(seraphim) / gcd() + holypower() > 3 or hastalent(final_reckoning_talent) or hastalent(execution_sentence_talent) or iscovenant("kyrian") } or hastalent(holy_avenger_talent) and spellcooldown(holy_avenger) < gcd() * 3 or buffpresent(holy_avenger) or buffpresent(crusade) and buffstacks(crusade) < 10 spell(templars_verdict)
 }
 
 AddFunction retributionfinishersmainpostconditions
@@ -567,18 +878,16 @@ AddFunction retributionfinishersmainpostconditions
 
 AddFunction retributionfinishersshortcdactions
 {
- #variable,name=ds_castable,value=spell_targets.divine_storm>=2|buff.empyrean_power.up&debuff.judgment.down&buff.divine_purpose.down
- #seraphim,if=((!talent.crusade.enabled&(cooldown.avenging_wrath.remains>25|cooldown.avenging_wrath.remains=0))|(talent.execution_sentence.enabled&talent.final_reckoning.enabled)|(buff.crusade.up|cooldown.crusade.remains>25))&(!talent.final_reckoning.enabled|cooldown.final_reckoning.remains<8)&(!talent.execution_sentence.enabled|cooldown.execution_sentence.remains<8)&time_to_hpg=0
- if { not hastalent(crusade_talent) and { spellcooldown(avenging_wrath) > 25 or not spellcooldown(avenging_wrath) > 0 } or hastalent(execution_sentence_talent) and hastalent(final_reckoning_talent) or buffpresent(crusade) or spellcooldown(crusade) > 25 } and { not hastalent(final_reckoning_talent) or spellcooldown(final_reckoning) < 8 } and { not hastalent(execution_sentence_talent) or spellcooldown(execution_sentence) < 8 } and retributiontimetohpg() == 0 spell(seraphim)
- #vanquishers_hammer,if=(!talent.final_reckoning.enabled|cooldown.final_reckoning.remains>gcd*10|debuff.final_reckoning.up)&(!talent.execution_sentence.enabled|cooldown.execution_sentence.remains>gcd*10|debuff.execution_sentence.up)|spell_targets.divine_storm>=2
- if { not hastalent(final_reckoning_talent) or spellcooldown(final_reckoning) > gcd() * 10 or target.debuffpresent(final_reckoning) } and { not hastalent(execution_sentence_talent) or spellcooldown(execution_sentence) > gcd() * 10 or target.debuffpresent(execution_sentence) } or enemies(tagged=1) >= 2 spell(vanquishers_hammer)
- #execution_sentence,if=((!talent.crusade.enabled|buff.crusade.down&cooldown.crusade.remains>10)|buff.crusade.stack>=3|cooldown.avenging_wrath.remains>10|debuff.final_reckoning.up)&time_to_hpg=0&target.time_to_die>8
- if { not hastalent(crusade_talent) or buffexpires(crusade) and spellcooldown(crusade) > 10 or buffstacks(crusade) >= 3 or spellcooldown(avenging_wrath) > 10 or target.debuffpresent(final_reckoning) } and retributiontimetohpg() == 0 and target.timetodie() > 8 spell(execution_sentence)
+ #variable,name=ds_castable,value=spell_targets.divine_storm=2&!(runeforge.final_verdict&talent.righteous_verdict.enabled&conduit.templars_vindication.enabled)|spell_targets.divine_storm>2|buff.empyrean_power.up&debuff.judgment.down&buff.divine_purpose.down
+ #seraphim,if=(cooldown.avenging_wrath.remains>15|cooldown.crusade.remains>15|talent.final_reckoning.enabled)&(!talent.final_reckoning.enabled|cooldown.final_reckoning.remains<=gcd*3&(!raid_event.adds.exists|raid_event.adds.in>40|raid_event.adds.in<gcd|raid_event.adds.up))&(!talent.execution_sentence.enabled|cooldown.execution_sentence.remains<=gcd*3|talent.final_reckoning.enabled)&(!covenant.kyrian|cooldown.divine_toll.remains<9)|target.time_to_die<15&target.time_to_die>5
+ if { spellcooldown(avenging_wrath) > 15 or spellcooldown(crusade) > 15 or hastalent(final_reckoning_talent) } and { not hastalent(final_reckoning_talent) or spellcooldown(final_reckoning) <= gcd() * 3 and { not never(raid_event_adds_exists) or 600 > 40 or 600 < gcd() or never(raid_event_adds_exists) } } and { not hastalent(execution_sentence_talent) or spellcooldown(execution_sentence) <= gcd() * 3 or hastalent(final_reckoning_talent) } and { not iscovenant("kyrian") or spellcooldown(divine_toll) < 9 } or target.timetodie() < 15 and target.timetodie() > 5 spell(seraphim)
+ #execution_sentence,if=(buff.crusade.down&cooldown.crusade.remains>10|buff.crusade.stack>=3|cooldown.avenging_wrath.remains>10)&(!talent.final_reckoning.enabled|cooldown.final_reckoning.remains>10)&target.time_to_die>8
+ if { buffexpires(crusade) and spellcooldown(crusade) > 10 or buffstacks(crusade) >= 3 or spellcooldown(avenging_wrath) > 10 } and { not hastalent(final_reckoning_talent) or spellcooldown(final_reckoning) > 10 } and target.timetodie() > 8 spell(execution_sentence)
 }
 
 AddFunction retributionfinishersshortcdpostconditions
 {
- ds_castable() and not buffpresent(vanquishers_hammer) and { { not hastalent(crusade_talent) or spellcooldown(crusade) > gcd() * 3 } and { not hastalent(execution_sentence_talent) or spellcooldown(execution_sentence) / gcd() + holypower() > 7 or target.timetodie() < 8 } and { not hastalent(final_reckoning_talent) or spellcooldown(final_reckoning) / gcd() + holypower() > 7 } or enemies(tagged=1) >= 2 and { hastalent(holy_avenger_talent) and spellcooldown(holy_avenger) < gcd() * 3 or buffpresent(crusade) and buffstacks(crusade) < 10 } } and spell(divine_storm) or { { not hastalent(crusade_talent) or spellcooldown(crusade) > gcd() * 3 } and { not hastalent(execution_sentence_talent) or spellcooldown(execution_sentence) / gcd() + holypower() > 7 or target.timetodie() < 8 } and { not hastalent(final_reckoning_talent) or spellcooldown(final_reckoning) / gcd() + holypower() > 7 } and { not iscovenant("necrolord") or spellcooldown(vanquishers_hammer) > gcd() } or hastalent(holy_avenger_talent) and spellcooldown(holy_avenger) < gcd() * 3 or buffpresent(holy_avenger) or buffpresent(crusade) and buffstacks(crusade) < 10 or buffpresent(vanquishers_hammer) } and spell(templars_verdict)
+ ds_castable() and not buffpresent(vanquishers_hammer) and { { not hastalent(crusade_talent) or spellcooldown(crusade) > gcd() * 3 } and { not hastalent(execution_sentence_talent) or spellcooldown(execution_sentence) > gcd() * 6 or spellcooldown(execution_sentence) > gcd() * 5 and holypower() >= 4 or target.timetodie() < 8 or not hastalent(seraphim_talent) and spellcooldown(execution_sentence) > gcd() * 2 } and { not hastalent(final_reckoning_talent) or spellcooldown(final_reckoning) > gcd() * 6 or spellcooldown(final_reckoning) > gcd() * 5 and holypower() >= 4 or not hastalent(seraphim_talent) and spellcooldown(final_reckoning) > gcd() * 2 } and { not hastalent(seraphim_talent) or spellcooldown(seraphim) / gcd() + holypower() > 3 or hastalent(final_reckoning_talent) or hastalent(execution_sentence_talent) or iscovenant("kyrian") } or { hastalent(holy_avenger_talent) and spellcooldown(holy_avenger) < gcd() * 3 or buffpresent(holy_avenger) } or buffpresent(crusade) and buffstacks(crusade) < 10 } and spell(divine_storm) or { { not hastalent(crusade_talent) or spellcooldown(crusade) > gcd() * 3 } and { not hastalent(execution_sentence_talent) or spellcooldown(execution_sentence) > gcd() * 6 or spellcooldown(execution_sentence) > gcd() * 5 and holypower() >= 4 or target.timetodie() < 8 or not hastalent(seraphim_talent) and spellcooldown(execution_sentence) > gcd() * 2 } and { not hastalent(final_reckoning_talent) or spellcooldown(final_reckoning) > gcd() * 6 or spellcooldown(final_reckoning) > gcd() * 5 and holypower() >= 4 or not hastalent(seraphim_talent) and spellcooldown(final_reckoning) > gcd() * 2 } and { not hastalent(seraphim_talent) or spellcooldown(seraphim) / gcd() + holypower() > 3 or hastalent(final_reckoning_talent) or hastalent(execution_sentence_talent) or iscovenant("kyrian") } or hastalent(holy_avenger_talent) and spellcooldown(holy_avenger) < gcd() * 3 or buffpresent(holy_avenger) or buffpresent(crusade) and buffstacks(crusade) < 10 } and spell(templars_verdict)
 }
 
 AddFunction retributionfinisherscdactions
@@ -587,7 +896,7 @@ AddFunction retributionfinisherscdactions
 
 AddFunction retributionfinisherscdpostconditions
 {
- { not hastalent(crusade_talent) and { spellcooldown(avenging_wrath) > 25 or not spellcooldown(avenging_wrath) > 0 } or hastalent(execution_sentence_talent) and hastalent(final_reckoning_talent) or buffpresent(crusade) or spellcooldown(crusade) > 25 } and { not hastalent(final_reckoning_talent) or spellcooldown(final_reckoning) < 8 } and { not hastalent(execution_sentence_talent) or spellcooldown(execution_sentence) < 8 } and retributiontimetohpg() == 0 and spell(seraphim) or { { not hastalent(final_reckoning_talent) or spellcooldown(final_reckoning) > gcd() * 10 or target.debuffpresent(final_reckoning) } and { not hastalent(execution_sentence_talent) or spellcooldown(execution_sentence) > gcd() * 10 or target.debuffpresent(execution_sentence) } or enemies(tagged=1) >= 2 } and spell(vanquishers_hammer) or { not hastalent(crusade_talent) or buffexpires(crusade) and spellcooldown(crusade) > 10 or buffstacks(crusade) >= 3 or spellcooldown(avenging_wrath) > 10 or target.debuffpresent(final_reckoning) } and retributiontimetohpg() == 0 and target.timetodie() > 8 and spell(execution_sentence) or ds_castable() and not buffpresent(vanquishers_hammer) and { { not hastalent(crusade_talent) or spellcooldown(crusade) > gcd() * 3 } and { not hastalent(execution_sentence_talent) or spellcooldown(execution_sentence) / gcd() + holypower() > 7 or target.timetodie() < 8 } and { not hastalent(final_reckoning_talent) or spellcooldown(final_reckoning) / gcd() + holypower() > 7 } or enemies(tagged=1) >= 2 and { hastalent(holy_avenger_talent) and spellcooldown(holy_avenger) < gcd() * 3 or buffpresent(crusade) and buffstacks(crusade) < 10 } } and spell(divine_storm) or { { not hastalent(crusade_talent) or spellcooldown(crusade) > gcd() * 3 } and { not hastalent(execution_sentence_talent) or spellcooldown(execution_sentence) / gcd() + holypower() > 7 or target.timetodie() < 8 } and { not hastalent(final_reckoning_talent) or spellcooldown(final_reckoning) / gcd() + holypower() > 7 } and { not iscovenant("necrolord") or spellcooldown(vanquishers_hammer) > gcd() } or hastalent(holy_avenger_talent) and spellcooldown(holy_avenger) < gcd() * 3 or buffpresent(holy_avenger) or buffpresent(crusade) and buffstacks(crusade) < 10 or buffpresent(vanquishers_hammer) } and spell(templars_verdict)
+ { { spellcooldown(avenging_wrath) > 15 or spellcooldown(crusade) > 15 or hastalent(final_reckoning_talent) } and { not hastalent(final_reckoning_talent) or spellcooldown(final_reckoning) <= gcd() * 3 and { not never(raid_event_adds_exists) or 600 > 40 or 600 < gcd() or never(raid_event_adds_exists) } } and { not hastalent(execution_sentence_talent) or spellcooldown(execution_sentence) <= gcd() * 3 or hastalent(final_reckoning_talent) } and { not iscovenant("kyrian") or spellcooldown(divine_toll) < 9 } or target.timetodie() < 15 and target.timetodie() > 5 } and spell(seraphim) or { buffexpires(crusade) and spellcooldown(crusade) > 10 or buffstacks(crusade) >= 3 or spellcooldown(avenging_wrath) > 10 } and { not hastalent(final_reckoning_talent) or spellcooldown(final_reckoning) > 10 } and target.timetodie() > 8 and spell(execution_sentence) or ds_castable() and not buffpresent(vanquishers_hammer) and { { not hastalent(crusade_talent) or spellcooldown(crusade) > gcd() * 3 } and { not hastalent(execution_sentence_talent) or spellcooldown(execution_sentence) > gcd() * 6 or spellcooldown(execution_sentence) > gcd() * 5 and holypower() >= 4 or target.timetodie() < 8 or not hastalent(seraphim_talent) and spellcooldown(execution_sentence) > gcd() * 2 } and { not hastalent(final_reckoning_talent) or spellcooldown(final_reckoning) > gcd() * 6 or spellcooldown(final_reckoning) > gcd() * 5 and holypower() >= 4 or not hastalent(seraphim_talent) and spellcooldown(final_reckoning) > gcd() * 2 } and { not hastalent(seraphim_talent) or spellcooldown(seraphim) / gcd() + holypower() > 3 or hastalent(final_reckoning_talent) or hastalent(execution_sentence_talent) or iscovenant("kyrian") } or { hastalent(holy_avenger_talent) and spellcooldown(holy_avenger) < gcd() * 3 or buffpresent(holy_avenger) } or buffpresent(crusade) and buffstacks(crusade) < 10 } and spell(divine_storm) or { { not hastalent(crusade_talent) or spellcooldown(crusade) > gcd() * 3 } and { not hastalent(execution_sentence_talent) or spellcooldown(execution_sentence) > gcd() * 6 or spellcooldown(execution_sentence) > gcd() * 5 and holypower() >= 4 or target.timetodie() < 8 or not hastalent(seraphim_talent) and spellcooldown(execution_sentence) > gcd() * 2 } and { not hastalent(final_reckoning_talent) or spellcooldown(final_reckoning) > gcd() * 6 or spellcooldown(final_reckoning) > gcd() * 5 and holypower() >= 4 or not hastalent(seraphim_talent) and spellcooldown(final_reckoning) > gcd() * 2 } and { not hastalent(seraphim_talent) or spellcooldown(seraphim) / gcd() + holypower() > 3 or hastalent(final_reckoning_talent) or hastalent(execution_sentence_talent) or iscovenant("kyrian") } or hastalent(holy_avenger_talent) and spellcooldown(holy_avenger) < gcd() * 3 or buffpresent(holy_avenger) or buffpresent(crusade) and buffstacks(crusade) < 10 } and spell(templars_verdict)
 }
 
 ### actions.cooldowns
@@ -606,8 +915,8 @@ AddFunction retributioncooldownsshortcdactions
 {
  unless spell(blessing_of_the_seasons)
  {
-  #final_reckoning,if=holy_power>=3&cooldown.avenging_wrath.remains>gcd&time_to_hpg=0&(!talent.seraphim.enabled|buff.seraphim.up)
-  if holypower() >= 3 and spellcooldown(avenging_wrath) > gcd() and retributiontimetohpg() == 0 and { not hastalent(seraphim_talent) or buffpresent(seraphim) } spell(final_reckoning)
+  #final_reckoning,if=(holy_power>=4&time<8|holy_power>=3&time>=8)&cooldown.avenging_wrath.remains>gcd&time_to_hpg=0&(!talent.seraphim.enabled|buff.seraphim.up)&(!raid_event.adds.exists|raid_event.adds.up|raid_event.adds.in>40)
+  if { holypower() >= 4 and timeincombat() < 8 or holypower() >= 3 and timeincombat() >= 8 } and spellcooldown(avenging_wrath) > gcd() and retributiontimetohpg() == 0 and { not hastalent(seraphim_talent) or buffpresent(seraphim) } and { not never(raid_event_adds_exists) or never(raid_event_adds_exists) or 600 > 40 } spell(final_reckoning)
  }
 }
 
@@ -618,53 +927,59 @@ AddFunction retributioncooldownsshortcdpostconditions
 
 AddFunction retributioncooldownscdactions
 {
- #potion,if=(buff.bloodlust.react|buff.avenging_wrath.up&buff.avenging_wrath.remains>18|buff.crusade.up&buff.crusade.remains<25)
- if { buffpresent(bloodlust) or buffpresent(avenging_wrath) and buffremaining(avenging_wrath) > 18 or buffpresent(crusade) and buffremaining(crusade) < 25 } and { checkboxon(opt_use_consumables) and target.classification(worldboss) } item(potion_of_spectral_strength_item usable=1)
- #lights_judgment,if=spell_targets.lights_judgment>=2|(!raid_event.adds.exists|raid_event.adds.in>75)
- if enemies(tagged=1) >= 2 or not never(raid_event_adds_exists) or 600 > 75 spell(lights_judgment)
+ #potion,if=buff.avenging_wrath.up|buff.crusade.up&buff.crusade.stack=10|fight_remains<25
+ if { buffpresent(avenging_wrath) or buffpresent(crusade) and buffstacks(crusade) == 10 or fightremains() < 25 } and { checkboxon(opt_use_consumables) and target.classification(worldboss) } item(potion_of_spectral_strength_item usable=1)
+ #lights_judgment,if=spell_targets.lights_judgment>=2|!raid_event.adds.exists|raid_event.adds.in>75|raid_event.adds.up
+ if enemies(tagged=1) >= 2 or not never(raid_event_adds_exists) or 600 > 75 or never(raid_event_adds_exists) spell(lights_judgment)
  #fireblood,if=buff.avenging_wrath.up|buff.crusade.up&buff.crusade.stack=10
  if buffpresent(avenging_wrath) or buffpresent(crusade) and buffstacks(crusade) == 10 spell(fireblood)
- #shield_of_vengeance
- if checkboxon(opt_shield_of_vengeance) spell(shield_of_vengeance)
+ #shield_of_vengeance,if=(!talent.execution_sentence.enabled|cooldown.execution_sentence.remains<52)&fight_remains>15
+ if { not hastalent(execution_sentence_talent) or spellcooldown(execution_sentence) < 52 } and fightremains() > 15 and checkboxon(opt_shield_of_vengeance) spell(shield_of_vengeance)
 
  unless spell(blessing_of_the_seasons)
  {
-  #use_item,name=inscrutable_quantum_device,if=buff.avenging_wrath.up|buff.crusade.up&buff.crusade.stack>=10|cooldown.avenging_wrath.remains>45|cooldown.crusade.remains>45
-  if buffpresent(avenging_wrath) or buffpresent(crusade) and buffstacks(crusade) >= 10 or spellcooldown(avenging_wrath) > 45 or spellcooldown(crusade) > 45 retributionuseitemactions()
-  #use_item,name=overwhelming_power_crystal,if=buff.avenging_wrath.up|buff.crusade.up&buff.crusade.stack>=10
-  if buffpresent(avenging_wrath) or buffpresent(crusade) and buffstacks(crusade) >= 10 retributionuseitemactions()
-  #use_item,name=darkmoon_deck_voracity,if=buff.avenging_wrath.up|buff.crusade.up&buff.crusade.stack>=10
-  if buffpresent(avenging_wrath) or buffpresent(crusade) and buffstacks(crusade) >= 10 retributionuseitemactions()
-  #use_item,name=macabre_sheet_music,if=buff.avenging_wrath.up|buff.crusade.up&buff.crusade.stack>=10
-  if buffpresent(avenging_wrath) or buffpresent(crusade) and buffstacks(crusade) >= 10 retributionuseitemactions()
-  #use_item,name=dreadfire_vessel,if=(!talent.execution_sentence.enabled|debuff.execution_sentence.up|cooldown.execution_sentence.remains>25)
-  if not hastalent(execution_sentence_talent) or target.debuffpresent(execution_sentence) or spellcooldown(execution_sentence) > 25 retributionuseitemactions()
-  #use_item,name=skulkers_wing,if=(!talent.execution_sentence.enabled|debuff.execution_sentence.up|cooldown.execution_sentence.remains>25)
-  if not hastalent(execution_sentence_talent) or target.debuffpresent(execution_sentence) or spellcooldown(execution_sentence) > 25 retributionuseitemactions()
-  #use_item,name=grim_codex,if=(!talent.execution_sentence.enabled|debuff.execution_sentence.up|cooldown.execution_sentence.remains>25)
-  if not hastalent(execution_sentence_talent) or target.debuffpresent(execution_sentence) or spellcooldown(execution_sentence) > 25 retributionuseitemactions()
-  #use_item,name=memory_of_past_sins,if=(!talent.execution_sentence.enabled|debuff.execution_sentence.up)
-  if not hastalent(execution_sentence_talent) or target.debuffpresent(execution_sentence) retributionuseitemactions()
-  #use_item,name=spare_meat_hook,if=(!talent.execution_sentence.enabled|debuff.execution_sentence.up)
-  if not hastalent(execution_sentence_talent) or target.debuffpresent(execution_sentence) retributionuseitemactions()
+  #use_item,name=inscrutable_quantum_device,if=buff.avenging_wrath.up|buff.crusade.up&buff.crusade.stack=10|fight_remains<30
+  if { buffpresent(avenging_wrath) or buffpresent(crusade) and buffstacks(crusade) == 10 or fightremains() < 30 } and hastrinket(inscrutable_quantum_device_item) item(inscrutable_quantum_device_item usable=1)
+  #use_item,name=overwhelming_power_crystal,if=buff.avenging_wrath.up|buff.crusade.up&buff.crusade.stack=10|fight_remains<15
+  if { buffpresent(avenging_wrath) or buffpresent(crusade) and buffstacks(crusade) == 10 or fightremains() < 15 } and hastrinket(overwhelming_power_crystal_item) item(overwhelming_power_crystal_item usable=1)
+  #use_item,name=darkmoon_deck_voracity,if=buff.avenging_wrath.up|buff.crusade.up&buff.crusade.stack=10|fight_remains<20
+  if { buffpresent(avenging_wrath) or buffpresent(crusade) and buffstacks(crusade) == 10 or fightremains() < 20 } and hastrinket(darkmoon_deck_voracity_item) item(darkmoon_deck_voracity_item usable=1)
+  #use_item,name=macabre_sheet_music,if=buff.avenging_wrath.up|buff.crusade.up&buff.crusade.stack=10|fight_remains<20
+  if { buffpresent(avenging_wrath) or buffpresent(crusade) and buffstacks(crusade) == 10 or fightremains() < 20 } and hastrinket(macabre_sheet_music_item) item(macabre_sheet_music_item usable=1)
+  #use_item,name=dreadfire_vessel
+  if hastrinket(dreadfire_vessel_item) item(dreadfire_vessel_item usable=1)
+  #use_item,name=skulkers_wing
+  if hastrinket(skulkers_wing_item) item(skulkers_wing_item usable=1)
+  #use_item,name=grim_codex
+  if hastrinket(grim_codex_item) item(grim_codex_item usable=1)
+  #use_item,name=memory_of_past_sins
+  if hastrinket(memory_of_past_sins_item) item(memory_of_past_sins_item usable=1)
+  #use_item,name=spare_meat_hook
+  if hastrinket(spare_meat_hook_item) item(spare_meat_hook_item usable=1)
+  #use_item,name=salvaged_fusion_amplifier
+  if hastrinket(salvaged_fusion_amplifier_item) item(salvaged_fusion_amplifier_item usable=1)
+  #use_item,name=unchained_gladiators_badge_of_ferocity,if=buff.avenging_wrath.up|buff.crusade.up&buff.crusade.stack>=10|cooldown.avenging_wrath.remains>45|cooldown.crusade.remains>45
+  if { buffpresent(avenging_wrath) or buffpresent(crusade) and buffstacks(crusade) >= 10 or spellcooldown(avenging_wrath) > 45 or spellcooldown(crusade) > 45 } and hastrinket(unchained_gladiators_badge_of_ferocity_item) item(unchained_gladiators_badge_of_ferocity_item usable=1)
+  #use_item,name=unchained_aspirants_badge_of_ferocity,if=buff.avenging_wrath.up|buff.crusade.up&buff.crusade.stack>=10|cooldown.avenging_wrath.remains>45|cooldown.crusade.remains>45
+  if { buffpresent(avenging_wrath) or buffpresent(crusade) and buffstacks(crusade) >= 10 or spellcooldown(avenging_wrath) > 45 or spellcooldown(crusade) > 45 } and hastrinket(unchained_aspirants_badge_of_ferocity_item) item(unchained_aspirants_badge_of_ferocity_item usable=1)
   #use_item,name=sinful_gladiators_badge_of_ferocity,if=buff.avenging_wrath.up|buff.crusade.up&buff.crusade.stack>=10|cooldown.avenging_wrath.remains>45|cooldown.crusade.remains>45
-  if buffpresent(avenging_wrath) or buffpresent(crusade) and buffstacks(crusade) >= 10 or spellcooldown(avenging_wrath) > 45 or spellcooldown(crusade) > 45 retributionuseitemactions()
+  if { buffpresent(avenging_wrath) or buffpresent(crusade) and buffstacks(crusade) >= 10 or spellcooldown(avenging_wrath) > 45 or spellcooldown(crusade) > 45 } and hastrinket(sinful_gladiators_badge_of_ferocity_item) item(sinful_gladiators_badge_of_ferocity_item usable=1)
   #use_item,name=sinful_aspirants_badge_of_ferocity,if=buff.avenging_wrath.up|buff.crusade.up&buff.crusade.stack>=10|cooldown.avenging_wrath.remains>45|cooldown.crusade.remains>45
-  if buffpresent(avenging_wrath) or buffpresent(crusade) and buffstacks(crusade) >= 10 or spellcooldown(avenging_wrath) > 45 or spellcooldown(crusade) > 45 retributionuseitemactions()
-  #avenging_wrath,if=(holy_power>=4&time<5|holy_power>=3&time>5|talent.holy_avenger.enabled&cooldown.holy_avenger.remains=0)&(!talent.seraphim.enabled|cooldown.seraphim.remains>0)
-  if { holypower() >= 4 and timeincombat() < 5 or holypower() >= 3 and timeincombat() > 5 or hastalent(holy_avenger_talent) and not spellcooldown(holy_avenger) > 0 } and { not hastalent(seraphim_talent) or spellcooldown(seraphim) > 0 } spell(avenging_wrath)
-  #crusade,if=(holy_power>=4&time<5|holy_power>=3&time>5|talent.holy_avenger.enabled&cooldown.holy_avenger.remains=0)
+  if { buffpresent(avenging_wrath) or buffpresent(crusade) and buffstacks(crusade) >= 10 or spellcooldown(avenging_wrath) > 45 or spellcooldown(crusade) > 45 } and hastrinket(sinful_aspirants_badge_of_ferocity_item) item(sinful_aspirants_badge_of_ferocity_item usable=1)
+  #avenging_wrath,if=(holy_power>=4&time<5|holy_power>=3&(time>5|runeforge.the_magistrates_judgment)|talent.holy_avenger.enabled&cooldown.holy_avenger.remains=0)&(!talent.seraphim.enabled|cooldown.seraphim.remains>0|talent.sanctified_wrath.enabled)
+  if { holypower() >= 4 and timeincombat() < 5 or holypower() >= 3 and { timeincombat() > 5 or runeforge(the_magistrates_judgment_runeforge) } or hastalent(holy_avenger_talent) and not spellcooldown(holy_avenger) > 0 } and { not hastalent(seraphim_talent) or spellcooldown(seraphim) > 0 or hastalent(sanctified_wrath_talent_retribution) } spell(avenging_wrath)
+  #crusade,if=holy_power>=4&time<5|holy_power>=3&time>5|talent.holy_avenger.enabled&cooldown.holy_avenger.remains=0
   if holypower() >= 4 and timeincombat() < 5 or holypower() >= 3 and timeincombat() > 5 or hastalent(holy_avenger_talent) and not spellcooldown(holy_avenger) > 0 spell(crusade)
   #ashen_hallow
   spell(ashen_hallow)
-  #holy_avenger,if=time_to_hpg=0&((buff.avenging_wrath.up|buff.crusade.up)|(buff.avenging_wrath.down&cooldown.avenging_wrath.remains>40|buff.crusade.down&cooldown.crusade.remains>40))
+  #holy_avenger,if=time_to_hpg=0&(buff.avenging_wrath.up|buff.crusade.up|buff.avenging_wrath.down&cooldown.avenging_wrath.remains>40|buff.crusade.down&cooldown.crusade.remains>40)
   if retributiontimetohpg() == 0 and { buffpresent(avenging_wrath) or buffpresent(crusade) or buffexpires(avenging_wrath) and spellcooldown(avenging_wrath) > 40 or buffexpires(crusade) and spellcooldown(crusade) > 40 } spell(holy_avenger)
  }
 }
 
 AddFunction retributioncooldownscdpostconditions
 {
- spell(blessing_of_the_seasons) or holypower() >= 3 and spellcooldown(avenging_wrath) > gcd() and retributiontimetohpg() == 0 and { not hastalent(seraphim_talent) or buffpresent(seraphim) } and spell(final_reckoning)
+ spell(blessing_of_the_seasons) or { holypower() >= 4 and timeincombat() < 8 or holypower() >= 3 and timeincombat() >= 8 } and spellcooldown(avenging_wrath) > gcd() and retributiontimetohpg() == 0 and { not hastalent(seraphim_talent) or buffpresent(seraphim) } and { not never(raid_event_adds_exists) or never(raid_event_adds_exists) or 600 > 40 } and spell(final_reckoning)
 }
 
 ### actions.default
@@ -769,34 +1084,56 @@ AddIcon enabled=(checkboxon(opt_paladin_retribution_aoe) and specialization(retr
 # ashen_hallow
 # avenging_wrath
 # blade_of_justice
+# blade_of_wrath_talent
 # blessing_of_the_seasons
-# bloodlust
 # consecration
 # crusade
 # crusade_talent
 # crusader_strike
+# darkmoon_deck_voracity_item
 # divine_purpose_buff
 # divine_storm
 # divine_toll
+# dreadfire_vessel_item
 # empyrean_power_buff
 # execution_sentence
 # execution_sentence_talent
+# expurgation_conduit
 # final_reckoning
 # final_reckoning_talent
+# final_verdict_runeforge
 # fireblood
+# grim_codex_item
 # hammer_of_justice
 # hammer_of_wrath
 # holy_avenger
 # holy_avenger_talent
+# inscrutable_quantum_device_item
 # judgment
 # judgment_debuff
 # lights_judgment
+# macabre_sheet_music_item
+# memory_of_past_sins_item
+# overwhelming_power_crystal_item
 # potion_of_spectral_strength_item
 # rebuke
+# righteous_verdict_talent
+# salvaged_fusion_amplifier_item
+# sanctified_wrath_talent_retribution
 # seraphim
 # seraphim_talent
 # shield_of_vengeance
+# sinful_aspirants_badge_of_ferocity_item
+# sinful_gladiators_badge_of_ferocity_item
+# skulkers_wing_item
+# spare_meat_hook_item
 # templars_verdict
+# templars_vindication_conduit
+# the_mad_paragon_runeforge
+# the_magistrates_judgment_runeforge
+# unchained_aspirants_badge_of_ferocity_item
+# unchained_gladiators_badge_of_ferocity_item
+# vanguards_momentum_runeforge
 # vanquishers_hammer
 # wake_of_ashes
 # war_stomp

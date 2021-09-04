@@ -5,13 +5,13 @@ export function registerDemonHunter(scripts: OvaleScriptsClass) {
     // ANY CHANGES MADE BELOW THIS POINT WILL BE LOST
 
     {
-        const name = "sc_t26_demon_hunter_havoc";
-        const desc = "[9.0] Simulationcraft: T26_Demon_Hunter_Havoc";
+        const name = "sc_t27_demon_hunter_havoc";
+        const desc = "[9.1] Simulationcraft: T27_Demon_Hunter_Havoc";
         const code = `
-# Based on SimulationCraft profile "T26_Demon_Hunter_Havoc".
+# Based on SimulationCraft profile "T27_Demon_Hunter_Havoc".
 #	class=demonhunter
 #	spec=havoc
-#	talents=3310221
+#	talents=1121111
 
 Include(ovale_common)
 Include(ovale_demonhunter_spells)
@@ -20,11 +20,6 @@ Include(ovale_demonhunter_spells)
 AddFunction waiting_for_momentum
 {
  hastalent(momentum_talent) and not buffpresent(momentum_buff)
-}
-
-AddFunction waiting_for_essence_break
-{
- hastalent(essence_break_talent) and not pooling_for_blade_dance() and not pooling_for_meta() and not spellcooldown(essence_break) > 0
 }
 
 AddFunction pooling_for_eye_beam
@@ -44,7 +39,21 @@ AddFunction pooling_for_meta
 
 AddFunction blade_dance
 {
- hastalent(first_blood_talent) or enemies(tagged=1) >= 3 - { talentpoints(trail_of_ruin_talent) + buffpresent(metamorphosis_buff) } or runeforge(chaos_theory_runeforge) and buffexpires(chaos_blades)
+ if hastalent(essence_break_talent) and spellcooldown(essence_break) <= 0 0
+ if runeforge(darkglare_medallion_runeforge) hastalent(first_blood_talent) or { buffpresent(metamorphosis_buff) or hastalent(trail_of_ruin_talent) or target.debuffpresent(essence_break_debuff) } and enemies(tagged=1) >= 3 - talentpoints(trail_of_ruin_talent) or not hastalent(demonic_talent) and enemies(tagged=1) >= 4
+ if runeforge(chaos_theory_runeforge) buffexpires(chaos_blades) or hastalent(first_blood_talent) and enemies(tagged=1) >= 2 - talentpoints(trail_of_ruin_talent) or not hastalent(cycle_of_hatred_talent) and enemies(tagged=1) >= 4 - talentpoints(trail_of_ruin_talent)
+ if not runeforge(chaos_theory_runeforge) and not runeforge(darkglare_medallion_runeforge) hastalent(first_blood_talent) or enemies(tagged=1) >= 3 - talentpoints(trail_of_ruin_talent)
+}
+
+AddFunction use_eye_beam_fury_condition
+{
+ hastalent(blind_fury_talent) and { runeforge(darkglare_medallion_runeforge) or hastalent(demon_blades_talent) }
+}
+
+AddFunction trinket_sync_slot
+{
+ if false and { not false or itemcooldownduration(slot="trinket1slot") > itemcooldownduration(slot="trinket0slot") } 2
+ if false and { not false or itemcooldownduration(slot="trinket0slot") >= itemcooldownduration(slot="trinket1slot") } 1
 }
 
 AddCheckBox(opt_interrupt l(interrupt) default enabled=(specialization(havoc)))
@@ -71,8 +80,8 @@ AddFunction havocinterruptactions
 
 AddFunction havocuseitemactions
 {
- item(trinket0slot text=13 usable=1)
- item(trinket1slot text=14 usable=1)
+ item("trinket0Slot" text=13 usable=1)
+ item("trinket1Slot" text=14 usable=1)
 }
 
 AddFunction havocgetinmeleerange
@@ -111,14 +120,6 @@ AddFunction havocprecombatshortcdpostconditions
 
 AddFunction havocprecombatcdactions
 {
- #flask
- #augmentation
- #food
- #snapshot_stats
- #potion
- if checkboxon(opt_use_consumables) and target.classification(worldboss) item(potion_of_phantom_fire_item usable=1)
- #use_item,name=azsharas_font_of_power
- havocuseitemactions()
 }
 
 AddFunction havocprecombatcdpostconditions
@@ -131,8 +132,8 @@ AddFunction havocnormalmainactions
 {
  #vengeful_retreat,if=talent.momentum.enabled&buff.prepared.down&time>1
  if hastalent(momentum_talent) and buffexpires(prepared_buff) and timeincombat() > 1 and checkboxon(opt_vengeful_retreat) spell(vengeful_retreat)
- #fel_rush,if=(variable.waiting_for_momentum|talent.unbound_chaos.enabled&buff.unbound_chaos.up)&(charges=2|(raid_event.movement.in>10&raid_event.adds.in>10))
- if { waiting_for_momentum() or hastalent(unbound_chaos_talent) and buffpresent(unbound_chaos_buff) } and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) spell(fel_rush)
+ #fel_rush,if=(buff.unbound_chaos.up|variable.waiting_for_momentum&(!talent.unbound_chaos.enabled|!cooldown.immolation_aura.ready))&(charges=2|(raid_event.movement.in>10&raid_event.adds.in>10))
+ if { buffpresent(unbound_chaos_buff) or waiting_for_momentum() and { not hastalent(unbound_chaos_talent) or not spellcooldown(immolation_aura) <= 0 } } and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) spell(fel_rush)
  #death_sweep,if=variable.blade_dance
  if blade_dance() spell(death_sweep)
  #glaive_tempest,if=!variable.waiting_for_momentum&(active_enemies>desired_targets|raid_event.adds.in>10)
@@ -143,10 +144,12 @@ AddFunction havocnormalmainactions
  if blade_dance() spell(blade_dance)
  #felblade,if=fury.deficit>=40
  if furydeficit() >= 40 spell(felblade)
- #annihilation,if=(talent.demon_blades.enabled|!variable.waiting_for_momentum|fury.deficit<30|buff.metamorphosis.remains<5)&!variable.pooling_for_blade_dance&!variable.waiting_for_essence_break
- if { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 or buffremaining(metamorphosis_buff) < 5 } and not pooling_for_blade_dance() and not waiting_for_essence_break() spell(annihilation)
- #chaos_strike,if=(talent.demon_blades.enabled|!variable.waiting_for_momentum|fury.deficit<30)&!variable.pooling_for_meta&!variable.pooling_for_blade_dance&!variable.waiting_for_essence_break
- if { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 } and not pooling_for_meta() and not pooling_for_blade_dance() and not waiting_for_essence_break() spell(chaos_strike_havoc)
+ #essence_break
+ spell(essence_break)
+ #annihilation,if=(talent.demon_blades.enabled|!variable.waiting_for_momentum|fury.deficit<30|buff.metamorphosis.remains<5)&!variable.pooling_for_blade_dance
+ if { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 or buffremaining(metamorphosis_buff) < 5 } and not pooling_for_blade_dance() spell(annihilation)
+ #chaos_strike,if=(talent.demon_blades.enabled|!variable.waiting_for_momentum|fury.deficit<30)&!variable.pooling_for_meta&!variable.pooling_for_blade_dance
+ if { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 } and not pooling_for_meta() and not pooling_for_blade_dance() spell(chaos_strike_havoc)
  #demons_bite,target_if=min:debuff.burning_wound.remains,if=runeforge.burning_wound&debuff.burning_wound.remains<4
  if runeforge(burning_wound_runeforge) and target.debuffremaining(burning_wound_debuff) < 4 spell(demons_bite)
  #demons_bite
@@ -169,22 +172,22 @@ AddFunction havocnormalmainpostconditions
 
 AddFunction havocnormalshortcdactions
 {
- unless hastalent(momentum_talent) and buffexpires(prepared_buff) and timeincombat() > 1 and checkboxon(opt_vengeful_retreat) and spell(vengeful_retreat) or { waiting_for_momentum() or hastalent(unbound_chaos_talent) and buffpresent(unbound_chaos_buff) } and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush)
+ unless hastalent(momentum_talent) and buffexpires(prepared_buff) and timeincombat() > 1 and checkboxon(opt_vengeful_retreat) and spell(vengeful_retreat) or { buffpresent(unbound_chaos_buff) or waiting_for_momentum() and { not hastalent(unbound_chaos_talent) or not spellcooldown(immolation_aura) <= 0 } } and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush)
  {
   #fel_barrage,if=active_enemies>desired_targets|raid_event.adds.in>30
   if enemies() > havocdesiredtargets() or 600 > 30 spell(fel_barrage)
 
   unless blade_dance() and spell(death_sweep)
   {
-   #immolation_aura
-   spell(immolation_aura)
+   #immolation_aura,if=!buff.immolation_aura.up
+   if not buffpresent(immolation_aura) spell(immolation_aura)
 
    unless not waiting_for_momentum() and { enemies() > havocdesiredtargets() or 600 > 10 } and spell(glaive_tempest) or conduit(serrated_glaive_conduit) and spellcooldown(eye_beam) < 6 and not buffpresent(metamorphosis_buff) and not target.debuffpresent(exposed_wound_debuff) and spell(throw_glaive)
    {
-    #eye_beam,if=!variable.waiting_for_momentum&(active_enemies>desired_targets|raid_event.adds.in>15)
-    if not waiting_for_momentum() and { enemies() > havocdesiredtargets() or 600 > 15 } spell(eye_beam)
+    #eye_beam,if=!variable.waiting_for_momentum&(active_enemies>desired_targets|raid_event.adds.in>15&(!variable.use_eye_beam_fury_condition|spell_targets>1|fury<70))
+    if not waiting_for_momentum() and { enemies() > havocdesiredtargets() or 600 > 15 and { not use_eye_beam_fury_condition() or enemies(tagged=1) > 1 or fury() < 70 } } spell(eye_beam)
 
-    unless blade_dance() and spell(blade_dance) or furydeficit() >= 40 and spell(felblade) or { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 or buffremaining(metamorphosis_buff) < 5 } and not pooling_for_blade_dance() and not waiting_for_essence_break() and spell(annihilation) or { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 } and not pooling_for_meta() and not pooling_for_blade_dance() and not waiting_for_essence_break() and spell(chaos_strike_havoc)
+    unless blade_dance() and spell(blade_dance) or furydeficit() >= 40 and spell(felblade) or spell(essence_break) or { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 or buffremaining(metamorphosis_buff) < 5 } and not pooling_for_blade_dance() and spell(annihilation) or { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 } and not pooling_for_meta() and not pooling_for_blade_dance() and spell(chaos_strike_havoc)
     {
      #eye_beam,if=talent.blind_fury.enabled&raid_event.adds.in>cooldown
      if hastalent(blind_fury_talent) and 600 > spellcooldown(eye_beam) spell(eye_beam)
@@ -196,7 +199,7 @@ AddFunction havocnormalshortcdactions
 
 AddFunction havocnormalshortcdpostconditions
 {
- hastalent(momentum_talent) and buffexpires(prepared_buff) and timeincombat() > 1 and checkboxon(opt_vengeful_retreat) and spell(vengeful_retreat) or { waiting_for_momentum() or hastalent(unbound_chaos_talent) and buffpresent(unbound_chaos_buff) } and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or blade_dance() and spell(death_sweep) or not waiting_for_momentum() and { enemies() > havocdesiredtargets() or 600 > 10 } and spell(glaive_tempest) or conduit(serrated_glaive_conduit) and spellcooldown(eye_beam) < 6 and not buffpresent(metamorphosis_buff) and not target.debuffpresent(exposed_wound_debuff) and spell(throw_glaive) or blade_dance() and spell(blade_dance) or furydeficit() >= 40 and spell(felblade) or { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 or buffremaining(metamorphosis_buff) < 5 } and not pooling_for_blade_dance() and not waiting_for_essence_break() and spell(annihilation) or { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 } and not pooling_for_meta() and not pooling_for_blade_dance() and not waiting_for_essence_break() and spell(chaos_strike_havoc) or runeforge(burning_wound_runeforge) and target.debuffremaining(burning_wound_debuff) < 4 and spell(demons_bite) or spell(demons_bite) or not hastalent(momentum_talent) and 600 > charges(fel_rush) * 10 and hastalent(demon_blades_talent) and checkboxon(opt_fel_rush) and spell(fel_rush) or { target.distance() > 15 or not target.inrange(chaos_strike) } and spell(felblade) or { target.distance() > 15 or not target.inrange(chaos_strike) and not hastalent(momentum_talent) } and checkboxon(opt_fel_rush) and spell(fel_rush) or target.distance() > 15 and checkboxon(opt_vengeful_retreat) and spell(vengeful_retreat) or hastalent(demon_blades_talent) and spell(throw_glaive)
+ hastalent(momentum_talent) and buffexpires(prepared_buff) and timeincombat() > 1 and checkboxon(opt_vengeful_retreat) and spell(vengeful_retreat) or { buffpresent(unbound_chaos_buff) or waiting_for_momentum() and { not hastalent(unbound_chaos_talent) or not spellcooldown(immolation_aura) <= 0 } } and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or blade_dance() and spell(death_sweep) or not waiting_for_momentum() and { enemies() > havocdesiredtargets() or 600 > 10 } and spell(glaive_tempest) or conduit(serrated_glaive_conduit) and spellcooldown(eye_beam) < 6 and not buffpresent(metamorphosis_buff) and not target.debuffpresent(exposed_wound_debuff) and spell(throw_glaive) or blade_dance() and spell(blade_dance) or furydeficit() >= 40 and spell(felblade) or spell(essence_break) or { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 or buffremaining(metamorphosis_buff) < 5 } and not pooling_for_blade_dance() and spell(annihilation) or { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 } and not pooling_for_meta() and not pooling_for_blade_dance() and spell(chaos_strike_havoc) or runeforge(burning_wound_runeforge) and target.debuffremaining(burning_wound_debuff) < 4 and spell(demons_bite) or spell(demons_bite) or not hastalent(momentum_talent) and 600 > charges(fel_rush) * 10 and hastalent(demon_blades_talent) and checkboxon(opt_fel_rush) and spell(fel_rush) or { target.distance() > 15 or not target.inrange(chaos_strike) } and spell(felblade) or { target.distance() > 15 or not target.inrange(chaos_strike) and not hastalent(momentum_talent) } and checkboxon(opt_fel_rush) and spell(fel_rush) or target.distance() > 15 and checkboxon(opt_vengeful_retreat) and spell(vengeful_retreat) or hastalent(demon_blades_talent) and spell(throw_glaive)
 }
 
 AddFunction havocnormalcdactions
@@ -205,52 +208,14 @@ AddFunction havocnormalcdactions
 
 AddFunction havocnormalcdpostconditions
 {
- hastalent(momentum_talent) and buffexpires(prepared_buff) and timeincombat() > 1 and checkboxon(opt_vengeful_retreat) and spell(vengeful_retreat) or { waiting_for_momentum() or hastalent(unbound_chaos_talent) and buffpresent(unbound_chaos_buff) } and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or { enemies() > havocdesiredtargets() or 600 > 30 } and spell(fel_barrage) or blade_dance() and spell(death_sweep) or spell(immolation_aura) or not waiting_for_momentum() and { enemies() > havocdesiredtargets() or 600 > 10 } and spell(glaive_tempest) or conduit(serrated_glaive_conduit) and spellcooldown(eye_beam) < 6 and not buffpresent(metamorphosis_buff) and not target.debuffpresent(exposed_wound_debuff) and spell(throw_glaive) or not waiting_for_momentum() and { enemies() > havocdesiredtargets() or 600 > 15 } and spell(eye_beam) or blade_dance() and spell(blade_dance) or furydeficit() >= 40 and spell(felblade) or { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 or buffremaining(metamorphosis_buff) < 5 } and not pooling_for_blade_dance() and not waiting_for_essence_break() and spell(annihilation) or { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 } and not pooling_for_meta() and not pooling_for_blade_dance() and not waiting_for_essence_break() and spell(chaos_strike_havoc) or hastalent(blind_fury_talent) and 600 > spellcooldown(eye_beam) and spell(eye_beam) or runeforge(burning_wound_runeforge) and target.debuffremaining(burning_wound_debuff) < 4 and spell(demons_bite) or spell(demons_bite) or not hastalent(momentum_talent) and 600 > charges(fel_rush) * 10 and hastalent(demon_blades_talent) and checkboxon(opt_fel_rush) and spell(fel_rush) or { target.distance() > 15 or not target.inrange(chaos_strike) } and spell(felblade) or { target.distance() > 15 or not target.inrange(chaos_strike) and not hastalent(momentum_talent) } and checkboxon(opt_fel_rush) and spell(fel_rush) or target.distance() > 15 and checkboxon(opt_vengeful_retreat) and spell(vengeful_retreat) or hastalent(demon_blades_talent) and spell(throw_glaive)
-}
-
-### actions.essence_break
-
-AddFunction havocessence_breakmainactions
-{
- #essence_break,if=fury>=80&(cooldown.blade_dance.ready|!variable.blade_dance)
- if fury() >= 80 and { spellcooldown(blade_dance) <= 0 or not blade_dance() } spell(essence_break)
- #death_sweep,if=variable.blade_dance&debuff.essence_break.up
- if blade_dance() and target.debuffpresent(essence_break_debuff) spell(death_sweep)
- #blade_dance,if=variable.blade_dance&debuff.essence_break.up
- if blade_dance() and target.debuffpresent(essence_break_debuff) spell(blade_dance)
- #annihilation,if=debuff.essence_break.up
- if target.debuffpresent(essence_break_debuff) spell(annihilation)
- #chaos_strike,if=debuff.essence_break.up
- if target.debuffpresent(essence_break_debuff) spell(chaos_strike_havoc)
-}
-
-AddFunction havocessence_breakmainpostconditions
-{
-}
-
-AddFunction havocessence_breakshortcdactions
-{
-}
-
-AddFunction havocessence_breakshortcdpostconditions
-{
- fury() >= 80 and { spellcooldown(blade_dance) <= 0 or not blade_dance() } and spell(essence_break) or blade_dance() and target.debuffpresent(essence_break_debuff) and spell(death_sweep) or blade_dance() and target.debuffpresent(essence_break_debuff) and spell(blade_dance) or target.debuffpresent(essence_break_debuff) and spell(annihilation) or target.debuffpresent(essence_break_debuff) and spell(chaos_strike_havoc)
-}
-
-AddFunction havocessence_breakcdactions
-{
-}
-
-AddFunction havocessence_breakcdpostconditions
-{
- fury() >= 80 and { spellcooldown(blade_dance) <= 0 or not blade_dance() } and spell(essence_break) or blade_dance() and target.debuffpresent(essence_break_debuff) and spell(death_sweep) or blade_dance() and target.debuffpresent(essence_break_debuff) and spell(blade_dance) or target.debuffpresent(essence_break_debuff) and spell(annihilation) or target.debuffpresent(essence_break_debuff) and spell(chaos_strike_havoc)
+ hastalent(momentum_talent) and buffexpires(prepared_buff) and timeincombat() > 1 and checkboxon(opt_vengeful_retreat) and spell(vengeful_retreat) or { buffpresent(unbound_chaos_buff) or waiting_for_momentum() and { not hastalent(unbound_chaos_talent) or not spellcooldown(immolation_aura) <= 0 } } and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or { enemies() > havocdesiredtargets() or 600 > 30 } and spell(fel_barrage) or blade_dance() and spell(death_sweep) or not buffpresent(immolation_aura) and spell(immolation_aura) or not waiting_for_momentum() and { enemies() > havocdesiredtargets() or 600 > 10 } and spell(glaive_tempest) or conduit(serrated_glaive_conduit) and spellcooldown(eye_beam) < 6 and not buffpresent(metamorphosis_buff) and not target.debuffpresent(exposed_wound_debuff) and spell(throw_glaive) or not waiting_for_momentum() and { enemies() > havocdesiredtargets() or 600 > 15 and { not use_eye_beam_fury_condition() or enemies(tagged=1) > 1 or fury() < 70 } } and spell(eye_beam) or blade_dance() and spell(blade_dance) or furydeficit() >= 40 and spell(felblade) or spell(essence_break) or { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 or buffremaining(metamorphosis_buff) < 5 } and not pooling_for_blade_dance() and spell(annihilation) or { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 } and not pooling_for_meta() and not pooling_for_blade_dance() and spell(chaos_strike_havoc) or hastalent(blind_fury_talent) and 600 > spellcooldown(eye_beam) and spell(eye_beam) or runeforge(burning_wound_runeforge) and target.debuffremaining(burning_wound_debuff) < 4 and spell(demons_bite) or spell(demons_bite) or not hastalent(momentum_talent) and 600 > charges(fel_rush) * 10 and hastalent(demon_blades_talent) and checkboxon(opt_fel_rush) and spell(fel_rush) or { target.distance() > 15 or not target.inrange(chaos_strike) } and spell(felblade) or { target.distance() > 15 or not target.inrange(chaos_strike) and not hastalent(momentum_talent) } and checkboxon(opt_fel_rush) and spell(fel_rush) or target.distance() > 15 and checkboxon(opt_vengeful_retreat) and spell(vengeful_retreat) or hastalent(demon_blades_talent) and spell(throw_glaive)
 }
 
 ### actions.demonic
 
 AddFunction havocdemonicmainactions
 {
- #fel_rush,if=(talent.unbound_chaos.enabled&buff.unbound_chaos.up)&(charges=2|(raid_event.movement.in>10&raid_event.adds.in>10))
+ #fel_rush,if=talent.unbound_chaos.enabled&buff.unbound_chaos.up&(charges=2|(raid_event.movement.in>10&raid_event.adds.in>10))
  if hastalent(unbound_chaos_talent) and buffpresent(unbound_chaos_buff) and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) spell(fel_rush)
  #death_sweep,if=variable.blade_dance
  if blade_dance() spell(death_sweep)
@@ -264,12 +229,16 @@ AddFunction havocdemonicmainactions
  if not pooling_for_blade_dance() spell(annihilation)
  #felblade,if=fury.deficit>=40
  if furydeficit() >= 40 spell(felblade)
+ #essence_break
+ spell(essence_break)
  #chaos_strike,if=!variable.pooling_for_blade_dance&!variable.pooling_for_eye_beam
  if not pooling_for_blade_dance() and not pooling_for_eye_beam() spell(chaos_strike_havoc)
  #fel_rush,if=talent.demon_blades.enabled&!cooldown.eye_beam.ready&(charges=2|(raid_event.movement.in>10&raid_event.adds.in>10))
  if hastalent(demon_blades_talent) and not spellcooldown(eye_beam) <= 0 and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) spell(fel_rush)
  #demons_bite,target_if=min:debuff.burning_wound.remains,if=runeforge.burning_wound&debuff.burning_wound.remains<4
  if runeforge(burning_wound_runeforge) and target.debuffremaining(burning_wound_debuff) < 4 spell(demons_bite)
+ #fel_rush,if=!talent.demon_blades.enabled&spell_targets>1&(charges=2|(raid_event.movement.in>10&raid_event.adds.in>10))
+ if not hastalent(demon_blades_talent) and enemies(tagged=1) > 1 and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) spell(fel_rush)
  #demons_bite
  spell(demons_bite)
  #throw_glaive,if=buff.out_of_range.up
@@ -290,20 +259,20 @@ AddFunction havocdemonicshortcdactions
 {
  unless hastalent(unbound_chaos_talent) and buffpresent(unbound_chaos_buff) and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or blade_dance() and spell(death_sweep) or { enemies() > havocdesiredtargets() or 600 > 10 } and spell(glaive_tempest) or conduit(serrated_glaive_conduit) and spellcooldown(eye_beam) < 6 and not buffpresent(metamorphosis_buff) and not target.debuffpresent(exposed_wound_debuff) and spell(throw_glaive)
  {
-  #eye_beam,if=raid_event.adds.up|raid_event.adds.in>25
-  if never(raid_event_adds_exists) or 600 > 25 spell(eye_beam)
+  #eye_beam,if=active_enemies>desired_targets|raid_event.adds.in>25&(!variable.use_eye_beam_fury_condition|spell_targets>1|fury<70)
+  if enemies() > havocdesiredtargets() or 600 > 25 and { not use_eye_beam_fury_condition() or enemies(tagged=1) > 1 or fury() < 70 } spell(eye_beam)
 
   unless blade_dance() and not { { not checkboxon(opt_meta_only_during_boss) or isbossfight() } and spellcooldown(metamorphosis) <= 0 } and { spellcooldown(eye_beam) > 5 or 600 > spellcooldown(blade_dance) and 600 < 25 } and spell(blade_dance)
   {
-   #immolation_aura
-   spell(immolation_aura)
+   #immolation_aura,if=!buff.immolation_aura.up
+   if not buffpresent(immolation_aura) spell(immolation_aura)
   }
  }
 }
 
 AddFunction havocdemonicshortcdpostconditions
 {
- hastalent(unbound_chaos_talent) and buffpresent(unbound_chaos_buff) and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or blade_dance() and spell(death_sweep) or { enemies() > havocdesiredtargets() or 600 > 10 } and spell(glaive_tempest) or conduit(serrated_glaive_conduit) and spellcooldown(eye_beam) < 6 and not buffpresent(metamorphosis_buff) and not target.debuffpresent(exposed_wound_debuff) and spell(throw_glaive) or blade_dance() and not { { not checkboxon(opt_meta_only_during_boss) or isbossfight() } and spellcooldown(metamorphosis) <= 0 } and { spellcooldown(eye_beam) > 5 or 600 > spellcooldown(blade_dance) and 600 < 25 } and spell(blade_dance) or not pooling_for_blade_dance() and spell(annihilation) or furydeficit() >= 40 and spell(felblade) or not pooling_for_blade_dance() and not pooling_for_eye_beam() and spell(chaos_strike_havoc) or hastalent(demon_blades_talent) and not spellcooldown(eye_beam) <= 0 and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or runeforge(burning_wound_runeforge) and target.debuffremaining(burning_wound_debuff) < 4 and spell(demons_bite) or spell(demons_bite) or not target.inrange(chaos_strike) and spell(throw_glaive) or { target.distance() > 15 or not target.inrange(chaos_strike) } and checkboxon(opt_fel_rush) and spell(fel_rush) or target.distance() > 15 and checkboxon(opt_vengeful_retreat) and spell(vengeful_retreat) or hastalent(demon_blades_talent) and spell(throw_glaive)
+ hastalent(unbound_chaos_talent) and buffpresent(unbound_chaos_buff) and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or blade_dance() and spell(death_sweep) or { enemies() > havocdesiredtargets() or 600 > 10 } and spell(glaive_tempest) or conduit(serrated_glaive_conduit) and spellcooldown(eye_beam) < 6 and not buffpresent(metamorphosis_buff) and not target.debuffpresent(exposed_wound_debuff) and spell(throw_glaive) or blade_dance() and not { { not checkboxon(opt_meta_only_during_boss) or isbossfight() } and spellcooldown(metamorphosis) <= 0 } and { spellcooldown(eye_beam) > 5 or 600 > spellcooldown(blade_dance) and 600 < 25 } and spell(blade_dance) or not pooling_for_blade_dance() and spell(annihilation) or furydeficit() >= 40 and spell(felblade) or spell(essence_break) or not pooling_for_blade_dance() and not pooling_for_eye_beam() and spell(chaos_strike_havoc) or hastalent(demon_blades_talent) and not spellcooldown(eye_beam) <= 0 and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or runeforge(burning_wound_runeforge) and target.debuffremaining(burning_wound_debuff) < 4 and spell(demons_bite) or not hastalent(demon_blades_talent) and enemies(tagged=1) > 1 and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or spell(demons_bite) or not target.inrange(chaos_strike) and spell(throw_glaive) or { target.distance() > 15 or not target.inrange(chaos_strike) } and checkboxon(opt_fel_rush) and spell(fel_rush) or target.distance() > 15 and checkboxon(opt_vengeful_retreat) and spell(vengeful_retreat) or hastalent(demon_blades_talent) and spell(throw_glaive)
 }
 
 AddFunction havocdemoniccdactions
@@ -312,7 +281,7 @@ AddFunction havocdemoniccdactions
 
 AddFunction havocdemoniccdpostconditions
 {
- hastalent(unbound_chaos_talent) and buffpresent(unbound_chaos_buff) and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or blade_dance() and spell(death_sweep) or { enemies() > havocdesiredtargets() or 600 > 10 } and spell(glaive_tempest) or conduit(serrated_glaive_conduit) and spellcooldown(eye_beam) < 6 and not buffpresent(metamorphosis_buff) and not target.debuffpresent(exposed_wound_debuff) and spell(throw_glaive) or { never(raid_event_adds_exists) or 600 > 25 } and spell(eye_beam) or blade_dance() and not { { not checkboxon(opt_meta_only_during_boss) or isbossfight() } and spellcooldown(metamorphosis) <= 0 } and { spellcooldown(eye_beam) > 5 or 600 > spellcooldown(blade_dance) and 600 < 25 } and spell(blade_dance) or spell(immolation_aura) or not pooling_for_blade_dance() and spell(annihilation) or furydeficit() >= 40 and spell(felblade) or not pooling_for_blade_dance() and not pooling_for_eye_beam() and spell(chaos_strike_havoc) or hastalent(demon_blades_talent) and not spellcooldown(eye_beam) <= 0 and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or runeforge(burning_wound_runeforge) and target.debuffremaining(burning_wound_debuff) < 4 and spell(demons_bite) or spell(demons_bite) or not target.inrange(chaos_strike) and spell(throw_glaive) or { target.distance() > 15 or not target.inrange(chaos_strike) } and checkboxon(opt_fel_rush) and spell(fel_rush) or target.distance() > 15 and checkboxon(opt_vengeful_retreat) and spell(vengeful_retreat) or hastalent(demon_blades_talent) and spell(throw_glaive)
+ hastalent(unbound_chaos_talent) and buffpresent(unbound_chaos_buff) and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or blade_dance() and spell(death_sweep) or { enemies() > havocdesiredtargets() or 600 > 10 } and spell(glaive_tempest) or conduit(serrated_glaive_conduit) and spellcooldown(eye_beam) < 6 and not buffpresent(metamorphosis_buff) and not target.debuffpresent(exposed_wound_debuff) and spell(throw_glaive) or { enemies() > havocdesiredtargets() or 600 > 25 and { not use_eye_beam_fury_condition() or enemies(tagged=1) > 1 or fury() < 70 } } and spell(eye_beam) or blade_dance() and not { { not checkboxon(opt_meta_only_during_boss) or isbossfight() } and spellcooldown(metamorphosis) <= 0 } and { spellcooldown(eye_beam) > 5 or 600 > spellcooldown(blade_dance) and 600 < 25 } and spell(blade_dance) or not buffpresent(immolation_aura) and spell(immolation_aura) or not pooling_for_blade_dance() and spell(annihilation) or furydeficit() >= 40 and spell(felblade) or spell(essence_break) or not pooling_for_blade_dance() and not pooling_for_eye_beam() and spell(chaos_strike_havoc) or hastalent(demon_blades_talent) and not spellcooldown(eye_beam) <= 0 and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or runeforge(burning_wound_runeforge) and target.debuffremaining(burning_wound_debuff) < 4 and spell(demons_bite) or not hastalent(demon_blades_talent) and enemies(tagged=1) > 1 and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or spell(demons_bite) or not target.inrange(chaos_strike) and spell(throw_glaive) or { target.distance() > 15 or not target.inrange(chaos_strike) } and checkboxon(opt_fel_rush) and spell(fel_rush) or target.distance() > 15 and checkboxon(opt_vengeful_retreat) and spell(vengeful_retreat) or hastalent(demon_blades_talent) and spell(throw_glaive)
 }
 
 ### actions.cooldown
@@ -329,8 +298,8 @@ AddFunction havoccooldownshortcdactions
 {
  #sinful_brand,if=!dot.sinful_brand.ticking
  if not target.debuffpresent(sinful_brand) spell(sinful_brand)
- #the_hunt,if=!talent.demonic.enabled&!variable.waiting_for_momentum|buff.furious_gaze.up
- if not hastalent(demonic_talent) and not waiting_for_momentum() or buffpresent(furious_gaze_buff) spell(the_hunt)
+ #the_hunt,if=!talent.demonic.enabled&!variable.waiting_for_momentum&!variable.pooling_for_meta|buff.furious_gaze.up
+ if not hastalent(demonic_talent) and not waiting_for_momentum() and not pooling_for_meta() or buffpresent(furious_gaze_buff) spell(the_hunt)
  #elysian_decree,if=(active_enemies>desired_targets|raid_event.adds.in>30)
  if enemies() > havocdesiredtargets() or 600 > 30 spell(elysian_decree)
 }
@@ -341,29 +310,21 @@ AddFunction havoccooldownshortcdpostconditions
 
 AddFunction havoccooldowncdactions
 {
- #metamorphosis,if=!(talent.demonic.enabled|variable.pooling_for_meta)&cooldown.eye_beam.remains>20&(!covenant.venthyr.enabled|!dot.sinful_brand.ticking)|fight_remains<25
- if not { hastalent(demonic_talent) or pooling_for_meta() } and spellcooldown(eye_beam) > 20 and { not iscovenant("venthyr") or not target.debuffpresent(sinful_brand) } or fightremains() < 25 spell(metamorphosis)
- #metamorphosis,if=talent.demonic.enabled&(cooldown.eye_beam.remains>20&(!variable.blade_dance|cooldown.blade_dance.remains>gcd.max))&(!covenant.venthyr.enabled|!dot.sinful_brand.ticking)
- if hastalent(demonic_talent) and spellcooldown(eye_beam) > 20 and { not blade_dance() or spellcooldown(blade_dance) > gcd() } and { not iscovenant("venthyr") or not target.debuffpresent(sinful_brand) } spell(metamorphosis)
-
- unless not target.debuffpresent(sinful_brand) and spell(sinful_brand) or { not hastalent(demonic_talent) and not waiting_for_momentum() or buffpresent(furious_gaze_buff) } and spell(the_hunt)
- {
-  #fodder_to_the_flame
-  spell(fodder_to_the_flame)
-
-  unless { enemies() > havocdesiredtargets() or 600 > 30 } and spell(elysian_decree)
-  {
-   #potion,if=buff.metamorphosis.remains>25|fight_remains<60
-   if { buffremaining(metamorphosis_buff) > 25 or fightremains() < 60 } and { checkboxon(opt_use_consumables) and target.classification(worldboss) } item(potion_of_phantom_fire_item usable=1)
-   #use_items,if=buff.metamorphosis.up
-   if buffpresent(metamorphosis_buff) havocuseitemactions()
-  }
- }
+ #metamorphosis,if=!talent.demonic.enabled&cooldown.eye_beam.remains>20&(!covenant.venthyr.enabled|!dot.sinful_brand.ticking)|fight_remains<25
+ if not hastalent(demonic_talent) and spellcooldown(eye_beam) > 20 and { not iscovenant("venthyr") or not target.debuffpresent(sinful_brand) } or fightremains() < 25 spell(metamorphosis)
+ #metamorphosis,if=talent.demonic.enabled&(cooldown.eye_beam.remains>20&(!variable.blade_dance|cooldown.blade_dance.remains>gcd.max))&(!covenant.venthyr.enabled|!dot.sinful_brand.ticking)|fight_remains<25
+ if hastalent(demonic_talent) and spellcooldown(eye_beam) > 20 and { not blade_dance() or spellcooldown(blade_dance) > gcd() } and { not iscovenant("venthyr") or not target.debuffpresent(sinful_brand) } or fightremains() < 25 spell(metamorphosis)
+ #potion,if=buff.metamorphosis.remains>25|fight_remains<60
+ if { buffremaining(metamorphosis_buff) > 25 or fightremains() < 60 } and { checkboxon(opt_use_consumables) and target.classification(worldboss) } item(potion_of_phantom_fire_item usable=1)
+ #use_items,slots=trinket1,if=variable.trinket_sync_slot=1&(buff.metamorphosis.up|(!talent.demonic.enabled&cooldown.metamorphosis.remains>(fight_remains>?trinket.1.cooldown.duration%2))|fight_remains<=20)|(variable.trinket_sync_slot=2&!trinket.2.cooldown.ready)|!variable.trinket_sync_slot
+ if trinket_sync_slot() == 1 and { buffpresent(metamorphosis_buff) or not hastalent(demonic_talent) and spellcooldown(metamorphosis) > fightremains() >? itemcooldownduration(slot="trinket0slot") / 2 or fightremains() <= 20 } or trinket_sync_slot() == 2 and not { not itemcooldown(slot="trinket1slot") > 0 } or not trinket_sync_slot() havocuseitemactions()
+ #use_items,slots=trinket2,if=variable.trinket_sync_slot=2&(buff.metamorphosis.up|(!talent.demonic.enabled&cooldown.metamorphosis.remains>(fight_remains>?trinket.2.cooldown.duration%2))|fight_remains<=20)|(variable.trinket_sync_slot=1&!trinket.1.cooldown.ready)|!variable.trinket_sync_slot
+ if trinket_sync_slot() == 2 and { buffpresent(metamorphosis_buff) or not hastalent(demonic_talent) and spellcooldown(metamorphosis) > fightremains() >? itemcooldownduration(slot="trinket1slot") / 2 or fightremains() <= 20 } or trinket_sync_slot() == 1 and not { not itemcooldown(slot="trinket0slot") > 0 } or not trinket_sync_slot() havocuseitemactions()
 }
 
 AddFunction havoccooldowncdpostconditions
 {
- not target.debuffpresent(sinful_brand) and spell(sinful_brand) or { not hastalent(demonic_talent) and not waiting_for_momentum() or buffpresent(furious_gaze_buff) } and spell(the_hunt) or { enemies() > havocdesiredtargets() or 600 > 30 } and spell(elysian_decree)
+ not target.debuffpresent(sinful_brand) and spell(sinful_brand) or { not hastalent(demonic_talent) and not waiting_for_momentum() and not pooling_for_meta() or buffpresent(furious_gaze_buff) } and spell(the_hunt) or { enemies() > havocdesiredtargets() or 600 > 30 } and spell(elysian_decree)
 }
 
 ### actions.default
@@ -381,26 +342,20 @@ AddFunction havoc_defaultmainactions
   if furydeficit() >= 35 and soulfragments() > 0 texture(spell_shadow_soulgem text=pickup)
   #throw_glaive,if=buff.fel_bombardment.stack=5&(buff.immolation_aura.up|!buff.metamorphosis.up)
   if buffstacks(fel_bombardment_buff) == 5 and { buffpresent(immolation_aura) or not buffpresent(metamorphosis_buff) } spell(throw_glaive)
-  #call_action_list,name=essence_break,if=talent.essence_break.enabled&(variable.waiting_for_essence_break|debuff.essence_break.up)
-  if hastalent(essence_break_talent) and { waiting_for_essence_break() or target.debuffpresent(essence_break_debuff) } havocessence_breakmainactions()
+  #run_action_list,name=demonic,if=talent.demonic.enabled
+  if hastalent(demonic_talent) havocdemonicmainactions()
 
-  unless hastalent(essence_break_talent) and { waiting_for_essence_break() or target.debuffpresent(essence_break_debuff) } and havocessence_breakmainpostconditions()
+  unless hastalent(demonic_talent) and havocdemonicmainpostconditions()
   {
-   #run_action_list,name=demonic,if=talent.demonic.enabled
-   if hastalent(demonic_talent) havocdemonicmainactions()
-
-   unless hastalent(demonic_talent) and havocdemonicmainpostconditions()
-   {
-    #run_action_list,name=normal
-    havocnormalmainactions()
-   }
+   #run_action_list,name=normal
+   havocnormalmainactions()
   }
  }
 }
 
 AddFunction havoc_defaultmainpostconditions
 {
- not gcdremaining() > 0 and havoccooldownmainpostconditions() or hastalent(essence_break_talent) and { waiting_for_essence_break() or target.debuffpresent(essence_break_debuff) } and havocessence_breakmainpostconditions() or hastalent(demonic_talent) and havocdemonicmainpostconditions() or havocnormalmainpostconditions()
+ not gcdremaining() > 0 and havoccooldownmainpostconditions() or hastalent(demonic_talent) and havocdemonicmainpostconditions() or havocnormalmainpostconditions()
 }
 
 AddFunction havoc_defaultshortcdactions
@@ -412,35 +367,32 @@ AddFunction havoc_defaultshortcdactions
 
  unless not gcdremaining() > 0 and havoccooldownshortcdpostconditions() or soulfragments() > 0 and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or furydeficit() >= 35 and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or buffstacks(fel_bombardment_buff) == 5 and { buffpresent(immolation_aura) or not buffpresent(metamorphosis_buff) } and spell(throw_glaive)
  {
-  #call_action_list,name=essence_break,if=talent.essence_break.enabled&(variable.waiting_for_essence_break|debuff.essence_break.up)
-  if hastalent(essence_break_talent) and { waiting_for_essence_break() or target.debuffpresent(essence_break_debuff) } havocessence_breakshortcdactions()
+  #run_action_list,name=demonic,if=talent.demonic.enabled
+  if hastalent(demonic_talent) havocdemonicshortcdactions()
 
-  unless hastalent(essence_break_talent) and { waiting_for_essence_break() or target.debuffpresent(essence_break_debuff) } and havocessence_breakshortcdpostconditions()
+  unless hastalent(demonic_talent) and havocdemonicshortcdpostconditions()
   {
-   #run_action_list,name=demonic,if=talent.demonic.enabled
-   if hastalent(demonic_talent) havocdemonicshortcdactions()
-
-   unless hastalent(demonic_talent) and havocdemonicshortcdpostconditions()
-   {
-    #run_action_list,name=normal
-    havocnormalshortcdactions()
-   }
+   #run_action_list,name=normal
+   havocnormalshortcdactions()
   }
  }
 }
 
 AddFunction havoc_defaultshortcdpostconditions
 {
- not gcdremaining() > 0 and havoccooldownshortcdpostconditions() or soulfragments() > 0 and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or furydeficit() >= 35 and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or buffstacks(fel_bombardment_buff) == 5 and { buffpresent(immolation_aura) or not buffpresent(metamorphosis_buff) } and spell(throw_glaive) or hastalent(essence_break_talent) and { waiting_for_essence_break() or target.debuffpresent(essence_break_debuff) } and havocessence_breakshortcdpostconditions() or hastalent(demonic_talent) and havocdemonicshortcdpostconditions() or havocnormalshortcdpostconditions()
+ not gcdremaining() > 0 and havoccooldownshortcdpostconditions() or soulfragments() > 0 and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or furydeficit() >= 35 and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or buffstacks(fel_bombardment_buff) == 5 and { buffpresent(immolation_aura) or not buffpresent(metamorphosis_buff) } and spell(throw_glaive) or hastalent(demonic_talent) and havocdemonicshortcdpostconditions() or havocnormalshortcdpostconditions()
 }
 
 AddFunction havoc_defaultcdactions
 {
- #variable,name=blade_dance,value=talent.first_blood.enabled|spell_targets.blade_dance1>=(3-(talent.trail_of_ruin.enabled+buff.metamorphosis.up))|runeforge.chaos_theory&buff.chaos_theory.down
+ #retarget_auto_attack,line_cd=1,target_if=min:debuff.burning_wound.remains,if=runeforge.burning_wound&talent.demon_blades.enabled
+ #variable,name=blade_dance,if=!runeforge.chaos_theory&!runeforge.darkglare_medallion,value=talent.first_blood.enabled|spell_targets.blade_dance1>=(3-talent.trail_of_ruin.enabled)
+ #variable,name=blade_dance,if=runeforge.chaos_theory,value=buff.chaos_theory.down|talent.first_blood.enabled&spell_targets.blade_dance1>=(2-talent.trail_of_ruin.enabled)|!talent.cycle_of_hatred.enabled&spell_targets.blade_dance1>=(4-talent.trail_of_ruin.enabled)
+ #variable,name=blade_dance,if=runeforge.darkglare_medallion,value=talent.first_blood.enabled|(buff.metamorphosis.up|talent.trail_of_ruin.enabled|debuff.essence_break.up)&spell_targets.blade_dance1>=(3-talent.trail_of_ruin.enabled)|!talent.demonic.enabled&spell_targets.blade_dance1>=4
+ #variable,name=blade_dance,op=reset,if=talent.essence_break.enabled&cooldown.essence_break.ready
  #variable,name=pooling_for_meta,value=!talent.demonic.enabled&cooldown.metamorphosis.remains<6&fury.deficit>30
  #variable,name=pooling_for_blade_dance,value=variable.blade_dance&(fury<75-talent.first_blood.enabled*20)
  #variable,name=pooling_for_eye_beam,value=talent.demonic.enabled&!talent.blind_fury.enabled&cooldown.eye_beam.remains<(gcd.max*2)&fury.deficit>20
- #variable,name=waiting_for_essence_break,value=talent.essence_break.enabled&!variable.pooling_for_blade_dance&!variable.pooling_for_meta&cooldown.essence_break.up
  #variable,name=waiting_for_momentum,value=talent.momentum.enabled&!buff.momentum.up
  #disrupt
  havocinterruptactions()
@@ -449,26 +401,20 @@ AddFunction havoc_defaultcdactions
 
  unless not gcdremaining() > 0 and havoccooldowncdpostconditions() or soulfragments() > 0 and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or furydeficit() >= 35 and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or buffstacks(fel_bombardment_buff) == 5 and { buffpresent(immolation_aura) or not buffpresent(metamorphosis_buff) } and spell(throw_glaive)
  {
-  #call_action_list,name=essence_break,if=talent.essence_break.enabled&(variable.waiting_for_essence_break|debuff.essence_break.up)
-  if hastalent(essence_break_talent) and { waiting_for_essence_break() or target.debuffpresent(essence_break_debuff) } havocessence_breakcdactions()
+  #run_action_list,name=demonic,if=talent.demonic.enabled
+  if hastalent(demonic_talent) havocdemoniccdactions()
 
-  unless hastalent(essence_break_talent) and { waiting_for_essence_break() or target.debuffpresent(essence_break_debuff) } and havocessence_breakcdpostconditions()
+  unless hastalent(demonic_talent) and havocdemoniccdpostconditions()
   {
-   #run_action_list,name=demonic,if=talent.demonic.enabled
-   if hastalent(demonic_talent) havocdemoniccdactions()
-
-   unless hastalent(demonic_talent) and havocdemoniccdpostconditions()
-   {
-    #run_action_list,name=normal
-    havocnormalcdactions()
-   }
+   #run_action_list,name=normal
+   havocnormalcdactions()
   }
  }
 }
 
 AddFunction havoc_defaultcdpostconditions
 {
- not gcdremaining() > 0 and havoccooldowncdpostconditions() or soulfragments() > 0 and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or furydeficit() >= 35 and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or buffstacks(fel_bombardment_buff) == 5 and { buffpresent(immolation_aura) or not buffpresent(metamorphosis_buff) } and spell(throw_glaive) or hastalent(essence_break_talent) and { waiting_for_essence_break() or target.debuffpresent(essence_break_debuff) } and havocessence_breakcdpostconditions() or hastalent(demonic_talent) and havocdemoniccdpostconditions() or havocnormalcdpostconditions()
+ not gcdremaining() > 0 and havoccooldowncdpostconditions() or soulfragments() > 0 and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or furydeficit() >= 35 and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or buffstacks(fel_bombardment_buff) == 5 and { buffpresent(immolation_aura) or not buffpresent(metamorphosis_buff) } and spell(throw_glaive) or hastalent(demonic_talent) and havocdemoniccdpostconditions() or havocnormalcdpostconditions()
 }
 
 ### Havoc icons.
@@ -522,6 +468,8 @@ AddIcon enabled=(checkboxon(opt_demonhunter_havoc_aoe) and specialization(havoc)
 # chaos_strike
 # chaos_strike_havoc
 # chaos_theory_runeforge
+# cycle_of_hatred_talent
+# darkglare_medallion_runeforge
 # death_sweep
 # demon_blades_talent
 # demonic_talent
@@ -539,7 +487,6 @@ AddIcon enabled=(checkboxon(opt_demonhunter_havoc_aoe) and specialization(havoc)
 # fel_rush
 # felblade
 # first_blood_talent
-# fodder_to_the_flame
 # furious_gaze_buff
 # glaive_tempest
 # immolation_aura
@@ -570,13 +517,13 @@ AddIcon enabled=(checkboxon(opt_demonhunter_havoc_aoe) and specialization(havoc)
     }
 
     {
-        const name = "sc_t26_demon_hunter_havoc_momentum";
-        const desc = "[9.0] Simulationcraft: T26_Demon_Hunter_Havoc_Momentum";
+        const name = "sc_t27_demon_hunter_havoc_momentum";
+        const desc = "[9.1] Simulationcraft: T27_Demon_Hunter_Havoc_Momentum";
         const code = `
-# Based on SimulationCraft profile "T26_Demon_Hunter_Havoc_Momentum".
+# Based on SimulationCraft profile "T27_Demon_Hunter_Havoc_Momentum".
 #	class=demonhunter
 #	spec=havoc
-#	talents=3310222
+#	talents=3321312
 
 Include(ovale_common)
 Include(ovale_demonhunter_spells)
@@ -585,11 +532,6 @@ Include(ovale_demonhunter_spells)
 AddFunction waiting_for_momentum
 {
  hastalent(momentum_talent) and not buffpresent(momentum_buff)
-}
-
-AddFunction waiting_for_essence_break
-{
- hastalent(essence_break_talent) and not pooling_for_blade_dance() and not pooling_for_meta() and not spellcooldown(essence_break) > 0
 }
 
 AddFunction pooling_for_eye_beam
@@ -609,7 +551,21 @@ AddFunction pooling_for_meta
 
 AddFunction blade_dance
 {
- hastalent(first_blood_talent) or enemies(tagged=1) >= 3 - { talentpoints(trail_of_ruin_talent) + buffpresent(metamorphosis_buff) } or runeforge(chaos_theory_runeforge) and buffexpires(chaos_blades)
+ if hastalent(essence_break_talent) and spellcooldown(essence_break) <= 0 0
+ if runeforge(darkglare_medallion_runeforge) hastalent(first_blood_talent) or { buffpresent(metamorphosis_buff) or hastalent(trail_of_ruin_talent) or target.debuffpresent(essence_break_debuff) } and enemies(tagged=1) >= 3 - talentpoints(trail_of_ruin_talent) or not hastalent(demonic_talent) and enemies(tagged=1) >= 4
+ if runeforge(chaos_theory_runeforge) buffexpires(chaos_blades) or hastalent(first_blood_talent) and enemies(tagged=1) >= 2 - talentpoints(trail_of_ruin_talent) or not hastalent(cycle_of_hatred_talent) and enemies(tagged=1) >= 4 - talentpoints(trail_of_ruin_talent)
+ if not runeforge(chaos_theory_runeforge) and not runeforge(darkglare_medallion_runeforge) hastalent(first_blood_talent) or enemies(tagged=1) >= 3 - talentpoints(trail_of_ruin_talent)
+}
+
+AddFunction use_eye_beam_fury_condition
+{
+ hastalent(blind_fury_talent) and { runeforge(darkglare_medallion_runeforge) or hastalent(demon_blades_talent) }
+}
+
+AddFunction trinket_sync_slot
+{
+ if false and { not false or itemcooldownduration(slot="trinket1slot") > itemcooldownduration(slot="trinket0slot") } 2
+ if false and { not false or itemcooldownduration(slot="trinket0slot") >= itemcooldownduration(slot="trinket1slot") } 1
 }
 
 AddCheckBox(opt_interrupt l(interrupt) default enabled=(specialization(havoc)))
@@ -636,8 +592,8 @@ AddFunction havocinterruptactions
 
 AddFunction havocuseitemactions
 {
- item(trinket0slot text=13 usable=1)
- item(trinket1slot text=14 usable=1)
+ item("trinket0Slot" text=13 usable=1)
+ item("trinket1Slot" text=14 usable=1)
 }
 
 AddFunction havocgetinmeleerange
@@ -676,14 +632,6 @@ AddFunction havocprecombatshortcdpostconditions
 
 AddFunction havocprecombatcdactions
 {
- #flask
- #augmentation
- #food
- #snapshot_stats
- #potion
- if checkboxon(opt_use_consumables) and target.classification(worldboss) item(potion_of_phantom_fire_item usable=1)
- #use_item,name=azsharas_font_of_power
- havocuseitemactions()
 }
 
 AddFunction havocprecombatcdpostconditions
@@ -696,8 +644,8 @@ AddFunction havocnormalmainactions
 {
  #vengeful_retreat,if=talent.momentum.enabled&buff.prepared.down&time>1
  if hastalent(momentum_talent) and buffexpires(prepared_buff) and timeincombat() > 1 and checkboxon(opt_vengeful_retreat) spell(vengeful_retreat)
- #fel_rush,if=(variable.waiting_for_momentum|talent.unbound_chaos.enabled&buff.unbound_chaos.up)&(charges=2|(raid_event.movement.in>10&raid_event.adds.in>10))
- if { waiting_for_momentum() or hastalent(unbound_chaos_talent) and buffpresent(unbound_chaos_buff) } and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) spell(fel_rush)
+ #fel_rush,if=(buff.unbound_chaos.up|variable.waiting_for_momentum&(!talent.unbound_chaos.enabled|!cooldown.immolation_aura.ready))&(charges=2|(raid_event.movement.in>10&raid_event.adds.in>10))
+ if { buffpresent(unbound_chaos_buff) or waiting_for_momentum() and { not hastalent(unbound_chaos_talent) or not spellcooldown(immolation_aura) <= 0 } } and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) spell(fel_rush)
  #death_sweep,if=variable.blade_dance
  if blade_dance() spell(death_sweep)
  #glaive_tempest,if=!variable.waiting_for_momentum&(active_enemies>desired_targets|raid_event.adds.in>10)
@@ -708,10 +656,12 @@ AddFunction havocnormalmainactions
  if blade_dance() spell(blade_dance)
  #felblade,if=fury.deficit>=40
  if furydeficit() >= 40 spell(felblade)
- #annihilation,if=(talent.demon_blades.enabled|!variable.waiting_for_momentum|fury.deficit<30|buff.metamorphosis.remains<5)&!variable.pooling_for_blade_dance&!variable.waiting_for_essence_break
- if { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 or buffremaining(metamorphosis_buff) < 5 } and not pooling_for_blade_dance() and not waiting_for_essence_break() spell(annihilation)
- #chaos_strike,if=(talent.demon_blades.enabled|!variable.waiting_for_momentum|fury.deficit<30)&!variable.pooling_for_meta&!variable.pooling_for_blade_dance&!variable.waiting_for_essence_break
- if { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 } and not pooling_for_meta() and not pooling_for_blade_dance() and not waiting_for_essence_break() spell(chaos_strike_havoc)
+ #essence_break
+ spell(essence_break)
+ #annihilation,if=(talent.demon_blades.enabled|!variable.waiting_for_momentum|fury.deficit<30|buff.metamorphosis.remains<5)&!variable.pooling_for_blade_dance
+ if { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 or buffremaining(metamorphosis_buff) < 5 } and not pooling_for_blade_dance() spell(annihilation)
+ #chaos_strike,if=(talent.demon_blades.enabled|!variable.waiting_for_momentum|fury.deficit<30)&!variable.pooling_for_meta&!variable.pooling_for_blade_dance
+ if { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 } and not pooling_for_meta() and not pooling_for_blade_dance() spell(chaos_strike_havoc)
  #demons_bite,target_if=min:debuff.burning_wound.remains,if=runeforge.burning_wound&debuff.burning_wound.remains<4
  if runeforge(burning_wound_runeforge) and target.debuffremaining(burning_wound_debuff) < 4 spell(demons_bite)
  #demons_bite
@@ -734,22 +684,22 @@ AddFunction havocnormalmainpostconditions
 
 AddFunction havocnormalshortcdactions
 {
- unless hastalent(momentum_talent) and buffexpires(prepared_buff) and timeincombat() > 1 and checkboxon(opt_vengeful_retreat) and spell(vengeful_retreat) or { waiting_for_momentum() or hastalent(unbound_chaos_talent) and buffpresent(unbound_chaos_buff) } and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush)
+ unless hastalent(momentum_talent) and buffexpires(prepared_buff) and timeincombat() > 1 and checkboxon(opt_vengeful_retreat) and spell(vengeful_retreat) or { buffpresent(unbound_chaos_buff) or waiting_for_momentum() and { not hastalent(unbound_chaos_talent) or not spellcooldown(immolation_aura) <= 0 } } and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush)
  {
   #fel_barrage,if=active_enemies>desired_targets|raid_event.adds.in>30
   if enemies() > havocdesiredtargets() or 600 > 30 spell(fel_barrage)
 
   unless blade_dance() and spell(death_sweep)
   {
-   #immolation_aura
-   spell(immolation_aura)
+   #immolation_aura,if=!buff.immolation_aura.up
+   if not buffpresent(immolation_aura) spell(immolation_aura)
 
    unless not waiting_for_momentum() and { enemies() > havocdesiredtargets() or 600 > 10 } and spell(glaive_tempest) or conduit(serrated_glaive_conduit) and spellcooldown(eye_beam) < 6 and not buffpresent(metamorphosis_buff) and not target.debuffpresent(exposed_wound_debuff) and spell(throw_glaive)
    {
-    #eye_beam,if=!variable.waiting_for_momentum&(active_enemies>desired_targets|raid_event.adds.in>15)
-    if not waiting_for_momentum() and { enemies() > havocdesiredtargets() or 600 > 15 } spell(eye_beam)
+    #eye_beam,if=!variable.waiting_for_momentum&(active_enemies>desired_targets|raid_event.adds.in>15&(!variable.use_eye_beam_fury_condition|spell_targets>1|fury<70))
+    if not waiting_for_momentum() and { enemies() > havocdesiredtargets() or 600 > 15 and { not use_eye_beam_fury_condition() or enemies(tagged=1) > 1 or fury() < 70 } } spell(eye_beam)
 
-    unless blade_dance() and spell(blade_dance) or furydeficit() >= 40 and spell(felblade) or { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 or buffremaining(metamorphosis_buff) < 5 } and not pooling_for_blade_dance() and not waiting_for_essence_break() and spell(annihilation) or { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 } and not pooling_for_meta() and not pooling_for_blade_dance() and not waiting_for_essence_break() and spell(chaos_strike_havoc)
+    unless blade_dance() and spell(blade_dance) or furydeficit() >= 40 and spell(felblade) or spell(essence_break) or { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 or buffremaining(metamorphosis_buff) < 5 } and not pooling_for_blade_dance() and spell(annihilation) or { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 } and not pooling_for_meta() and not pooling_for_blade_dance() and spell(chaos_strike_havoc)
     {
      #eye_beam,if=talent.blind_fury.enabled&raid_event.adds.in>cooldown
      if hastalent(blind_fury_talent) and 600 > spellcooldown(eye_beam) spell(eye_beam)
@@ -761,7 +711,7 @@ AddFunction havocnormalshortcdactions
 
 AddFunction havocnormalshortcdpostconditions
 {
- hastalent(momentum_talent) and buffexpires(prepared_buff) and timeincombat() > 1 and checkboxon(opt_vengeful_retreat) and spell(vengeful_retreat) or { waiting_for_momentum() or hastalent(unbound_chaos_talent) and buffpresent(unbound_chaos_buff) } and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or blade_dance() and spell(death_sweep) or not waiting_for_momentum() and { enemies() > havocdesiredtargets() or 600 > 10 } and spell(glaive_tempest) or conduit(serrated_glaive_conduit) and spellcooldown(eye_beam) < 6 and not buffpresent(metamorphosis_buff) and not target.debuffpresent(exposed_wound_debuff) and spell(throw_glaive) or blade_dance() and spell(blade_dance) or furydeficit() >= 40 and spell(felblade) or { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 or buffremaining(metamorphosis_buff) < 5 } and not pooling_for_blade_dance() and not waiting_for_essence_break() and spell(annihilation) or { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 } and not pooling_for_meta() and not pooling_for_blade_dance() and not waiting_for_essence_break() and spell(chaos_strike_havoc) or runeforge(burning_wound_runeforge) and target.debuffremaining(burning_wound_debuff) < 4 and spell(demons_bite) or spell(demons_bite) or not hastalent(momentum_talent) and 600 > charges(fel_rush) * 10 and hastalent(demon_blades_talent) and checkboxon(opt_fel_rush) and spell(fel_rush) or { target.distance() > 15 or not target.inrange(chaos_strike) } and spell(felblade) or { target.distance() > 15 or not target.inrange(chaos_strike) and not hastalent(momentum_talent) } and checkboxon(opt_fel_rush) and spell(fel_rush) or target.distance() > 15 and checkboxon(opt_vengeful_retreat) and spell(vengeful_retreat) or hastalent(demon_blades_talent) and spell(throw_glaive)
+ hastalent(momentum_talent) and buffexpires(prepared_buff) and timeincombat() > 1 and checkboxon(opt_vengeful_retreat) and spell(vengeful_retreat) or { buffpresent(unbound_chaos_buff) or waiting_for_momentum() and { not hastalent(unbound_chaos_talent) or not spellcooldown(immolation_aura) <= 0 } } and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or blade_dance() and spell(death_sweep) or not waiting_for_momentum() and { enemies() > havocdesiredtargets() or 600 > 10 } and spell(glaive_tempest) or conduit(serrated_glaive_conduit) and spellcooldown(eye_beam) < 6 and not buffpresent(metamorphosis_buff) and not target.debuffpresent(exposed_wound_debuff) and spell(throw_glaive) or blade_dance() and spell(blade_dance) or furydeficit() >= 40 and spell(felblade) or spell(essence_break) or { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 or buffremaining(metamorphosis_buff) < 5 } and not pooling_for_blade_dance() and spell(annihilation) or { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 } and not pooling_for_meta() and not pooling_for_blade_dance() and spell(chaos_strike_havoc) or runeforge(burning_wound_runeforge) and target.debuffremaining(burning_wound_debuff) < 4 and spell(demons_bite) or spell(demons_bite) or not hastalent(momentum_talent) and 600 > charges(fel_rush) * 10 and hastalent(demon_blades_talent) and checkboxon(opt_fel_rush) and spell(fel_rush) or { target.distance() > 15 or not target.inrange(chaos_strike) } and spell(felblade) or { target.distance() > 15 or not target.inrange(chaos_strike) and not hastalent(momentum_talent) } and checkboxon(opt_fel_rush) and spell(fel_rush) or target.distance() > 15 and checkboxon(opt_vengeful_retreat) and spell(vengeful_retreat) or hastalent(demon_blades_talent) and spell(throw_glaive)
 }
 
 AddFunction havocnormalcdactions
@@ -770,52 +720,14 @@ AddFunction havocnormalcdactions
 
 AddFunction havocnormalcdpostconditions
 {
- hastalent(momentum_talent) and buffexpires(prepared_buff) and timeincombat() > 1 and checkboxon(opt_vengeful_retreat) and spell(vengeful_retreat) or { waiting_for_momentum() or hastalent(unbound_chaos_talent) and buffpresent(unbound_chaos_buff) } and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or { enemies() > havocdesiredtargets() or 600 > 30 } and spell(fel_barrage) or blade_dance() and spell(death_sweep) or spell(immolation_aura) or not waiting_for_momentum() and { enemies() > havocdesiredtargets() or 600 > 10 } and spell(glaive_tempest) or conduit(serrated_glaive_conduit) and spellcooldown(eye_beam) < 6 and not buffpresent(metamorphosis_buff) and not target.debuffpresent(exposed_wound_debuff) and spell(throw_glaive) or not waiting_for_momentum() and { enemies() > havocdesiredtargets() or 600 > 15 } and spell(eye_beam) or blade_dance() and spell(blade_dance) or furydeficit() >= 40 and spell(felblade) or { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 or buffremaining(metamorphosis_buff) < 5 } and not pooling_for_blade_dance() and not waiting_for_essence_break() and spell(annihilation) or { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 } and not pooling_for_meta() and not pooling_for_blade_dance() and not waiting_for_essence_break() and spell(chaos_strike_havoc) or hastalent(blind_fury_talent) and 600 > spellcooldown(eye_beam) and spell(eye_beam) or runeforge(burning_wound_runeforge) and target.debuffremaining(burning_wound_debuff) < 4 and spell(demons_bite) or spell(demons_bite) or not hastalent(momentum_talent) and 600 > charges(fel_rush) * 10 and hastalent(demon_blades_talent) and checkboxon(opt_fel_rush) and spell(fel_rush) or { target.distance() > 15 or not target.inrange(chaos_strike) } and spell(felblade) or { target.distance() > 15 or not target.inrange(chaos_strike) and not hastalent(momentum_talent) } and checkboxon(opt_fel_rush) and spell(fel_rush) or target.distance() > 15 and checkboxon(opt_vengeful_retreat) and spell(vengeful_retreat) or hastalent(demon_blades_talent) and spell(throw_glaive)
-}
-
-### actions.essence_break
-
-AddFunction havocessence_breakmainactions
-{
- #essence_break,if=fury>=80&(cooldown.blade_dance.ready|!variable.blade_dance)
- if fury() >= 80 and { spellcooldown(blade_dance) <= 0 or not blade_dance() } spell(essence_break)
- #death_sweep,if=variable.blade_dance&debuff.essence_break.up
- if blade_dance() and target.debuffpresent(essence_break_debuff) spell(death_sweep)
- #blade_dance,if=variable.blade_dance&debuff.essence_break.up
- if blade_dance() and target.debuffpresent(essence_break_debuff) spell(blade_dance)
- #annihilation,if=debuff.essence_break.up
- if target.debuffpresent(essence_break_debuff) spell(annihilation)
- #chaos_strike,if=debuff.essence_break.up
- if target.debuffpresent(essence_break_debuff) spell(chaos_strike_havoc)
-}
-
-AddFunction havocessence_breakmainpostconditions
-{
-}
-
-AddFunction havocessence_breakshortcdactions
-{
-}
-
-AddFunction havocessence_breakshortcdpostconditions
-{
- fury() >= 80 and { spellcooldown(blade_dance) <= 0 or not blade_dance() } and spell(essence_break) or blade_dance() and target.debuffpresent(essence_break_debuff) and spell(death_sweep) or blade_dance() and target.debuffpresent(essence_break_debuff) and spell(blade_dance) or target.debuffpresent(essence_break_debuff) and spell(annihilation) or target.debuffpresent(essence_break_debuff) and spell(chaos_strike_havoc)
-}
-
-AddFunction havocessence_breakcdactions
-{
-}
-
-AddFunction havocessence_breakcdpostconditions
-{
- fury() >= 80 and { spellcooldown(blade_dance) <= 0 or not blade_dance() } and spell(essence_break) or blade_dance() and target.debuffpresent(essence_break_debuff) and spell(death_sweep) or blade_dance() and target.debuffpresent(essence_break_debuff) and spell(blade_dance) or target.debuffpresent(essence_break_debuff) and spell(annihilation) or target.debuffpresent(essence_break_debuff) and spell(chaos_strike_havoc)
+ hastalent(momentum_talent) and buffexpires(prepared_buff) and timeincombat() > 1 and checkboxon(opt_vengeful_retreat) and spell(vengeful_retreat) or { buffpresent(unbound_chaos_buff) or waiting_for_momentum() and { not hastalent(unbound_chaos_talent) or not spellcooldown(immolation_aura) <= 0 } } and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or { enemies() > havocdesiredtargets() or 600 > 30 } and spell(fel_barrage) or blade_dance() and spell(death_sweep) or not buffpresent(immolation_aura) and spell(immolation_aura) or not waiting_for_momentum() and { enemies() > havocdesiredtargets() or 600 > 10 } and spell(glaive_tempest) or conduit(serrated_glaive_conduit) and spellcooldown(eye_beam) < 6 and not buffpresent(metamorphosis_buff) and not target.debuffpresent(exposed_wound_debuff) and spell(throw_glaive) or not waiting_for_momentum() and { enemies() > havocdesiredtargets() or 600 > 15 and { not use_eye_beam_fury_condition() or enemies(tagged=1) > 1 or fury() < 70 } } and spell(eye_beam) or blade_dance() and spell(blade_dance) or furydeficit() >= 40 and spell(felblade) or spell(essence_break) or { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 or buffremaining(metamorphosis_buff) < 5 } and not pooling_for_blade_dance() and spell(annihilation) or { hastalent(demon_blades_talent) or not waiting_for_momentum() or furydeficit() < 30 } and not pooling_for_meta() and not pooling_for_blade_dance() and spell(chaos_strike_havoc) or hastalent(blind_fury_talent) and 600 > spellcooldown(eye_beam) and spell(eye_beam) or runeforge(burning_wound_runeforge) and target.debuffremaining(burning_wound_debuff) < 4 and spell(demons_bite) or spell(demons_bite) or not hastalent(momentum_talent) and 600 > charges(fel_rush) * 10 and hastalent(demon_blades_talent) and checkboxon(opt_fel_rush) and spell(fel_rush) or { target.distance() > 15 or not target.inrange(chaos_strike) } and spell(felblade) or { target.distance() > 15 or not target.inrange(chaos_strike) and not hastalent(momentum_talent) } and checkboxon(opt_fel_rush) and spell(fel_rush) or target.distance() > 15 and checkboxon(opt_vengeful_retreat) and spell(vengeful_retreat) or hastalent(demon_blades_talent) and spell(throw_glaive)
 }
 
 ### actions.demonic
 
 AddFunction havocdemonicmainactions
 {
- #fel_rush,if=(talent.unbound_chaos.enabled&buff.unbound_chaos.up)&(charges=2|(raid_event.movement.in>10&raid_event.adds.in>10))
+ #fel_rush,if=talent.unbound_chaos.enabled&buff.unbound_chaos.up&(charges=2|(raid_event.movement.in>10&raid_event.adds.in>10))
  if hastalent(unbound_chaos_talent) and buffpresent(unbound_chaos_buff) and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) spell(fel_rush)
  #death_sweep,if=variable.blade_dance
  if blade_dance() spell(death_sweep)
@@ -829,12 +741,16 @@ AddFunction havocdemonicmainactions
  if not pooling_for_blade_dance() spell(annihilation)
  #felblade,if=fury.deficit>=40
  if furydeficit() >= 40 spell(felblade)
+ #essence_break
+ spell(essence_break)
  #chaos_strike,if=!variable.pooling_for_blade_dance&!variable.pooling_for_eye_beam
  if not pooling_for_blade_dance() and not pooling_for_eye_beam() spell(chaos_strike_havoc)
  #fel_rush,if=talent.demon_blades.enabled&!cooldown.eye_beam.ready&(charges=2|(raid_event.movement.in>10&raid_event.adds.in>10))
  if hastalent(demon_blades_talent) and not spellcooldown(eye_beam) <= 0 and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) spell(fel_rush)
  #demons_bite,target_if=min:debuff.burning_wound.remains,if=runeforge.burning_wound&debuff.burning_wound.remains<4
  if runeforge(burning_wound_runeforge) and target.debuffremaining(burning_wound_debuff) < 4 spell(demons_bite)
+ #fel_rush,if=!talent.demon_blades.enabled&spell_targets>1&(charges=2|(raid_event.movement.in>10&raid_event.adds.in>10))
+ if not hastalent(demon_blades_talent) and enemies(tagged=1) > 1 and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) spell(fel_rush)
  #demons_bite
  spell(demons_bite)
  #throw_glaive,if=buff.out_of_range.up
@@ -855,20 +771,20 @@ AddFunction havocdemonicshortcdactions
 {
  unless hastalent(unbound_chaos_talent) and buffpresent(unbound_chaos_buff) and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or blade_dance() and spell(death_sweep) or { enemies() > havocdesiredtargets() or 600 > 10 } and spell(glaive_tempest) or conduit(serrated_glaive_conduit) and spellcooldown(eye_beam) < 6 and not buffpresent(metamorphosis_buff) and not target.debuffpresent(exposed_wound_debuff) and spell(throw_glaive)
  {
-  #eye_beam,if=raid_event.adds.up|raid_event.adds.in>25
-  if never(raid_event_adds_exists) or 600 > 25 spell(eye_beam)
+  #eye_beam,if=active_enemies>desired_targets|raid_event.adds.in>25&(!variable.use_eye_beam_fury_condition|spell_targets>1|fury<70)
+  if enemies() > havocdesiredtargets() or 600 > 25 and { not use_eye_beam_fury_condition() or enemies(tagged=1) > 1 or fury() < 70 } spell(eye_beam)
 
   unless blade_dance() and not { { not checkboxon(opt_meta_only_during_boss) or isbossfight() } and spellcooldown(metamorphosis) <= 0 } and { spellcooldown(eye_beam) > 5 or 600 > spellcooldown(blade_dance) and 600 < 25 } and spell(blade_dance)
   {
-   #immolation_aura
-   spell(immolation_aura)
+   #immolation_aura,if=!buff.immolation_aura.up
+   if not buffpresent(immolation_aura) spell(immolation_aura)
   }
  }
 }
 
 AddFunction havocdemonicshortcdpostconditions
 {
- hastalent(unbound_chaos_talent) and buffpresent(unbound_chaos_buff) and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or blade_dance() and spell(death_sweep) or { enemies() > havocdesiredtargets() or 600 > 10 } and spell(glaive_tempest) or conduit(serrated_glaive_conduit) and spellcooldown(eye_beam) < 6 and not buffpresent(metamorphosis_buff) and not target.debuffpresent(exposed_wound_debuff) and spell(throw_glaive) or blade_dance() and not { { not checkboxon(opt_meta_only_during_boss) or isbossfight() } and spellcooldown(metamorphosis) <= 0 } and { spellcooldown(eye_beam) > 5 or 600 > spellcooldown(blade_dance) and 600 < 25 } and spell(blade_dance) or not pooling_for_blade_dance() and spell(annihilation) or furydeficit() >= 40 and spell(felblade) or not pooling_for_blade_dance() and not pooling_for_eye_beam() and spell(chaos_strike_havoc) or hastalent(demon_blades_talent) and not spellcooldown(eye_beam) <= 0 and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or runeforge(burning_wound_runeforge) and target.debuffremaining(burning_wound_debuff) < 4 and spell(demons_bite) or spell(demons_bite) or not target.inrange(chaos_strike) and spell(throw_glaive) or { target.distance() > 15 or not target.inrange(chaos_strike) } and checkboxon(opt_fel_rush) and spell(fel_rush) or target.distance() > 15 and checkboxon(opt_vengeful_retreat) and spell(vengeful_retreat) or hastalent(demon_blades_talent) and spell(throw_glaive)
+ hastalent(unbound_chaos_talent) and buffpresent(unbound_chaos_buff) and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or blade_dance() and spell(death_sweep) or { enemies() > havocdesiredtargets() or 600 > 10 } and spell(glaive_tempest) or conduit(serrated_glaive_conduit) and spellcooldown(eye_beam) < 6 and not buffpresent(metamorphosis_buff) and not target.debuffpresent(exposed_wound_debuff) and spell(throw_glaive) or blade_dance() and not { { not checkboxon(opt_meta_only_during_boss) or isbossfight() } and spellcooldown(metamorphosis) <= 0 } and { spellcooldown(eye_beam) > 5 or 600 > spellcooldown(blade_dance) and 600 < 25 } and spell(blade_dance) or not pooling_for_blade_dance() and spell(annihilation) or furydeficit() >= 40 and spell(felblade) or spell(essence_break) or not pooling_for_blade_dance() and not pooling_for_eye_beam() and spell(chaos_strike_havoc) or hastalent(demon_blades_talent) and not spellcooldown(eye_beam) <= 0 and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or runeforge(burning_wound_runeforge) and target.debuffremaining(burning_wound_debuff) < 4 and spell(demons_bite) or not hastalent(demon_blades_talent) and enemies(tagged=1) > 1 and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or spell(demons_bite) or not target.inrange(chaos_strike) and spell(throw_glaive) or { target.distance() > 15 or not target.inrange(chaos_strike) } and checkboxon(opt_fel_rush) and spell(fel_rush) or target.distance() > 15 and checkboxon(opt_vengeful_retreat) and spell(vengeful_retreat) or hastalent(demon_blades_talent) and spell(throw_glaive)
 }
 
 AddFunction havocdemoniccdactions
@@ -877,7 +793,7 @@ AddFunction havocdemoniccdactions
 
 AddFunction havocdemoniccdpostconditions
 {
- hastalent(unbound_chaos_talent) and buffpresent(unbound_chaos_buff) and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or blade_dance() and spell(death_sweep) or { enemies() > havocdesiredtargets() or 600 > 10 } and spell(glaive_tempest) or conduit(serrated_glaive_conduit) and spellcooldown(eye_beam) < 6 and not buffpresent(metamorphosis_buff) and not target.debuffpresent(exposed_wound_debuff) and spell(throw_glaive) or { never(raid_event_adds_exists) or 600 > 25 } and spell(eye_beam) or blade_dance() and not { { not checkboxon(opt_meta_only_during_boss) or isbossfight() } and spellcooldown(metamorphosis) <= 0 } and { spellcooldown(eye_beam) > 5 or 600 > spellcooldown(blade_dance) and 600 < 25 } and spell(blade_dance) or spell(immolation_aura) or not pooling_for_blade_dance() and spell(annihilation) or furydeficit() >= 40 and spell(felblade) or not pooling_for_blade_dance() and not pooling_for_eye_beam() and spell(chaos_strike_havoc) or hastalent(demon_blades_talent) and not spellcooldown(eye_beam) <= 0 and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or runeforge(burning_wound_runeforge) and target.debuffremaining(burning_wound_debuff) < 4 and spell(demons_bite) or spell(demons_bite) or not target.inrange(chaos_strike) and spell(throw_glaive) or { target.distance() > 15 or not target.inrange(chaos_strike) } and checkboxon(opt_fel_rush) and spell(fel_rush) or target.distance() > 15 and checkboxon(opt_vengeful_retreat) and spell(vengeful_retreat) or hastalent(demon_blades_talent) and spell(throw_glaive)
+ hastalent(unbound_chaos_talent) and buffpresent(unbound_chaos_buff) and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or blade_dance() and spell(death_sweep) or { enemies() > havocdesiredtargets() or 600 > 10 } and spell(glaive_tempest) or conduit(serrated_glaive_conduit) and spellcooldown(eye_beam) < 6 and not buffpresent(metamorphosis_buff) and not target.debuffpresent(exposed_wound_debuff) and spell(throw_glaive) or { enemies() > havocdesiredtargets() or 600 > 25 and { not use_eye_beam_fury_condition() or enemies(tagged=1) > 1 or fury() < 70 } } and spell(eye_beam) or blade_dance() and not { { not checkboxon(opt_meta_only_during_boss) or isbossfight() } and spellcooldown(metamorphosis) <= 0 } and { spellcooldown(eye_beam) > 5 or 600 > spellcooldown(blade_dance) and 600 < 25 } and spell(blade_dance) or not buffpresent(immolation_aura) and spell(immolation_aura) or not pooling_for_blade_dance() and spell(annihilation) or furydeficit() >= 40 and spell(felblade) or spell(essence_break) or not pooling_for_blade_dance() and not pooling_for_eye_beam() and spell(chaos_strike_havoc) or hastalent(demon_blades_talent) and not spellcooldown(eye_beam) <= 0 and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or runeforge(burning_wound_runeforge) and target.debuffremaining(burning_wound_debuff) < 4 and spell(demons_bite) or not hastalent(demon_blades_talent) and enemies(tagged=1) > 1 and { charges(fel_rush) == 2 or 600 > 10 and 600 > 10 } and checkboxon(opt_fel_rush) and spell(fel_rush) or spell(demons_bite) or not target.inrange(chaos_strike) and spell(throw_glaive) or { target.distance() > 15 or not target.inrange(chaos_strike) } and checkboxon(opt_fel_rush) and spell(fel_rush) or target.distance() > 15 and checkboxon(opt_vengeful_retreat) and spell(vengeful_retreat) or hastalent(demon_blades_talent) and spell(throw_glaive)
 }
 
 ### actions.cooldown
@@ -894,8 +810,8 @@ AddFunction havoccooldownshortcdactions
 {
  #sinful_brand,if=!dot.sinful_brand.ticking
  if not target.debuffpresent(sinful_brand) spell(sinful_brand)
- #the_hunt,if=!talent.demonic.enabled&!variable.waiting_for_momentum|buff.furious_gaze.up
- if not hastalent(demonic_talent) and not waiting_for_momentum() or buffpresent(furious_gaze_buff) spell(the_hunt)
+ #the_hunt,if=!talent.demonic.enabled&!variable.waiting_for_momentum&!variable.pooling_for_meta|buff.furious_gaze.up
+ if not hastalent(demonic_talent) and not waiting_for_momentum() and not pooling_for_meta() or buffpresent(furious_gaze_buff) spell(the_hunt)
  #elysian_decree,if=(active_enemies>desired_targets|raid_event.adds.in>30)
  if enemies() > havocdesiredtargets() or 600 > 30 spell(elysian_decree)
 }
@@ -906,29 +822,21 @@ AddFunction havoccooldownshortcdpostconditions
 
 AddFunction havoccooldowncdactions
 {
- #metamorphosis,if=!(talent.demonic.enabled|variable.pooling_for_meta)&cooldown.eye_beam.remains>20&(!covenant.venthyr.enabled|!dot.sinful_brand.ticking)|fight_remains<25
- if not { hastalent(demonic_talent) or pooling_for_meta() } and spellcooldown(eye_beam) > 20 and { not iscovenant("venthyr") or not target.debuffpresent(sinful_brand) } or fightremains() < 25 spell(metamorphosis)
- #metamorphosis,if=talent.demonic.enabled&(cooldown.eye_beam.remains>20&(!variable.blade_dance|cooldown.blade_dance.remains>gcd.max))&(!covenant.venthyr.enabled|!dot.sinful_brand.ticking)
- if hastalent(demonic_talent) and spellcooldown(eye_beam) > 20 and { not blade_dance() or spellcooldown(blade_dance) > gcd() } and { not iscovenant("venthyr") or not target.debuffpresent(sinful_brand) } spell(metamorphosis)
-
- unless not target.debuffpresent(sinful_brand) and spell(sinful_brand) or { not hastalent(demonic_talent) and not waiting_for_momentum() or buffpresent(furious_gaze_buff) } and spell(the_hunt)
- {
-  #fodder_to_the_flame
-  spell(fodder_to_the_flame)
-
-  unless { enemies() > havocdesiredtargets() or 600 > 30 } and spell(elysian_decree)
-  {
-   #potion,if=buff.metamorphosis.remains>25|fight_remains<60
-   if { buffremaining(metamorphosis_buff) > 25 or fightremains() < 60 } and { checkboxon(opt_use_consumables) and target.classification(worldboss) } item(potion_of_phantom_fire_item usable=1)
-   #use_items,if=buff.metamorphosis.up
-   if buffpresent(metamorphosis_buff) havocuseitemactions()
-  }
- }
+ #metamorphosis,if=!talent.demonic.enabled&cooldown.eye_beam.remains>20&(!covenant.venthyr.enabled|!dot.sinful_brand.ticking)|fight_remains<25
+ if not hastalent(demonic_talent) and spellcooldown(eye_beam) > 20 and { not iscovenant("venthyr") or not target.debuffpresent(sinful_brand) } or fightremains() < 25 spell(metamorphosis)
+ #metamorphosis,if=talent.demonic.enabled&(cooldown.eye_beam.remains>20&(!variable.blade_dance|cooldown.blade_dance.remains>gcd.max))&(!covenant.venthyr.enabled|!dot.sinful_brand.ticking)|fight_remains<25
+ if hastalent(demonic_talent) and spellcooldown(eye_beam) > 20 and { not blade_dance() or spellcooldown(blade_dance) > gcd() } and { not iscovenant("venthyr") or not target.debuffpresent(sinful_brand) } or fightremains() < 25 spell(metamorphosis)
+ #potion,if=buff.metamorphosis.remains>25|fight_remains<60
+ if { buffremaining(metamorphosis_buff) > 25 or fightremains() < 60 } and { checkboxon(opt_use_consumables) and target.classification(worldboss) } item(potion_of_phantom_fire_item usable=1)
+ #use_items,slots=trinket1,if=variable.trinket_sync_slot=1&(buff.metamorphosis.up|(!talent.demonic.enabled&cooldown.metamorphosis.remains>(fight_remains>?trinket.1.cooldown.duration%2))|fight_remains<=20)|(variable.trinket_sync_slot=2&!trinket.2.cooldown.ready)|!variable.trinket_sync_slot
+ if trinket_sync_slot() == 1 and { buffpresent(metamorphosis_buff) or not hastalent(demonic_talent) and spellcooldown(metamorphosis) > fightremains() >? itemcooldownduration(slot="trinket0slot") / 2 or fightremains() <= 20 } or trinket_sync_slot() == 2 and not { not itemcooldown(slot="trinket1slot") > 0 } or not trinket_sync_slot() havocuseitemactions()
+ #use_items,slots=trinket2,if=variable.trinket_sync_slot=2&(buff.metamorphosis.up|(!talent.demonic.enabled&cooldown.metamorphosis.remains>(fight_remains>?trinket.2.cooldown.duration%2))|fight_remains<=20)|(variable.trinket_sync_slot=1&!trinket.1.cooldown.ready)|!variable.trinket_sync_slot
+ if trinket_sync_slot() == 2 and { buffpresent(metamorphosis_buff) or not hastalent(demonic_talent) and spellcooldown(metamorphosis) > fightremains() >? itemcooldownduration(slot="trinket1slot") / 2 or fightremains() <= 20 } or trinket_sync_slot() == 1 and not { not itemcooldown(slot="trinket0slot") > 0 } or not trinket_sync_slot() havocuseitemactions()
 }
 
 AddFunction havoccooldowncdpostconditions
 {
- not target.debuffpresent(sinful_brand) and spell(sinful_brand) or { not hastalent(demonic_talent) and not waiting_for_momentum() or buffpresent(furious_gaze_buff) } and spell(the_hunt) or { enemies() > havocdesiredtargets() or 600 > 30 } and spell(elysian_decree)
+ not target.debuffpresent(sinful_brand) and spell(sinful_brand) or { not hastalent(demonic_talent) and not waiting_for_momentum() and not pooling_for_meta() or buffpresent(furious_gaze_buff) } and spell(the_hunt) or { enemies() > havocdesiredtargets() or 600 > 30 } and spell(elysian_decree)
 }
 
 ### actions.default
@@ -946,26 +854,20 @@ AddFunction havoc_defaultmainactions
   if furydeficit() >= 35 and soulfragments() > 0 texture(spell_shadow_soulgem text=pickup)
   #throw_glaive,if=buff.fel_bombardment.stack=5&(buff.immolation_aura.up|!buff.metamorphosis.up)
   if buffstacks(fel_bombardment_buff) == 5 and { buffpresent(immolation_aura) or not buffpresent(metamorphosis_buff) } spell(throw_glaive)
-  #call_action_list,name=essence_break,if=talent.essence_break.enabled&(variable.waiting_for_essence_break|debuff.essence_break.up)
-  if hastalent(essence_break_talent) and { waiting_for_essence_break() or target.debuffpresent(essence_break_debuff) } havocessence_breakmainactions()
+  #run_action_list,name=demonic,if=talent.demonic.enabled
+  if hastalent(demonic_talent) havocdemonicmainactions()
 
-  unless hastalent(essence_break_talent) and { waiting_for_essence_break() or target.debuffpresent(essence_break_debuff) } and havocessence_breakmainpostconditions()
+  unless hastalent(demonic_talent) and havocdemonicmainpostconditions()
   {
-   #run_action_list,name=demonic,if=talent.demonic.enabled
-   if hastalent(demonic_talent) havocdemonicmainactions()
-
-   unless hastalent(demonic_talent) and havocdemonicmainpostconditions()
-   {
-    #run_action_list,name=normal
-    havocnormalmainactions()
-   }
+   #run_action_list,name=normal
+   havocnormalmainactions()
   }
  }
 }
 
 AddFunction havoc_defaultmainpostconditions
 {
- not gcdremaining() > 0 and havoccooldownmainpostconditions() or hastalent(essence_break_talent) and { waiting_for_essence_break() or target.debuffpresent(essence_break_debuff) } and havocessence_breakmainpostconditions() or hastalent(demonic_talent) and havocdemonicmainpostconditions() or havocnormalmainpostconditions()
+ not gcdremaining() > 0 and havoccooldownmainpostconditions() or hastalent(demonic_talent) and havocdemonicmainpostconditions() or havocnormalmainpostconditions()
 }
 
 AddFunction havoc_defaultshortcdactions
@@ -977,35 +879,32 @@ AddFunction havoc_defaultshortcdactions
 
  unless not gcdremaining() > 0 and havoccooldownshortcdpostconditions() or soulfragments() > 0 and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or furydeficit() >= 35 and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or buffstacks(fel_bombardment_buff) == 5 and { buffpresent(immolation_aura) or not buffpresent(metamorphosis_buff) } and spell(throw_glaive)
  {
-  #call_action_list,name=essence_break,if=talent.essence_break.enabled&(variable.waiting_for_essence_break|debuff.essence_break.up)
-  if hastalent(essence_break_talent) and { waiting_for_essence_break() or target.debuffpresent(essence_break_debuff) } havocessence_breakshortcdactions()
+  #run_action_list,name=demonic,if=talent.demonic.enabled
+  if hastalent(demonic_talent) havocdemonicshortcdactions()
 
-  unless hastalent(essence_break_talent) and { waiting_for_essence_break() or target.debuffpresent(essence_break_debuff) } and havocessence_breakshortcdpostconditions()
+  unless hastalent(demonic_talent) and havocdemonicshortcdpostconditions()
   {
-   #run_action_list,name=demonic,if=talent.demonic.enabled
-   if hastalent(demonic_talent) havocdemonicshortcdactions()
-
-   unless hastalent(demonic_talent) and havocdemonicshortcdpostconditions()
-   {
-    #run_action_list,name=normal
-    havocnormalshortcdactions()
-   }
+   #run_action_list,name=normal
+   havocnormalshortcdactions()
   }
  }
 }
 
 AddFunction havoc_defaultshortcdpostconditions
 {
- not gcdremaining() > 0 and havoccooldownshortcdpostconditions() or soulfragments() > 0 and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or furydeficit() >= 35 and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or buffstacks(fel_bombardment_buff) == 5 and { buffpresent(immolation_aura) or not buffpresent(metamorphosis_buff) } and spell(throw_glaive) or hastalent(essence_break_talent) and { waiting_for_essence_break() or target.debuffpresent(essence_break_debuff) } and havocessence_breakshortcdpostconditions() or hastalent(demonic_talent) and havocdemonicshortcdpostconditions() or havocnormalshortcdpostconditions()
+ not gcdremaining() > 0 and havoccooldownshortcdpostconditions() or soulfragments() > 0 and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or furydeficit() >= 35 and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or buffstacks(fel_bombardment_buff) == 5 and { buffpresent(immolation_aura) or not buffpresent(metamorphosis_buff) } and spell(throw_glaive) or hastalent(demonic_talent) and havocdemonicshortcdpostconditions() or havocnormalshortcdpostconditions()
 }
 
 AddFunction havoc_defaultcdactions
 {
- #variable,name=blade_dance,value=talent.first_blood.enabled|spell_targets.blade_dance1>=(3-(talent.trail_of_ruin.enabled+buff.metamorphosis.up))|runeforge.chaos_theory&buff.chaos_theory.down
+ #retarget_auto_attack,line_cd=1,target_if=min:debuff.burning_wound.remains,if=runeforge.burning_wound&talent.demon_blades.enabled
+ #variable,name=blade_dance,if=!runeforge.chaos_theory&!runeforge.darkglare_medallion,value=talent.first_blood.enabled|spell_targets.blade_dance1>=(3-talent.trail_of_ruin.enabled)
+ #variable,name=blade_dance,if=runeforge.chaos_theory,value=buff.chaos_theory.down|talent.first_blood.enabled&spell_targets.blade_dance1>=(2-talent.trail_of_ruin.enabled)|!talent.cycle_of_hatred.enabled&spell_targets.blade_dance1>=(4-talent.trail_of_ruin.enabled)
+ #variable,name=blade_dance,if=runeforge.darkglare_medallion,value=talent.first_blood.enabled|(buff.metamorphosis.up|talent.trail_of_ruin.enabled|debuff.essence_break.up)&spell_targets.blade_dance1>=(3-talent.trail_of_ruin.enabled)|!talent.demonic.enabled&spell_targets.blade_dance1>=4
+ #variable,name=blade_dance,op=reset,if=talent.essence_break.enabled&cooldown.essence_break.ready
  #variable,name=pooling_for_meta,value=!talent.demonic.enabled&cooldown.metamorphosis.remains<6&fury.deficit>30
  #variable,name=pooling_for_blade_dance,value=variable.blade_dance&(fury<75-talent.first_blood.enabled*20)
  #variable,name=pooling_for_eye_beam,value=talent.demonic.enabled&!talent.blind_fury.enabled&cooldown.eye_beam.remains<(gcd.max*2)&fury.deficit>20
- #variable,name=waiting_for_essence_break,value=talent.essence_break.enabled&!variable.pooling_for_blade_dance&!variable.pooling_for_meta&cooldown.essence_break.up
  #variable,name=waiting_for_momentum,value=talent.momentum.enabled&!buff.momentum.up
  #disrupt
  havocinterruptactions()
@@ -1014,26 +913,20 @@ AddFunction havoc_defaultcdactions
 
  unless not gcdremaining() > 0 and havoccooldowncdpostconditions() or soulfragments() > 0 and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or furydeficit() >= 35 and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or buffstacks(fel_bombardment_buff) == 5 and { buffpresent(immolation_aura) or not buffpresent(metamorphosis_buff) } and spell(throw_glaive)
  {
-  #call_action_list,name=essence_break,if=talent.essence_break.enabled&(variable.waiting_for_essence_break|debuff.essence_break.up)
-  if hastalent(essence_break_talent) and { waiting_for_essence_break() or target.debuffpresent(essence_break_debuff) } havocessence_breakcdactions()
+  #run_action_list,name=demonic,if=talent.demonic.enabled
+  if hastalent(demonic_talent) havocdemoniccdactions()
 
-  unless hastalent(essence_break_talent) and { waiting_for_essence_break() or target.debuffpresent(essence_break_debuff) } and havocessence_breakcdpostconditions()
+  unless hastalent(demonic_talent) and havocdemoniccdpostconditions()
   {
-   #run_action_list,name=demonic,if=talent.demonic.enabled
-   if hastalent(demonic_talent) havocdemoniccdactions()
-
-   unless hastalent(demonic_talent) and havocdemoniccdpostconditions()
-   {
-    #run_action_list,name=normal
-    havocnormalcdactions()
-   }
+   #run_action_list,name=normal
+   havocnormalcdactions()
   }
  }
 }
 
 AddFunction havoc_defaultcdpostconditions
 {
- not gcdremaining() > 0 and havoccooldowncdpostconditions() or soulfragments() > 0 and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or furydeficit() >= 35 and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or buffstacks(fel_bombardment_buff) == 5 and { buffpresent(immolation_aura) or not buffpresent(metamorphosis_buff) } and spell(throw_glaive) or hastalent(essence_break_talent) and { waiting_for_essence_break() or target.debuffpresent(essence_break_debuff) } and havocessence_breakcdpostconditions() or hastalent(demonic_talent) and havocdemoniccdpostconditions() or havocnormalcdpostconditions()
+ not gcdremaining() > 0 and havoccooldowncdpostconditions() or soulfragments() > 0 and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or furydeficit() >= 35 and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or buffstacks(fel_bombardment_buff) == 5 and { buffpresent(immolation_aura) or not buffpresent(metamorphosis_buff) } and spell(throw_glaive) or hastalent(demonic_talent) and havocdemoniccdpostconditions() or havocnormalcdpostconditions()
 }
 
 ### Havoc icons.
@@ -1087,6 +980,8 @@ AddIcon enabled=(checkboxon(opt_demonhunter_havoc_aoe) and specialization(havoc)
 # chaos_strike
 # chaos_strike_havoc
 # chaos_theory_runeforge
+# cycle_of_hatred_talent
+# darkglare_medallion_runeforge
 # death_sweep
 # demon_blades_talent
 # demonic_talent
@@ -1104,7 +999,6 @@ AddIcon enabled=(checkboxon(opt_demonhunter_havoc_aoe) and specialization(havoc)
 # fel_rush
 # felblade
 # first_blood_talent
-# fodder_to_the_flame
 # furious_gaze_buff
 # glaive_tempest
 # immolation_aura
@@ -1135,13 +1029,13 @@ AddIcon enabled=(checkboxon(opt_demonhunter_havoc_aoe) and specialization(havoc)
     }
 
     {
-        const name = "sc_t26_demon_hunter_vengeance";
-        const desc = "[9.0] Simulationcraft: T26_Demon_Hunter_Vengeance";
+        const name = "sc_t27_demon_hunter_vengeance";
+        const desc = "[9.1] Simulationcraft: T27_Demon_Hunter_Vengeance";
         const code = `
-# Based on SimulationCraft profile "T26_Demon_Hunter_Vengeance".
+# Based on SimulationCraft profile "T27_Demon_Hunter_Vengeance".
 #	class=demonhunter
 #	spec=vengeance
-#	talents=1233321
+#	talents=2323221
 
 Include(ovale_common)
 Include(ovale_demonhunter_spells)
@@ -1170,8 +1064,8 @@ AddFunction vengeanceinterruptactions
 
 AddFunction vengeanceuseitemactions
 {
- item(trinket0slot text=13 usable=1)
- item(trinket1slot text=14 usable=1)
+ item("trinket0Slot" text=13 usable=1)
+ item("trinket1Slot" text=14 usable=1)
 }
 
 AddFunction vengeancegetinmeleerange
@@ -1199,14 +1093,6 @@ AddFunction vengeanceprecombatshortcdpostconditions
 
 AddFunction vengeanceprecombatcdactions
 {
- #flask
- #augmentation
- #food
- #snapshot_stats
- #potion
- if checkboxon(opt_use_consumables) and target.classification(worldboss) item(potion_of_phantom_fire_item usable=1)
- #use_item,name=azsharas_font_of_power
- vengeanceuseitemactions()
 }
 
 AddFunction vengeanceprecombatcdpostconditions
@@ -1348,12 +1234,6 @@ AddFunction vengeancecooldownscdactions
  if checkboxon(opt_use_consumables) and target.classification(worldboss) item(potion_of_phantom_fire_item usable=1)
  #use_items
  vengeanceuseitemactions()
-
- unless not target.debuffpresent(sinful_brand) and spell(sinful_brand) or spell(the_hunt)
- {
-  #fodder_to_the_flame
-  spell(fodder_to_the_flame)
- }
 }
 
 AddFunction vengeancecooldownscdpostconditions
@@ -1552,7 +1432,6 @@ AddIcon enabled=(checkboxon(opt_demonhunter_vengeance_aoe) and specialization(ve
 # felblade
 # fiery_brand
 # fiery_brand_debuff
-# fodder_to_the_flame
 # fracture
 # fracture_talent
 # immolation_aura

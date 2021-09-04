@@ -386,6 +386,34 @@ export class Emiter {
             "DRUID",
             "feral"
         );
+        this.addDisambiguation(
+            "incarnation",
+            "incarnation_chosen_of_elune",
+            "DRUID",
+            "balance"
+        );
+        this.addDisambiguation(
+            "incarnation",
+            "incarnation_guardian_of_ursoc",
+            "DRUID",
+            "guardian"
+        );
+        this.addDisambiguation(
+            "incarnation",
+            "incarnation_king_of_the_jungle",
+            "DRUID",
+            "feral"
+        );
+        this.addDisambiguation(
+            "incarnation",
+            "incarnation_tree_of_life",
+            "DRUID",
+            "restoration"
+        );
+        this.addDisambiguation("berserk", "berserk_bear", "DRUID", "guardian");
+        this.addDisambiguation("berserk", "berserk_cat", "DRUID", "feral");
+        this.addDisambiguation("bs_inc", "berserk_bear", "DRUID", "guardian");
+        this.addDisambiguation("bs_inc", "berserk_cat", "DRUID", "feral");
         this.addDisambiguation("ca_inc", "celestial_alignment", "DRUID");
         this.addDisambiguation(
             "adaptive_swarm_heal",
@@ -431,6 +459,7 @@ export class Emiter {
         this.addDisambiguation("frenzy", "frenzy_pet_buff", "HUNTER");
 
         this.addDisambiguation("blood_fury", "blood_fury_ap_int", "MONK");
+        this.addDisambiguation("blood_fury", "blood_fury_ap_int", "PALADIN");
         this.addDisambiguation("blood_fury", "blood_fury_ap_int", "SHAMAN");
         this.addDisambiguation("blood_fury", "blood_fury_ap", "DEATHKNIGHT");
         this.addDisambiguation("blood_fury", "blood_fury_ap", "HUNTER");
@@ -440,6 +469,11 @@ export class Emiter {
         this.addDisambiguation("blood_fury", "blood_fury_int", "PRIEST");
         this.addDisambiguation("blood_fury", "blood_fury_int", "WARLOCK");
         this.addDisambiguation("blood_fury_buff", "blood_fury_ap_int", "MONK");
+        this.addDisambiguation(
+            "blood_fury_buff",
+            "blood_fury_ap_int",
+            "PALADIN"
+        );
         this.addDisambiguation(
             "blood_fury_buff",
             "blood_fury_ap_int",
@@ -484,6 +518,8 @@ export class Emiter {
             "phantom_fire_item",
             "potion_of_phantom_fire_item"
         );
+        this.addDisambiguation("interrupt", "pet_interrupt", "WARLOCK");
+        this.addDisambiguation("bonedust_brew_debuff", "bonedust_brew", "MONK");
     }
 
     /** Transform a ParseNode to an AstNode
@@ -539,15 +575,14 @@ export class Emiter {
                     for (const [_, symbol] of ipairs(info.symbolsInCode)) {
                         annotation.addSymbol(symbol);
                     }
-                    const [result] = this.ovaleAst.parseCode(
-                        "expression",
-                        info.code,
-                        nodeList,
-                        annotation.astAnnotation
-                    );
-                    if (result) return result;
-                    return undefined;
                 }
+                const [result] = this.ovaleAst.parseCode(
+                    "expression",
+                    info.code,
+                    nodeList,
+                    annotation.astAnnotation
+                );
+                return result;
             }
 
             const result = this.ovaleAst.newNodeWithParameters(
@@ -751,7 +786,15 @@ export class Emiter {
         if (modifier == "if") {
             node = this.emit(parseNode, nodeList, annotation, action);
         } else if (modifier == "target_if") {
-            node = this.emit(parseNode, nodeList, annotation, action);
+            if (parseNode.targetIf) {
+                /* Skip "target_if" for "first:", "max:", and "min:" since
+                 * they only apply for multi-target and are for choosing
+                 * between the targets; in a single-target situation, this
+                 * always evaluates to the current target.
+                 */
+            } else {
+                node = this.emit(parseNode, nodeList, annotation, action);
+            }
         } else if (modifier == "five_stacks" && action == "focus_fire") {
             const value = tonumber(this.unparser.unparse(parseNode));
             if (value == 1) {
@@ -802,6 +845,15 @@ export class Emiter {
                 this.addSymbol(annotation, buffName);
                 code = format("pet.BuffStacks(%s) >= %d", buffName, value);
             }
+        } else if (modifier == "precast_etf_equip" && action == "trueshot") {
+            const value = tonumber(this.unparser.unparse(parseNode));
+            const symbol = "eagletalons_true_focus_runeforge";
+            if (value > 0) {
+                code = `equippedruneforge(${symbol})`;
+            } else {
+                code = `not equippedruneforge(${symbol})`;
+            }
+            this.addSymbol(annotation, symbol);
         } else if (modifier == "moving") {
             const value = tonumber(this.unparser.unparse(parseNode));
             if (value == 0) {
@@ -911,7 +963,7 @@ export class Emiter {
         modifiers: Modifiers
     ) => {
         let conditionNode = undefined;
-        for (const [modifier, expressionNode] of kpairs(parseNode.modifiers)) {
+        for (const [modifier, expressionNode] of kpairs(modifiers)) {
             const rhsNode = this.emitModifier(
                 modifier,
                 expressionNode,
@@ -1356,13 +1408,14 @@ export class Emiter {
                 action == "augmentation" ||
                 action == "flask" ||
                 action == "food" ||
+                action == "retarget_auto_attack" ||
                 action == "snapshot_stats"
             )
         ) {
             // Most of this code is obsolete and should be cleaned or dispatched in the correct function
             let bodyCode, conditionCode;
             const expressionType = "expression";
-            const modifiers = parseNode.modifiers;
+            let modifiers = parseNode.modifiers;
             let isSpellAction = true;
             if (
                 interruptsClasses[action as keyof typeof interruptsClasses] ===
@@ -1579,6 +1632,10 @@ export class Emiter {
                         isSpellAction = false;
                     }
                 }
+            } else if (className == "WARRIOR" && action == "heroic_charge") {
+                bodyCode = "Spell(heroic_leap text=charge)";
+                this.addSymbol(annotation, "heroic_leap");
+                isSpellAction = false;
             } else if (className == "WARRIOR" && action == "heroic_leap") {
                 conditionCode =
                     "CheckBoxOn(opt_melee_range) and target.Distance() >= 8 and target.Distance() <= 40";
@@ -1679,6 +1736,17 @@ export class Emiter {
                     );
                 }
                 isSpellAction = false;
+            } else if (action == "newfound_resolve") {
+                const buffName = "newfound_resolve_buff";
+                const debuffName = "trial_of_doubt_debuff";
+                bodyCode = "Texture(inv_enchant_essencemagiclarge text=face)";
+                // Newfound Resolve does not stack
+                conditionCode = `not BuffPresent(${buffName}) and DebuffPresent(${debuffName}) and DebuffRemains(${debuffName}) < 10`;
+                this.addSymbol(annotation, buffName);
+                this.addSymbol(annotation, debuffName);
+                // Ignore any modifiers for the "newfound_resolve" action.
+                modifiers = {};
+                isSpellAction = false;
             } else if (action == "potion") {
                 let name =
                     (modifiers.name && this.unparser.unparse(modifiers.name)) ||
@@ -1719,13 +1787,21 @@ export class Emiter {
                 if (modifiers.slot) {
                     // use this slot only?
                     const slot = this.unparser.unparse(modifiers.slot);
-                    if (slot && truthy(match(slot, "finger"))) {
-                        [legendaryRing] = this.disambiguate(
-                            annotation,
-                            "legendary_ring",
-                            className,
-                            specialization
-                        );
+                    if (slot) {
+                        if (truthy(match(slot, "^finger"))) {
+                            [legendaryRing] = this.disambiguate(
+                                annotation,
+                                "legendary_ring",
+                                className,
+                                specialization
+                            );
+                        } else if (slot == "trinket1") {
+                            bodyCode = `Item("trinket0slot" text=13 usable=1)`;
+                            annotation[action] = true;
+                        } else if (slot == "trinket2") {
+                            bodyCode = `Item("trinket1slot" text=14 usable=1)`;
+                            annotation[action] = true;
+                        }
                     }
                 } else if (modifiers.name) {
                     let name = this.unparser.unparse(modifiers.name);
@@ -1738,12 +1814,22 @@ export class Emiter {
                         );
                         if (truthy(match(name, "legendary_ring"))) {
                             legendaryRing = name;
+                        } else {
+                            [name] = this.disambiguate(
+                                annotation,
+                                name,
+                                className,
+                                specialization,
+                                "item",
+                                "item"
+                            );
+                            if (name) {
+                                conditionCode = `HasTrinket(${name})`;
+                                bodyCode = `Item(${name} usable=1)`;
+                                this.addSymbol(annotation, name);
+                            }
                         }
                     }
-                    // } else if (false) {
-                    //     bodyCode = format("Item(%s usable=1)", name);
-                    //     AddSymbol(annotation, name);
-                    // }
                 } else if (modifiers.effect_name) {
                     // TODO use any item that has this effect
                 }
@@ -1752,7 +1838,7 @@ export class Emiter {
                     bodyCode = format("Item(%s usable=1)", legendaryRing);
                     this.addSymbol(annotation, legendaryRing);
                     annotation.use_legendary_ring = legendaryRing;
-                } else {
+                } else if (!bodyCode) {
                     bodyCode = `${camelSpecialization}UseItemActions()`;
                     annotation[action] = true;
                 }
@@ -2715,7 +2801,12 @@ export class Emiter {
             property == "execute_time" ||
             property == "execute_remains"
         ) {
-            code = format("ExecuteTime(%s)", name);
+            if (name == "use_item") {
+                // Assume that items have an execute time of 0 seconds.
+                code = "0";
+            } else {
+                code = format("ExecuteTime(%s)", name);
+            }
         } else if (property == "executing") {
             code = format("ExecuteTime(%s) > 0", name);
         } else if (
@@ -3251,11 +3342,7 @@ export class Emiter {
             }
         } else if (sub(operand, 1, 10) == "main_hand.") {
             const weaponType = sub(operand, 11);
-            if (weaponType == "1h") {
-                code = "HasWeapon(main type=one_handed)";
-            } else if (weaponType == "2h") {
-                code = "HasWeapon(main type=two_handed)";
-            }
+            code = `HasWeapon(mainhandslot ${weaponType})`;
         } else if (operand == "mastery_value") {
             code = format("%sMasteryEffect() / 100", target);
         } else if (sub(operand, 1, 5) == "role.") {
@@ -3310,6 +3397,10 @@ export class Emiter {
                 name = `shared="${name}"`;
                 prefix = "Item";
                 isSymbol = false;
+            } else if (truthy(match(name, "^[%w_]+_%d+$"))) {
+                name = gsub(name, "_%d+$", "_item");
+                prefix = "Item";
+                isSymbol = true;
             } else {
                 [name, prefix] = this.disambiguate(
                     annotation,
@@ -3323,12 +3414,16 @@ export class Emiter {
             let code;
             if (property == "execute_time") {
                 code = format("ExecuteTime(%s)", name);
-            } else if (property == "duration") {
+            } else if (
+                property == "duration" ||
+                property == "duration_expected"
+            ) {
                 code = format("%sCooldownDuration(%s)", prefix, name);
             } else if (property == "ready") {
                 code = format("%sCooldown(%s) <= 0", prefix, name);
             } else if (
                 property == "remains" ||
+                property == "remains_expected" ||
                 property == "remains_guess" ||
                 property == "adjusted_remains"
             ) {
@@ -3813,6 +3908,14 @@ export class Emiter {
             } else if (property === "exists") {
                 code = "never(raid_event_invulnerable_exists)";
             }
+        } else if (name == "vulnerable") {
+            if (property == "exists") {
+                code = "always(raid_event_vulnerable_exists)";
+            } else if (property == "in") {
+                code = "0";
+            } else if (property == "up") {
+                code = "always(raid_event_vulnerable_up)";
+            }
         }
         if (code) {
             [node] = this.ovaleAst.parseCode(
@@ -4211,6 +4314,12 @@ export class Emiter {
             this.addSymbol(annotation, "frozen_orb");
         } else if (
             className == "MONK" &&
+            operand == "buff.recent_purifies.value"
+        ) {
+            // TODO assume that we've always recently purified 5% max health
+            code = "MaxHealth() * 0.05";
+        } else if (
+            className == "MONK" &&
             sub(operand, 1, 35) == "debuff.storm_earth_and_fire_target."
         ) {
             const property = sub(operand, 36);
@@ -4430,6 +4539,8 @@ export class Emiter {
             code = `${target}EnrageRemaining()`;
         } else if (operand == "buff.enrage.up") {
             code = `${target}IsEnraged()`;
+        } else if (operand == "cp_gain") {
+            code = `SpellInfoProperty(${action} combopoints) <? ComboPointsDeficit()`;
         } else if (operand == "debuff.casting.react") {
             code = `${target}IsInterruptible()`;
         } else if (operand == "debuff.casting.up") {
@@ -4604,6 +4715,20 @@ export class Emiter {
             if (modifier === "pct") {
                 code = `${target}.HealthPercent()`;
             }
+        } else if (property === "cooldown") {
+            const targetAction = tokenIterator();
+            if (targetAction == "pause_action") {
+                /* target.cooldown.pause_action.* should return values
+                 * appropriate for the target never pausing on actions on
+                 * the player.
+                 */
+                const actionProperty = tokenIterator();
+                if (actionProperty == "duration") {
+                    code = "0";
+                } else if (actionProperty == "remains") {
+                    code = "600";
+                }
+            }
         } else if (property) {
             const [percent] = match(property, "^time_to_pct_(%d+)");
             if (percent) {
@@ -4692,6 +4817,11 @@ export class Emiter {
                         `ItemCooldownDuration(slot="%s")`,
                         slot
                     );
+                } else if (statName === "ready") {
+                    code = emitTrinketCondition(
+                        `not ItemCooldown(slot="%s") > 0`,
+                        slot
+                    );
                 }
             } else if (procType === "ready_cooldown") {
                 // TODO The item internal cooldown is ready
@@ -4701,11 +4831,40 @@ export class Emiter {
                     `ItemCooldownDuration(slot="%s")`,
                     slot
                 );
-            } else if (procType == "has_proc") {
+            } else if (procType === "has_buff") {
+                // TODO trinket.has_buff.<stat>
+                code = "true";
+            } else if (procType === "has_proc") {
                 code = emitTrinketCondition(`ItemRppm(slot="%s") > 0`, slot);
             } else if (procType === "has_stat") {
                 // TODO
                 code = "false";
+            } else if (procType === "has_use_buff") {
+                /* TODO item has an on-use ability that applies a buff;
+                 * if the item has a cooldown duration, then it is on-use;
+                 * need to detect if it applies a buff.
+                 */
+                code = emitTrinketCondition(
+                    `ItemCooldownDuration(slot="%s") > 0`,
+                    slot
+                );
+            } else if (procType === "proc") {
+                if (statName === "any_dps") {
+                    const property = tokenIterator();
+                    if (property == "duration") {
+                        /* TODO duration of the on-use buff granted by the item;
+                         * approximate as 30s for 3 minute CD.
+                         */
+                        code = emitTrinketCondition(
+                            `30 * ItemCooldownDuration(slot="%s") / 180`,
+                            slot
+                        );
+                    }
+                }
+                if (!code) {
+                    // TODO trinket.proc.<stat>.<property>
+                    code = "false";
+                }
             } else {
                 const property = statName;
                 const [buffName] = this.disambiguate(

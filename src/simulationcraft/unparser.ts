@@ -11,7 +11,15 @@ import {
     NumberParseNode,
     OperandParseNode,
 } from "./definitions";
-import { tostring, lualength, pairs, tonumber, kpairs } from "@wowts/lua";
+import {
+    ipairs,
+    kpairs,
+    lualength,
+    pairs,
+    tonumber,
+    tostring,
+    wipe,
+} from "@wowts/lua";
 import { DebugTools, Tracer } from "../engine/debug";
 import { outputPool } from "./text-tools";
 import { concat } from "@wowts/table";
@@ -71,7 +79,15 @@ export class Unparser {
                 expressionNode
             )}`;
         }
-        const s = concat(output, ",");
+        let s = concat(output, ",");
+        if (node.sequence) {
+            wipe(output);
+            output[lualength(output) + 1] = s;
+            for (const [, actionNode] of ipairs(node.sequence)) {
+                output[lualength(output) + 1] = this.unparseAction(actionNode);
+            }
+            s = concat(output, ":");
+        }
         outputPool.release(output);
         return s;
     };

@@ -313,7 +313,7 @@ export class OvaleEquipmentClass {
     getEquippedItemId(slot: SlotName): number | undefined {
         const invSlot = slotNameByName[slot];
         const item = this.equippedItem[invSlot];
-        return (item.exists && item.id) || undefined;
+        return (item && item.exists && item.id) || undefined;
     }
 
     getEquippedItemIdBySharedCooldown(
@@ -325,7 +325,7 @@ export class OvaleEquipmentClass {
     getEquippedItemLocation(slot: SlotName): ItemLocationMixin | undefined {
         const invSlot = slotNameByName[slot];
         const item = this.equippedItem[invSlot];
-        if (item.exists) {
+        if (item && item.exists) {
             if (item.location && item.location.IsValid()) {
                 return item.location;
             }
@@ -336,14 +336,14 @@ export class OvaleEquipmentClass {
     getEquippedItemQuality(slot: SlotName): number | undefined {
         const invSlot = slotNameByName[slot];
         const item = this.equippedItem[invSlot];
-        return (item.exists && item.quality) || undefined;
+        return (item && item.exists && item.quality) || undefined;
     }
 
     getEquippedItemBonusIds(slot: SlotName): LuaArray<number> {
         // Returns the array of bonus IDs for the slot.
         const invSlot = slotNameByName[slot];
         const item = this.equippedItem[invSlot];
-        return item.bonus;
+        return (item && item.bonus) || {};
     }
 
     hasRangedWeapon() {
@@ -541,6 +541,7 @@ export class OvaleEquipmentClass {
         );
         ovaleCondition.registerCondition("hasshield", false, this.hasShield);
         ovaleCondition.registerCondition("hastrinket", false, this.hasTrinket);
+        ovaleCondition.registerCondition("hasweapon", false, this.hasWeapon);
         const slotParameter: ParameterInfo<SlotName> = {
             type: "string",
             name: "slot",
@@ -678,6 +679,24 @@ export class OvaleEquipmentClass {
             }
         }
         return returnBoolean(boolean);
+    };
+
+    private hasWeapon: ConditionFunction = (
+        positionalParameter,
+        namedParameter,
+        atTime
+    ) => {
+        const slot = positionalParameter[1] as SlotName;
+        const handedness = positionalParameter[2];
+        const invSlot = slotNameByName[slot];
+        const invType =
+            (handedness == "1h" && Enum.InventoryType.IndexWeaponType) ||
+            Enum.InventoryType.Index2HweaponType;
+        const item = this.equippedItem[invSlot];
+        if (item.exists && item.type) {
+            return returnBoolean(item.type == invType);
+        }
+        return returnBoolean(false);
     };
 
     /** Get the cooldown time in seconds of an item, e.g., trinket.
