@@ -528,6 +528,13 @@ Define(disciplinary_command_frost_buff -327366)
     SpellRequire(presence_of_mind unusable set=1 enabled=(buffpresent(presence_of_mind)))
 #summon_water_elemental
     SpellRequire(summon_water_elemental unusable set=1 enabled=(pet.present()))
+#winters_chill_debuff
+    SpellAddTargetDebuff(flurry winters_chill_debuff add=2 enabled=(buffpresent(brain_freeze_buff)))
+    SpellAddTargetDebuff(ebonbolt winters_chill_debuff add=-1)
+    SpellAddTargetDebuff(frostbolt winters_chill_debuff add=-1)
+    SpellAddTargetDebuff(glacial_spike winters_chill_debuff add=-1)
+    SpellAddTargetDebuff(ice_lance winters_chill_debuff add=-1)
+    SpellAddTargetDebuff(ray_of_frost winters_chill_debuff add=-1)
     `;
     scripts.registerScript("MAGE", undefined, name, desc, code, "include");
 }
