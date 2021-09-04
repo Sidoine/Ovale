@@ -1,6 +1,5 @@
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { LuaArray } from "@wowts/lua";
-import { huge as infinity } from "@wowts/math";
 import { concat, insert } from "@wowts/table";
 import { AceModule } from "@wowts/tsaddon";
 import {
@@ -10,13 +9,6 @@ import {
     TalentId,
     UnitCastingInfo,
 } from "@wowts/wow-mock";
-import {
-    ConditionFunction,
-    ConditionResult,
-    OvaleConditionClass,
-    returnBoolean,
-    returnConstant,
-} from "../engine/condition";
 import { DebugTools, Tracer } from "../engine/debug";
 import { SpellCastEventHandler, States, StateModule } from "../engine/state";
 import { OptionUiGroup } from "../ui/acegui-helpers";
@@ -29,7 +21,7 @@ import { OvaleCombatClass } from "./combat";
 
 type EclipseType = "lunar" | "solar";
 
-type EclipseState =
+export type EclipseState =
     | "any_next"
     | "in_both"
     | "in_lunar"
@@ -535,7 +527,7 @@ export class Eclipse extends States<EclipseData> implements StateModule {
      * GetSpellCount(): 0, 1, or 2 for the number of spells needed to
      * enter the next eclipse.
      */
-    private getSpellCounts = (atTime: number): number[] => {
+    getSpellCounts(atTime: number): number[] {
         const state = this.next;
         let starfire = state.starfire;
         let wrath = state.wrath;
@@ -568,9 +560,9 @@ export class Eclipse extends States<EclipseData> implements StateModule {
             wrath
         );
         return [starfire, wrath];
-    };
+    }
 
-    private getEclipse = (atTime: number): EclipseState => {
+    getEclipse = (atTime: number): EclipseState => {
         let eclipse: EclipseState = "any_next";
         const [starfire, wrath] = this.getSpellCounts(atTime);
         if (starfire > 0 && wrath > 0) {
@@ -595,93 +587,5 @@ export class Eclipse extends States<EclipseData> implements StateModule {
             }
         }
         return eclipse;
-    };
-
-    registerConditions(condition: OvaleConditionClass) {
-        condition.registerCondition(
-            "eclipseanynext",
-            false,
-            this.isNextEclipseAny
-        );
-        condition.registerCondition(
-            "eclipselunarin",
-            false,
-            this.enterEclipseLunarIn
-        );
-        condition.registerCondition(
-            "eclipselunarnext",
-            false,
-            this.isNextEclipseLunar
-        );
-        condition.registerCondition(
-            "eclipsesolarin",
-            false,
-            this.enterEclipseSolarIn
-        );
-        condition.registerCondition(
-            "eclipsesolarnext",
-            false,
-            this.isNextEclipseSolar
-        );
-    }
-
-    private isNextEclipseAny: ConditionFunction = (
-        positionalParameters,
-        namedParameters,
-        atTime
-    ): ConditionResult => {
-        const eclipse = this.getEclipse(atTime);
-        const value = eclipse == "any_next";
-        return returnBoolean(value);
-    };
-
-    private isNextEclipseLunar: ConditionFunction = (
-        positionalParameters,
-        namedParameters,
-        atTime
-    ): ConditionResult => {
-        const eclipse = this.getEclipse(atTime);
-        const value = eclipse == "lunar_next";
-        return returnBoolean(value);
-    };
-
-    private isNextEclipseSolar: ConditionFunction = (
-        positionalParameters,
-        namedParameters,
-        atTime
-    ): ConditionResult => {
-        const eclipse = this.getEclipse(atTime);
-        const value = eclipse == "solar_next";
-        return returnBoolean(value);
-    };
-
-    /* this.enterEclipseLunarIn() returns the number of Wrath casts to
-     * enter lunar eclipse.
-     */
-    private enterEclipseLunarIn: ConditionFunction = (
-        positionalParameters,
-        namedParameters,
-        atTime
-    ): ConditionResult => {
-        const [, wrath] = this.getSpellCounts(atTime);
-        if (wrath > 0) {
-            return returnConstant(wrath);
-        }
-        return returnConstant(infinity);
-    };
-
-    /* this.enterEclipseSolarIn() returns the number of Starfire casts to
-     * enter solar eclipse.
-     */
-    private enterEclipseSolarIn: ConditionFunction = (
-        positionalParameters,
-        namedParameters,
-        atTime
-    ): ConditionResult => {
-        const [starfire] = this.getSpellCounts(atTime);
-        if (starfire > 0) {
-            return returnConstant(starfire);
-        }
-        return returnConstant(infinity);
     };
 }

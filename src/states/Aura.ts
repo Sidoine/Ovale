@@ -26,36 +26,20 @@ import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import {
     pairs,
     tonumber,
-    tostring,
     wipe,
     lualength,
     LuaObj,
     next,
     LuaArray,
     kpairs,
-    unpack,
 } from "@wowts/lua";
 import { lower } from "@wowts/string";
 import { concat, insert, sort } from "@wowts/table";
 import { GetTime, UnitAura } from "@wowts/wow-mock";
 import { huge as INFINITY, huge } from "@wowts/math";
 import { OvalePaperDollClass } from "./PaperDoll";
-import { BaseState } from "./BaseState";
 import { isNumber, isString } from "../tools/tools";
-import {
-    PositionalParameters,
-    NamedParametersOf,
-    AstFunctionNode,
-} from "../engine/ast";
-import {
-    ConditionFunction,
-    ConditionResult,
-    OvaleConditionClass,
-    parseCondition,
-    returnConstant,
-    returnValue,
-    returnValueBetween,
-} from "../engine/condition";
+import { ConditionResult } from "../engine/condition";
 import { OvaleOptionsClass } from "../ui/Options";
 import { AceModule } from "@wowts/tsaddon";
 import { OptionUiAll } from "../ui/acegui-helpers";
@@ -337,7 +321,6 @@ export class OvaleAuraClass
     constructor(
         private ovaleState: OvaleStateClass,
         private ovalePaperDoll: OvalePaperDollClass,
-        private baseState: BaseState,
         private ovaleData: OvaleDataClass,
         private ovaleGuid: Guids,
         private lastSpell: LastSpell,
@@ -358,19 +341,6 @@ export class OvaleAuraClass
         this.debug = ovaleDebug.create("OvaleAura");
         this.ovaleState.registerState(this);
         this.addDebugOptions();
-    }
-
-    registerConditions(condition: OvaleConditionClass) {
-        condition.registerCondition(
-            "bufflastexpire",
-            true,
-            this.buffLastExpire
-        );
-        condition.registerCondition(
-            "ticksgainedonrefresh",
-            true,
-            this.ticksGainedOnRefresh
-        );
     }
 
     isWithinAuraLag(time1: number, time2: number, factor?: number) {
@@ -746,66 +716,6 @@ export class OvaleAuraClass
             }
         }
     }
-
-    private buffLastExpire: ConditionFunction = (
-        positionalParameters,
-        namedParameters,
-        atTime
-    ) => {
-        const [spellId] = unpack(positionalParameters);
-        const [target, filter, mine] = parseCondition(
-            namedParameters,
-            this.baseState
-        );
-        const aura = this.getAura(
-            target,
-            spellId as number,
-            atTime,
-            filter,
-            mine
-        );
-        if (!aura) return [];
-        return returnValue(0, aura.ending, 1);
-    };
-
-    private ticksGainedOnRefresh: ConditionFunction = (
-        positionalParameters: PositionalParameters,
-        namedParameters: NamedParametersOf<AstFunctionNode>,
-        atTime: number
-    ): ConditionResult => {
-        const [target, filter, mine] = parseCondition(
-            namedParameters,
-            this.baseState
-        );
-        let [auraId, spellId] = unpack(positionalParameters);
-        auraId = tonumber(auraId);
-        if (isNumber(spellId)) {
-            spellId = tonumber(spellId);
-        } else if (isString(spellId)) {
-            spellId = tostring(spellId);
-        } else {
-            spellId = undefined;
-        }
-        const duration = this.getBaseDuration(auraId, spellId, atTime);
-        const tick = this.getTickLength(auraId, atTime);
-        const aura = this.getAura(target, auraId, atTime, filter, mine);
-        if (aura) {
-            const remainingDuration = aura.ending - atTime;
-            const pandemicDuration = 0.3 * (aura.ending - aura.start);
-            let refreshedDuration = pandemicDuration + duration;
-            if (remainingDuration < pandemicDuration) {
-                refreshedDuration = remainingDuration + duration;
-            }
-            return returnValueBetween(
-                aura.gain,
-                INFINITY,
-                (refreshedDuration - remainingDuration) / tick,
-                atTime,
-                -1 / tick
-            );
-        }
-        return returnConstant(duration / tick);
-    };
 
     isActiveAura(aura: Aura, atTime: number): aura is Aura {
         let boolean = false;
@@ -2206,6 +2116,7 @@ export class OvaleAuraClass
         }
         return duration;
     }
+
     getTickLength(auraId: number, atTime?: number) {
         let tick = 3;
         const si = this.ovaleData.spellInfo[auraId];

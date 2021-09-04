@@ -3,7 +3,7 @@ import { OvaleClass } from "../Ovale";
 import { OvaleEquipmentClass, SlotName } from "./Equipment";
 import { States, StateModule } from "../engine/state";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
-import { tonumber, LuaObj, LuaArray, ipairs, unpack } from "@wowts/lua";
+import { LuaArray, LuaObj, ipairs, tonumber } from "@wowts/lua";
 import {
     GetCombatRating,
     GetCombatRatingBonus,
@@ -30,11 +30,6 @@ import {
 } from "@wowts/wow-mock";
 import { isNumber } from "../tools/tools";
 import { AceModule } from "@wowts/tsaddon";
-import {
-    ConditionFunction,
-    OvaleConditionClass,
-    returnBoolean,
-} from "../engine/condition";
 
 const spellDamageSchools: LuaObj<number> = {
     DEATHKNIGHT: 4,
@@ -234,23 +229,6 @@ export class OvalePaperDollClass
         );
         this.debug = ovaleDebug.create("OvalePaperDoll");
     }
-
-    registerConditions(condition: OvaleConditionClass) {
-        condition.registerCondition(
-            "specialization",
-            false,
-            this.hasSpecialization
-        );
-    }
-
-    private hasSpecialization: ConditionFunction = (positional) => {
-        const [id] = unpack(positional);
-        if (this.specialization)
-            return returnBoolean(
-                ovaleSpecializationName[this.class][this.specialization] === id
-            );
-        return [];
-    };
 
     private handleInitialize = () => {
         // TODO this module should be the source of this value

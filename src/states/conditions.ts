@@ -15,17 +15,30 @@ import { SpellInfo, OvaleDataClass, SpellInfoProperty } from "../engine/data";
 import { PowerType, OvalePowerClass } from "./Power";
 import { HasteType, PaperDollData, OvalePaperDollClass } from "./PaperDoll";
 import { Aura, OvaleAuraClass } from "./Aura";
-import { ipairs, pairs, type, LuaArray, lualength } from "@wowts/lua";
+import {
+    LuaArray,
+    ipairs,
+    lualength,
+    pairs,
+    tonumber,
+    tostring,
+    type,
+    unpack,
+} from "@wowts/lua";
 import {
     GetBuildInfo,
+    GetItemCooldown,
     GetItemCount,
     GetNumTrackingTypes,
+    GetTime,
     GetTrackingInfo,
     GetUnitName,
     GetUnitSpeed,
+    GetWeaponEnchantInfo,
     HasFullControl,
     IsStealthed,
     SpellId,
+    TalentId,
     UnitCastingInfo,
     UnitChannelInfo,
     UnitClass,
@@ -44,6 +57,7 @@ import {
     UnitPower,
     UnitPowerMax,
     UnitRace,
+    UnitStagger,
 } from "@wowts/wow-mock";
 import { huge as INFINITY, min } from "@wowts/math";
 import {
@@ -54,13 +68,18 @@ import {
 import { OvaleSpellsClass } from "./Spells";
 import { lower, upper, sub } from "@wowts/string";
 import { OvaleAzeriteEssenceClass } from "./AzeriteEssence";
+import { OvaleAzeriteArmor } from "./AzeriteArmor";
 import { BaseState } from "./BaseState";
+import { OvaleCombatClass } from "./combat";
+import { Covenant } from "./covenant";
+import { Eclipse } from "./eclipse";
 import { OvaleFutureClass } from "./Future";
 import { OvaleSpellBookClass } from "./SpellBook";
 import { OvaleFrameModuleClass } from "../ui/Frame";
 import { Guids } from "../engine/guid";
 import { OvaleDamageTakenClass } from "./DamageTaken";
 import { OvaleEnemiesClass } from "./Enemies";
+import { checkSlotName, OvaleEquipmentClass, SlotName } from "./Equipment";
 import { OvaleCooldownClass } from "./Cooldown";
 import { LastSpell } from "./LastSpell";
 import { OvaleHealthClass } from "./Health";
@@ -70,9 +89,15 @@ import { OvaleSpellDamageClass } from "./SpellDamage";
 import { OvaleTotemClass } from "./Totem";
 import { OvaleDemonHunterSoulFragmentsClass } from "./DemonHunterSoulFragments";
 import { OvaleSigilClass } from "./DemonHunterSigils";
+import { Runeforge } from "./runeforge";
 import { OvaleRunesClass } from "./Runes";
+import { Soulbind } from "./soulbind";
+import { SpellActivationGlow } from "./spellactivationglow";
+import { OvaleStaggerClass } from "./Stagger";
+import { OvaleStanceClass } from "./Stance";
+import { DemonId, OvaleWarlockClass } from "./Warlock";
 import { OvaleBossModClass } from "./BossMod";
-import { isNumber, KeyCheck, oneTimeMessage } from "../tools/tools";
+import { KeyCheck, isNumber, isString, oneTimeMessage } from "../tools/tools";
 
 // Return the target's damage reduction from armor, which seems to be 30% with most bosses
 function bossArmorDamageReduction(target: string) {
@@ -239,6 +264,26 @@ export class OvaleConditions {
         const essenceId = positionalParams[1];
         const value = this.azeriteEssence.essenceRank(essenceId);
         return returnConstant(value);
+    };
+
+    private azeriteTraitRank: ConditionFunction = (
+        positionalParams,
+        namedParams,
+        atTime
+    ) => {
+        const spellId = positionalParams[1] as number;
+        const value = this.azeriteArmor.traitRank(spellId);
+        return returnConstant(value);
+    };
+
+    private hasAzeriteTrait: ConditionFunction = (
+        positionalParams,
+        namedParams,
+        atTime
+    ) => {
+        const spellId = positionalParams[1] as number;
+        const value = this.azeriteArmor.hasTrait(spellId);
+        return returnBoolean(value);
     };
 
     /** Get the base duration of the aura in seconds if it is applied at the current time.
@@ -618,6 +663,31 @@ export class OvaleConditions {
             }
         }
         return [0, INFINITY];
+    };
+
+    private buffLastExpire: ConditionFunction = (
+        positionalParameters,
+        namedParameters,
+        atTime
+    ) => {
+        const [auraId] = unpack(positionalParameters);
+        const [target, filter, mine] = this.parseCondition(
+            positionalParameters,
+            namedParameters
+        );
+        if (isNumber(auraId)) {
+            const aura = this.auras.getAura(
+                target,
+                auraId,
+                atTime,
+                filter,
+                mine
+            );
+            if (aura) {
+                return returnValue(0, aura.ending, 1);
+            }
+        }
+        return [];
     };
 
     /** Test if an aura is present or if the remaining time on the aura is more than the given number of seconds.
@@ -1086,6 +1156,24 @@ export class OvaleConditions {
         return [];
     };
 
+    private isChanneling: ConditionFunction = (
+        positionalParameters,
+        namedParameters,
+        atTime
+    ) => {
+        const [spellId] = unpack(positionalParameters);
+        const state = this.future.getState(atTime);
+        if (state.currentCast.spellId !== spellId || !state.currentCast.channel)
+            return [];
+        return returnValueBetween(
+            state.currentCast.start,
+            state.currentCast.stop,
+            1,
+            state.currentCast.start,
+            0
+        );
+    };
+
     /** Test if all of the listed checkboxes are off.
 	 @name CheckBoxOff
 	 @paramsig boolean
@@ -1219,6 +1307,29 @@ export class OvaleConditions {
         }
         const boolean = targetClassification == classification;
         return returnBoolean(boolean);
+    };
+
+    private conduitCondition: ConditionFunction = (positionalParameters) => {
+        const [id] = unpack(positionalParameters);
+        if (isNumber(id)) {
+            const bool = this.soulbind.hasActiveConduit(id as number);
+            return returnBoolean(bool);
+        }
+        return returnBoolean(false);
+    };
+
+    private conduitRankCondition: ConditionFunction = (
+        positionalParameters
+    ) => {
+        const [id] = unpack(positionalParameters);
+        if (isNumber(id)) {
+            return returnConstant(this.soulbind.getConduitRank(id as number));
+        }
+        return returnConstant(0);
+    };
+
+    private conduitValue = (atTime: number, id: number): ConditionResult => {
+        return returnConstant(this.soulbind.getConduitValue(id));
     };
 
     /**  Get the current value of a script counter.
@@ -1453,6 +1564,38 @@ export class OvaleConditions {
         return returnConstant(value);
     };
 
+    private getDemonsCount: ConditionFunction = (
+        positionalParams,
+        namedParams,
+        atTime
+    ) => {
+        const creatureId = unpack(positionalParams);
+        if (isNumber(creatureId)) {
+            const value = this.warlock.getDemonsCount(
+                creatureId as number,
+                atTime
+            );
+            return returnConstant(value);
+        }
+        return returnConstant(0);
+    };
+
+    private demonDuration: ConditionFunction = (
+        positionalParams,
+        namedParams,
+        atTime
+    ) => {
+        const creatureId = unpack(positionalParams);
+        if (isNumber(creatureId)) {
+            const value = this.warlock.getRemainingDemonDuration(
+                creatureId as number,
+                atTime
+            );
+            return returnConstant(value);
+        }
+        return returnConstant(0);
+    };
+
     getDiseases(
         target: string,
         atTime: number
@@ -1598,6 +1741,72 @@ export class OvaleConditions {
 	 @usage
 	 if Enemies() > 4 Spell(fan_of_knives)
      */
+
+    private isNextEclipseAny: ConditionFunction = (
+        positionalParameters,
+        namedParameters,
+        atTime
+    ): ConditionResult => {
+        const eclipse = this.eclipse.getEclipse(atTime);
+        const value = eclipse == "any_next";
+        return returnBoolean(value);
+    };
+
+    private isNextEclipseLunar: ConditionFunction = (
+        positionalParameters,
+        namedParameters,
+        atTime
+    ): ConditionResult => {
+        const eclipse = this.eclipse.getEclipse(atTime);
+        const value = eclipse == "lunar_next";
+        return returnBoolean(value);
+    };
+
+    private isNextEclipseSolar: ConditionFunction = (
+        positionalParameters,
+        namedParameters,
+        atTime
+    ): ConditionResult => {
+        const eclipse = this.eclipse.getEclipse(atTime);
+        const value = eclipse == "solar_next";
+        return returnBoolean(value);
+    };
+
+    /* this.enterEclipseLunarIn() returns the number of Wrath casts to
+     * enter lunar eclipse.
+     */
+    private enterEclipseLunarIn: ConditionFunction = (
+        positionalParameters,
+        namedParameters,
+        atTime
+    ): ConditionResult => {
+        const [, wrath] = this.eclipse.getSpellCounts(atTime);
+        if (wrath > 0) {
+            return returnConstant(wrath);
+        }
+        return returnConstant(INFINITY);
+    };
+
+    /* this.enterEclipseSolarIn() returns the number of Starfire casts to
+     * enter solar eclipse.
+     */
+    private enterEclipseSolarIn: ConditionFunction = (
+        positionalParameters,
+        namedParameters,
+        atTime
+    ): ConditionResult => {
+        const [starfire] = this.eclipse.getSpellCounts(atTime);
+        if (starfire > 0) {
+            return returnConstant(starfire);
+        }
+        return returnConstant(INFINITY);
+    };
+
+    private equippedRuneforge: ConditionFunction = (positionalParameters) => {
+        const [id] = unpack(positionalParameters);
+        return returnBoolean(this.runeforge.hasRuneforge(id as number));
+    };
+
     private getEnemies = (
         positionalParams: LuaArray<any>,
         namedParams: NamedParametersOf<AstFunctionNode>,
@@ -2084,6 +2293,182 @@ export class OvaleConditions {
         return returnConstant(0);
     };
 
+    /** Test if the player is in combat.
+	 @name InCombat
+	 @paramsig boolean
+	 @param yesno Optional. If yes, then return true if the player is in combat. If no, then return true if the player isn't in combat.
+	     Default is yes.
+	     Valid values: yes, no.
+	 @return A boolean value.
+	 @usage
+	 if not InCombat() and not Stealthed() Spell(stealth)
+     */
+    private inCombat: ConditionFunction = (
+        positionalParams,
+        namedParams,
+        atTime
+    ) => {
+        const inCombat = this.combat.isInCombat(atTime);
+        return returnBoolean(inCombat);
+    };
+
+    /** Get the number of seconds elapsed since the player entered combat.
+	 @name TimeInCombat
+	 @paramsig number or boolean
+	 @return The number of seconds.
+	 @usage
+	 if TimeInCombat() > 5 Spell(bloodlust)
+     */
+    private timeInCombat: ConditionFunction = (
+        positionalParams,
+        namedParams,
+        atTime
+    ) => {
+        const inCombat = this.combat.isInCombat(atTime);
+        if (inCombat) {
+            const state = this.combat.getState(atTime);
+            const start = state.combatStartTime;
+            return returnValueBetween(start, INFINITY, 0, start, 1);
+        }
+        return returnConstant(0);
+    };
+
+    private expectedCombatLength: ConditionFunction = () => {
+        // TODO maybe should depend on the fact that it is a boss fight or not
+        return returnConstant(15 * 60);
+    };
+
+    private fightRemains: ConditionFunction = () => {
+        // TODO use enemies health
+        return returnConstant(15 * 60);
+    };
+
+    /**  Test if the player has a particular item equipped.
+	 @name HasEquippedItem
+	 @paramsig boolean
+	 @param item Item to be checked whether it is equipped.
+     */
+    private hasItemEquipped: ConditionFunction = (
+        positionalParams,
+        namedParams,
+        atTime
+    ) => {
+        const [itemId] = unpack(positionalParams);
+        if (itemId) {
+            if (isNumber(itemId)) {
+                return returnBoolean(this.equipment.hasEquippedItem(itemId));
+            } else {
+                const itemList = this.data.itemList[itemId as string];
+                if (itemList) {
+                    for (const [, id] of pairs(itemList)) {
+                        if (this.equipment.hasEquippedItem(id)) {
+                            return returnBoolean(true);
+                        }
+                    }
+                }
+            }
+        }
+        return returnBoolean(false);
+    };
+
+    /** Test if the player has a shield equipped.
+	 @name HasShield
+	 @paramsig boolean
+	 @return A boolean value.
+	 @usage
+	 if HasShield() Spell(shield_wall)
+     */
+    private hasShield: ConditionFunction = () => {
+        return returnBoolean(this.equipment.hasShield());
+    };
+
+    /** Test if the player has a particular trinket equipped.
+	 @name HasTrinket
+	 @paramsig boolean
+	 @param id The item ID of the trinket or the name of an item list.
+	 @usage
+	 ItemList(rune_of_reorigination 94532 95802 96546)
+	 if HasTrinket(rune_of_reorigination) and BuffPresent(rune_of_reorigination_buff)
+	     Spell(rake)
+     */
+    private hasTrinket: ConditionFunction = (
+        positionalParams,
+        namedParams,
+        atTime
+    ) => {
+        const [itemId] = unpack(positionalParams);
+        if (itemId) {
+            if (isNumber(itemId)) {
+                return returnBoolean(this.equipment.hasTrinket(itemId));
+            } else {
+                const itemList = this.data.itemList[itemId as string];
+                if (itemList) {
+                    for (const [, id] of pairs(itemList)) {
+                        if (this.equipment.hasTrinket(id)) {
+                            return returnBoolean(true);
+                        }
+                    }
+                }
+            }
+        }
+        return returnBoolean(false);
+    };
+
+    private hasWeapon: ConditionFunction = (
+        positionalParameter,
+        namedParameter,
+        atTime
+    ) => {
+        const [slot, handedness] = unpack(positionalParameter);
+        if (isString(slot) && isString(handedness)) {
+            return returnBoolean(
+                this.equipment.hasWeapon(slot as SlotName, handedness as string)
+            );
+        }
+        return returnBoolean(false);
+    };
+
+    private impsSpawnedDuring = (
+        positionalParams: LuaArray<any>,
+        namedParams: NamedParametersOf<AstFunctionNode>,
+        atTime: number
+    ) => {
+        const milliseconds = unpack(positionalParams);
+        if (isNumber(milliseconds)) {
+            const delay = (milliseconds as number) / 1000;
+            let impsSpawned = 0;
+            // Hand of Gul'dan summons up to 3 imps based on Soul Shards consumed.
+            if (
+                this.future.next.currentCast.spellId == SpellId.hand_of_guldan
+            ) {
+                let soulshards = this.powers.current.power["soulshards"] || 0;
+                if (soulshards >= 3) {
+                    soulshards = 3;
+                }
+                impsSpawned = impsSpawned + soulshards;
+            }
+
+            /* TODO: Inner Demons talent summons an imp every 12 seconds
+             * Assume that the imp will spawn within given window if
+             * there are no more imps.
+             */
+            const hasInnerDemons = this.spellBook.isKnownTalent(
+                TalentId.inner_demons_talent
+            );
+            if (hasInnerDemons) {
+                const value = this.warlock.getRemainingDemonDuration(
+                    DemonId.InnerDemonsWildImp,
+                    atTime + delay
+                );
+                if (value === 0) {
+                    impsSpawned = impsSpawned + 1;
+                }
+            }
+            return returnConstant(impsSpawned);
+        }
+        return returnConstant(0);
+    };
+
     /** Test if the given spell is in flight for spells that have a flight time after cast, e.g., Lava Burst.
 	 @name InFlightToTarget
 	 @paramsig boolean
@@ -2145,6 +2530,14 @@ export class OvaleConditions {
         const [target] = this.parseCondition(positionalParams, namedParams);
         const [boolean] = UnitDetailedThreatSituation("player", target);
         return returnBoolean(boolean || false);
+    };
+
+    private isCovenant: ConditionFunction = (positionalParameters) => {
+        const [covenant] = unpack(positionalParameters);
+        if (isNumber(covenant) || isString(covenant)) {
+            return returnBoolean(this.covenant.isCovenant(covenant));
+        }
+        return [];
     };
 
     /**  Test if the target is dead.
@@ -2364,6 +2757,85 @@ export class OvaleConditions {
         const itemId = positionalParams[1];
         const value = GetItemCount(itemId);
         return returnConstant(value);
+    };
+
+    /** Get the cooldown time in seconds of an item, e.g., trinket.
+	 @name ItemCooldown
+	 @paramsig number or boolean
+	 @param id The item ID or the equipped slot name.
+	 @return The number of seconds.
+	 @usage
+	 if not ItemCooldown(ancient_petrified_seed) > 0
+	     Spell(berserk_cat)
+	 if not ItemCooldown(Trinket0Slot) > 0
+	     Spell(berserk_cat)
+     */
+    private itemCooldown = (
+        atTime: number,
+        itemId: number | undefined,
+        slot: SlotName | undefined,
+        sharedCooldown: string | undefined
+    ) => {
+        if (sharedCooldown) {
+            itemId =
+                this.equipment.getEquippedItemIdBySharedCooldown(
+                    sharedCooldown
+                );
+        }
+        if (slot != undefined) {
+            itemId = this.equipment.getEquippedItemId(slot);
+        }
+        if (itemId) {
+            const [start, duration] = GetItemCooldown(itemId);
+            if (start > 0 && duration > 0) {
+                const ending = start + duration;
+                return returnValueBetween(start, ending, duration, start, -1);
+            }
+        }
+        return returnConstant(0);
+    };
+
+    private itemCooldownDuration = (
+        atTime: number,
+        itemId: number | undefined,
+        slot: SlotName | undefined
+    ) => {
+        if (slot) {
+            itemId = this.equipment.getEquippedItemId(slot);
+        }
+        if (itemId) {
+            const [, duration] = GetItemCooldown(itemId);
+            if (duration > 0) {
+                return returnConstant(duration);
+            }
+            const value = this.data.getItemInfoProperty(itemId, atTime, "cd");
+            if (value) {
+                return returnConstant(tonumber(value));
+            }
+        }
+        return returnConstant(0);
+    };
+
+    private itemInSlot = (atTime: number, slot: SlotName) => {
+        const itemId = this.equipment.getEquippedItemId(slot);
+        return returnConstant(itemId);
+    };
+
+    private itemRppm = (
+        atTime: number,
+        itemId: number | undefined,
+        slot: SlotName | undefined
+    ): ConditionResult => {
+        if (slot) {
+            itemId = this.equipment.getEquippedItemId(slot);
+        }
+        if (itemId) {
+            const value = this.data.getItemInfoProperty(itemId, atTime, "rppm");
+            if (value) {
+                return returnConstant(tonumber(value));
+            }
+        }
+        return returnConstant(0);
     };
 
     /** Get the damage done by the most recent damage event for the given spell.
@@ -4164,6 +4636,15 @@ l    */
         );
     };
 
+    private soulbindCondition: ConditionFunction = (positionalParameters) => {
+        const [spellId] = unpack(positionalParameters);
+        if (isNumber(spellId)) {
+            const bool = this.soulbind.hasActiveTrait(spellId as number);
+            return returnBoolean(bool);
+        }
+        return returnBoolean(false);
+    };
+
     /** Get the current speed of the target.
 	 If the target is not moving, then this condition returns 0 (zero).
 	 If the target is at running speed, then this condition returns 100.
@@ -4185,6 +4666,25 @@ l    */
         const [target] = this.parseCondition(positionalParams, namedParams);
         const value = (GetUnitSpeed(target) * 100) / 7;
         return returnConstant(value);
+    };
+
+    private hasSpecialization: ConditionFunction = (positionalParams) => {
+        const [id] = unpack(positionalParams);
+        const specialization = this.paperDoll.getSpecialization();
+        return returnBoolean(id === specialization);
+    };
+
+    private spellActivationGlowActive: ConditionFunction = (
+        positionalParams
+    ) => {
+        const [spellId] = unpack(positionalParams);
+        if (isNumber(spellId)) {
+            const bool = this.spellActivationGlow.hasSpellActivationGlow(
+                spellId as number
+            );
+            return returnBoolean(bool);
+        }
+        return returnBoolean(false);
     };
 
     /** Get the cooldown in seconds on a spell before it gains another charge.
@@ -4598,6 +5098,152 @@ l    */
         return returnValueBetween(0, ending, 0, ending, -1);
     };
 
+    /** Get the remaining amount of damage Stagger will cause to the target.
+	 @name StaggerRemaining
+	 @paramsig number
+	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+	     Defaults to target=player.
+	     Valid values: player, target, focus, pet.
+	 @return The amount of damage.
+	 @usage
+	 if StaggerRemaining() / MaxHealth() >0.4 Spell(purifying_brew)
+     */
+    private staggerRemaining: ConditionFunction = (
+        positionalParams,
+        namedParams,
+        atTime
+    ) => {
+        const [target] = this.parseCondition(
+            positionalParams,
+            namedParams,
+            "target"
+        );
+        return this.getAnyStaggerAura(target, atTime);
+    };
+
+    private getAnyStaggerAura(target: string, atTime: number): ConditionResult {
+        let aura = this.auras.getAura(
+            target,
+            SpellId.heavy_stagger_buff,
+            atTime,
+            "HARMFUL"
+        );
+        if (!aura || !this.auras.isActiveAura(aura, atTime)) {
+            aura = this.auras.getAura(
+                target,
+                SpellId.moderate_stagger_buff,
+                atTime,
+                "HARMFUL"
+            );
+        }
+        if (!aura || !this.auras.isActiveAura(aura, atTime)) {
+            aura = this.auras.getAura(
+                target,
+                SpellId.light_stagger_buff,
+                atTime,
+                "HARMFUL"
+            );
+        }
+        if (aura && this.auras.isActiveAura(aura, atTime)) {
+            const [gain, start, ending] = [aura.gain, aura.start, aura.ending];
+            const stagger = UnitStagger(target);
+            const rate = (-1 * stagger) / (ending - start);
+            return returnValueBetween(gain, ending, 0, ending, rate);
+        }
+        return [];
+    }
+
+    private staggerPercent: ConditionFunction = (
+        positionalParams,
+        namedParams,
+        atTime
+    ) => {
+        const [target] = this.parseCondition(
+            positionalParams,
+            namedParams,
+            "target"
+        );
+        let [start, ending, value, origin, rate] = this.getAnyStaggerAura(
+            target,
+            atTime
+        );
+        const healthMax = this.health.getUnitHealthMax(target);
+        if (isNumber(value)) {
+            value = (value * 100) / healthMax;
+        }
+        if (isNumber(rate)) {
+            rate = (rate * 100) / healthMax;
+        }
+        return [start, ending, value, origin, rate];
+    };
+
+    private missingStaggerPercent: ConditionFunction = (
+        positionalParams,
+        namedParams,
+        atTime
+    ) => {
+        const [target] = this.parseCondition(
+            positionalParams,
+            namedParams,
+            "target"
+        );
+        let [start, ending, value, origin, rate] = this.getAnyStaggerAura(
+            target,
+            atTime
+        );
+        const healthMax = this.health.getUnitHealthMax(target);
+        if (isNumber(value)) {
+            value = ((healthMax - value) * 100) / healthMax;
+        }
+        if (isNumber(rate)) {
+            rate = -(rate * 100) / healthMax;
+        }
+        return [start, ending, value, origin, rate];
+    };
+
+    /** Get the last Stagger tick damage.
+	 @name StaggerTick
+     @paramsig number or boolean
+     @param count Optional. Counts n amount of previous stagger ticks.
+	 @param target Optional. Sets the target to check. The target may also be given as a prefix to the condition.
+	     Defaults to target=player.
+	     Valid values: player, target, focus, pet.
+	 @return Stagger tick damage.
+	 @usage
+     if StaggerTick() > 1000 Spell(purifying_brew) #return current tick of stagger
+     or 
+     if StaggerTick(2) > 1000 Spell(purifying_brew) #return two ticks of current stagger
+     */
+    private staggerTick: ConditionFunction = (positionalParams) => {
+        const [count] = unpack(positionalParams);
+        if (isNumber(count)) {
+            const damage = this.stagger.lastTickDamage(count as number);
+            return returnConstant(damage);
+        }
+        return returnConstant(0);
+    };
+
+    /** Test if the player is in a given stance.
+	 @name Stance
+	 @paramsig boolean
+	 @param stance The stance name or a number representing the stance index.
+	 @return A boolean value.
+	 @usage
+	 unless Stance(druid_bear_form) Spell(bear_form)
+     */
+    private stanceCondition: ConditionFunction = (
+        positionalParams,
+        namedParams,
+        atTime
+    ) => {
+        const stance = unpack(positionalParams);
+        if (isString(stance)) {
+            const bool = this.stance.isStance(stance as string, atTime);
+            return returnBoolean(bool);
+        }
+        return returnBoolean(false);
+    };
+
     /** Test if the given talent is active.
 	 @name Talent
 	 @paramsig boolean
@@ -4733,6 +5379,45 @@ l    */
             tickTime = 0;
         }
         return returnConstant(tickTime);
+    };
+
+    private ticksGainedOnRefresh: ConditionFunction = (
+        positionalParameters,
+        namedParameters,
+        atTime
+    ): ConditionResult => {
+        const [target, filter, mine] = this.parseCondition(
+            positionalParameters,
+            namedParameters
+        );
+        let [auraId, spellId] = unpack(positionalParameters);
+        auraId = tonumber(auraId);
+        if (isNumber(spellId)) {
+            spellId = tonumber(spellId);
+        } else if (isString(spellId)) {
+            spellId = tostring(spellId);
+        } else {
+            spellId = undefined;
+        }
+        const duration = this.auras.getBaseDuration(auraId, spellId, atTime);
+        const tick = this.auras.getTickLength(auraId, atTime);
+        const aura = this.auras.getAura(target, auraId, atTime, filter, mine);
+        if (aura) {
+            const remainingDuration = aura.ending - atTime;
+            const pandemicDuration = 0.3 * (aura.ending - aura.start);
+            let refreshedDuration = pandemicDuration + duration;
+            if (remainingDuration < pandemicDuration) {
+                refreshedDuration = remainingDuration + duration;
+            }
+            return returnValueBetween(
+                aura.gain,
+                INFINITY,
+                (refreshedDuration - remainingDuration) / tick,
+                atTime,
+                -1 / tick
+            );
+        }
+        return returnConstant(duration / tick);
     };
 
     /** Get the remaining number of ticks of a periodic aura on a target.
@@ -5023,6 +5708,15 @@ l    */
             namedParams,
             atTime
         );
+    };
+
+    private timeToShard: ConditionFunction = (
+        positionalParams,
+        namedParams,
+        atTime
+    ) => {
+        const value = this.warlock.getTimeToShard(atTime);
+        return returnConstant(value);
     };
 
     /** Get the number of seconds before the spell is ready to be cast, either due to cooldown or resources.
@@ -5397,6 +6091,68 @@ l    */
         return [];
     };
 
+    /** Get the number of seconds since the enchantment has expired
+     */
+    private weaponEnchantExpires: ConditionFunction = (
+        positionalParameters
+    ) => {
+        const [id, hand] = unpack(positionalParameters);
+        const [
+            hasMainHandEnchant,
+            mainHandExpiration,
+            ,
+            mainHandEnchantId,
+            hasOffHandEnchant,
+            offHandExpiration,
+            ,
+            offHandEnchantId,
+        ] = GetWeaponEnchantInfo();
+        const now = GetTime();
+        if (hand == "main" || hand === undefined) {
+            if (hasMainHandEnchant && id == mainHandEnchantId) {
+                const expirationTime = mainHandExpiration / 1000;
+                return [now + expirationTime, INFINITY];
+            }
+        } else if (hand == "offhand" || hand == "off") {
+            if (hasOffHandEnchant && id == offHandEnchantId) {
+                const expirationTime = offHandExpiration / 1000;
+                return [now + expirationTime, INFINITY];
+            }
+        }
+        return [0, INFINITY];
+    };
+
+    /** Get the number of seconds since the enchantment has expired
+     */
+    private weaponEnchantPresent: ConditionFunction = (
+        positionalParameters
+    ) => {
+        const [id, hand] = unpack(positionalParameters);
+        const [
+            hasMainHandEnchant,
+            mainHandExpiration,
+            ,
+            mainHandEnchantId,
+            hasOffHandEnchant,
+            offHandExpiration,
+            ,
+            offHandEnchantId,
+        ] = GetWeaponEnchantInfo();
+        const now = GetTime();
+        if (hand == "main" || hand === undefined) {
+            if (hasMainHandEnchant && id == mainHandEnchantId) {
+                const expirationTime = mainHandExpiration / 1000;
+                return [0, now + expirationTime];
+            }
+        } else if (hand == "offhand" || hand == "off") {
+            if (hasOffHandEnchant && id == offHandEnchantId) {
+                const expirationTime = offHandExpiration / 1000;
+                return [0, now + expirationTime];
+            }
+        }
+        return [];
+    };
+
     private stackTimeTo = (
         positionalParams: PositionalParameters,
         namedParams: NamedParametersOf<AstFunctionNode>,
@@ -5462,9 +6218,14 @@ l    */
         private data: OvaleDataClass,
         private paperDoll: OvalePaperDollClass,
         private azeriteEssence: OvaleAzeriteEssenceClass,
+        private azeriteArmor: OvaleAzeriteArmor,
         private auras: OvaleAuraClass,
         private baseState: BaseState,
+        private combat: OvaleCombatClass,
         private cooldown: OvaleCooldownClass,
+        private covenant: Covenant,
+        private eclipse: Eclipse,
+        private equipment: OvaleEquipmentClass,
         private future: OvaleFutureClass,
         private spellBook: OvaleSpellBookClass,
         private frameModule: OvaleFrameModuleClass,
@@ -5482,7 +6243,13 @@ l    */
         private demonHunterSoulFragments: OvaleDemonHunterSoulFragmentsClass,
         private runes: OvaleRunesClass,
         private bossMod: OvaleBossModClass,
-        private spells: OvaleSpellsClass
+        private runeforge: Runeforge,
+        private soulbind: Soulbind,
+        private spellActivationGlow: SpellActivationGlow,
+        private spells: OvaleSpellsClass,
+        private stagger: OvaleStaggerClass,
+        private stance: OvaleStanceClass,
+        private warlock: OvaleWarlockClass
     ) {
         ovaleCondition.registerCondition("message", false, this.message);
 
@@ -5521,6 +6288,16 @@ l    */
             "azeriteessencerank",
             false,
             this.azeriteEssenceRank
+        );
+        ovaleCondition.registerCondition(
+            "azeritetraitrank",
+            false,
+            this.azeriteTraitRank
+        );
+        ovaleCondition.registerCondition(
+            "hasazeritetrait",
+            false,
+            this.hasAzeriteTrait
         );
         ovaleCondition.registerCondition(
             "baseduration",
@@ -5615,7 +6392,11 @@ l    */
             false,
             this.buffExpires
         );
-
+        ovaleCondition.registerCondition(
+            "bufflastexpire",
+            false,
+            this.buffLastExpire
+        );
         const targetParameter: ParameterInfo<Target> = {
             name: "target",
             optional: true,
@@ -5750,6 +6531,7 @@ l    */
         ovaleCondition.registerCondition("casttime", true, this.castTime);
         ovaleCondition.registerCondition("executetime", true, this.executeTime);
         ovaleCondition.registerCondition("casting", false, this.casting);
+        ovaleCondition.registerCondition("channeling", true, this.isChanneling);
         ovaleCondition.registerCondition(
             "checkboxoff",
             false,
@@ -5761,6 +6543,22 @@ l    */
             "classification",
             false,
             this.classification
+        );
+        ovaleCondition.registerCondition(
+            "conduit",
+            false,
+            this.conduitCondition
+        );
+        ovaleCondition.registerCondition(
+            "conduitrank",
+            false,
+            this.conduitRankCondition
+        );
+        ovaleCondition.register(
+            "conduitvalue",
+            this.conduitValue,
+            { type: "number" },
+            { name: "conduit", type: "number", optional: false }
         );
         ovaleCondition.registerCondition("counter", false, this.counter);
         ovaleCondition.register(
@@ -5807,6 +6605,12 @@ l    */
             false,
             this.physicalDamageTaken
         );
+        ovaleCondition.registerCondition("demons", false, this.getDemonsCount);
+        ovaleCondition.registerCondition(
+            "demonduration",
+            false,
+            this.demonDuration
+        );
         ovaleCondition.registerCondition(
             "diseasesremaining",
             false,
@@ -5823,6 +6627,41 @@ l    */
             this.diseasesAnyTicking
         );
         ovaleCondition.registerCondition("distance", false, this.distance);
+        ovaleCondition.registerCondition(
+            "eclipseanynext",
+            false,
+            this.isNextEclipseAny
+        );
+        ovaleCondition.registerCondition(
+            "eclipselunarin",
+            false,
+            this.enterEclipseLunarIn
+        );
+        ovaleCondition.registerCondition(
+            "eclipselunarnext",
+            false,
+            this.isNextEclipseLunar
+        );
+        ovaleCondition.registerCondition(
+            "eclipsesolarin",
+            false,
+            this.enterEclipseSolarIn
+        );
+        ovaleCondition.registerCondition(
+            "eclipsesolarnext",
+            false,
+            this.isNextEclipseSolar
+        );
+        ovaleCondition.registerCondition(
+            "equippedruneforge",
+            false,
+            this.equippedRuneforge
+        );
+        ovaleCondition.registerCondition(
+            "runeforge",
+            false,
+            this.equippedRuneforge
+        );
         ovaleCondition.registerCondition("enemies", false, this.getEnemies);
         ovaleCondition.registerCondition(
             "energyregen",
@@ -5919,6 +6758,35 @@ l    */
             false,
             this.timeToHealthPercent
         );
+        ovaleCondition.registerCondition("incombat", false, this.inCombat);
+        ovaleCondition.registerCondition(
+            "timeincombat",
+            false,
+            this.timeInCombat
+        );
+        ovaleCondition.registerCondition(
+            "expectedcombatlength",
+            false,
+            this.expectedCombatLength
+        );
+        ovaleCondition.registerCondition(
+            "fightremains",
+            false,
+            this.fightRemains
+        );
+        ovaleCondition.registerCondition(
+            "hasequippeditem",
+            false,
+            this.hasItemEquipped
+        );
+        ovaleCondition.registerCondition("hasshield", false, this.hasShield);
+        ovaleCondition.registerCondition("hastrinket", false, this.hasTrinket);
+        ovaleCondition.registerCondition("hasweapon", false, this.hasWeapon);
+        ovaleCondition.registerCondition(
+            "impsspawnedduring",
+            false,
+            this.impsSpawnedDuring
+        );
         ovaleCondition.registerCondition(
             "inflighttotarget",
             false,
@@ -5926,6 +6794,7 @@ l    */
         );
         ovaleCondition.registerCondition("inrange", false, this.inRange);
         ovaleCondition.registerCondition("isaggroed", false, this.isAggroed);
+        ovaleCondition.registerCondition("iscovenant", false, this.isCovenant);
         ovaleCondition.registerCondition("isdead", false, this.isDead);
         ovaleCondition.registerCondition("isenraged", false, this.isEnraged);
         ovaleCondition.registerCondition("isfeared", false, this.isFeared);
@@ -5949,6 +6818,56 @@ l    */
             this.itemCharges
         );
         ovaleCondition.registerCondition("itemcount", false, this.itemCount);
+        const slotParameter: ParameterInfo<SlotName> = {
+            type: "string",
+            name: "slot",
+            checkTokens: checkSlotName,
+            optional: true,
+        };
+        const itemParameter: ParameterInfo<number> = {
+            name: "item",
+            type: "number",
+            optional: true,
+            isItem: true,
+        };
+        ovaleCondition.register(
+            "itemcooldown",
+            this.itemCooldown,
+            { type: "number" },
+            itemParameter,
+            slotParameter,
+            { name: "shared", type: "string", optional: true }
+        );
+        ovaleCondition.register(
+            "itemcooldownduration",
+            this.itemCooldownDuration,
+            { type: "number" },
+            itemParameter,
+            slotParameter
+        );
+        ovaleCondition.register(
+            "iteminslot",
+            this.itemInSlot,
+            { type: "number" },
+            {
+                type: "string",
+                optional: false,
+                name: "slot",
+                checkTokens: checkSlotName,
+            }
+        );
+        ovaleCondition.register(
+            "itemrppm",
+            this.itemRppm,
+            { type: "number" },
+            { type: "number", name: "item", optional: true },
+            {
+                type: "string",
+                name: "slot",
+                checkTokens: checkSlotName,
+                optional: true,
+            }
+        );
         ovaleCondition.registerCondition("lastdamage", false, this.lastDamage);
         ovaleCondition.registerCondition(
             "lastspelldamage",
@@ -6234,7 +7153,32 @@ l    */
             false,
             this.versatilityRating
         );
+        ovaleCondition.registerCondition(
+            "soulbind",
+            false,
+            this.soulbindCondition
+        );
+        ovaleCondition.registerCondition(
+            "enabledsoulbind",
+            false,
+            this.soulbindCondition
+        );
+        ovaleCondition.registerCondition(
+            "specialization",
+            false,
+            this.hasSpecialization
+        );
         ovaleCondition.registerCondition("speed", false, this.speed);
+        ovaleCondition.registerCondition(
+            "spellactivationglowactive",
+            false,
+            this.spellActivationGlowActive
+        );
+        ovaleCondition.registerCondition(
+            "spellactivationglowshown",
+            false,
+            this.spellActivationGlowActive
+        );
         ovaleCondition.registerCondition(
             "spellchargecooldown",
             true,
@@ -6284,6 +7228,32 @@ l    */
         ovaleCondition.registerCondition("stealthed", false, this.stealthed);
         ovaleCondition.registerCondition("lastswing", false, this.lastSwing);
         ovaleCondition.registerCondition("nextswing", false, this.nextSwing);
+        ovaleCondition.registerCondition(
+            "staggerremaining",
+            false,
+            this.staggerRemaining
+        );
+        ovaleCondition.registerCondition(
+            "staggerremains",
+            false,
+            this.staggerRemaining
+        );
+        ovaleCondition.registerCondition(
+            "staggertick",
+            false,
+            this.staggerTick
+        );
+        ovaleCondition.registerCondition(
+            "staggerpercent",
+            false,
+            this.staggerPercent
+        );
+        ovaleCondition.registerCondition(
+            "staggermissingpercent",
+            false,
+            this.missingStaggerPercent
+        );
+        ovaleCondition.registerCondition("stance", false, this.stanceCondition);
         ovaleCondition.registerCondition("talent", false, this.talent);
         ovaleCondition.registerCondition("hastalent", false, this.talent);
         ovaleCondition.registerCondition(
@@ -6307,6 +7277,11 @@ l    */
             "currentticktime",
             false,
             this.currentTickTime
+        );
+        ovaleCondition.registerCondition(
+            "ticksgainedonrefresh",
+            false,
+            this.ticksGainedOnRefresh
         );
         ovaleCondition.registerCondition(
             "ticksremaining",
@@ -6373,6 +7348,11 @@ l    */
             true,
             this.timeToFocusFor
         );
+        ovaleCondition.registerCondition(
+            "timetoshard",
+            false,
+            this.timeToShard
+        );
         ovaleCondition.registerCondition("timetospell", true, this.timeToSpell);
         ovaleCondition.registerCondition(
             "timewithhaste",
@@ -6438,6 +7418,16 @@ l    */
             "hasdebufftype",
             false,
             this.hasDebuffType
+        );
+        ovaleCondition.registerCondition(
+            "weaponenchantexpires",
+            false,
+            this.weaponEnchantExpires
+        );
+        ovaleCondition.registerCondition(
+            "weaponenchantpresent",
+            false,
+            this.weaponEnchantPresent
         );
     }
 }

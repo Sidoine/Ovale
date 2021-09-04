@@ -22,12 +22,6 @@ import { OvaleClass } from "../Ovale";
 import { DebugTools } from "../engine/debug";
 import { AceEventHandler } from "../tools/tools";
 import { OptionUiAll } from "../ui/acegui-helpers";
-import {
-    OvaleConditionClass,
-    returnBoolean,
-    returnConstant,
-} from "../engine/condition";
-import { AstFunctionNode, NamedParametersOf } from "../engine/ast";
 
 type SlotNameMap = { [key in SlotName]?: boolean };
 const azeriteSlots: SlotNameMap = {
@@ -80,19 +74,6 @@ export class OvaleAzeriteArmor {
         for (const [k, v] of pairs(this.debugOptions)) {
             ovaleDebug.defaultOptions.args[k] = v;
         }
-    }
-
-    public registerConditions(ovaleCondition: OvaleConditionClass) {
-        ovaleCondition.registerCondition(
-            "hasazeritetrait",
-            false,
-            this.hasAzeriteTrait
-        );
-        ovaleCondition.registerCondition(
-            "azeritetraitrank",
-            false,
-            this.azeriteTraitRank
-        );
     }
 
     private handleInitialize = () => {
@@ -197,23 +178,4 @@ export class OvaleAzeriteArmor {
         }
         return concat(this.output, "\n");
     }
-
-    private azeriteTraitRank = (
-        positionalParams: LuaArray<any>,
-        namedParams: NamedParametersOf<AstFunctionNode>,
-        atTime: number
-    ) => {
-        const spellId = positionalParams[1];
-        const value = this.traitRank(spellId);
-        return returnConstant(value);
-    };
-    private hasAzeriteTrait = (
-        positionalParams: LuaArray<any>,
-        namedParams: NamedParametersOf<AstFunctionNode>,
-        atTime: number
-    ) => {
-        const spellId = positionalParams[1];
-        const value = this.hasTrait(spellId);
-        return returnBoolean(value);
-    };
 }

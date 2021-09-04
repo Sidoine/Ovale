@@ -4,11 +4,6 @@ import { concat, insert } from "@wowts/table";
 import { AceModule } from "@wowts/tsaddon";
 import { C_LegendaryCrafting, Enum } from "@wowts/wow-mock";
 import { OvaleClass } from "../Ovale";
-import {
-    ConditionFunction,
-    OvaleConditionClass,
-    returnBoolean,
-} from "../engine/condition";
 import { DebugTools } from "../engine/debug";
 import { OptionUiGroup } from "../ui/acegui-helpers";
 import { OvaleEquipmentClass, SlotName } from "./Equipment";
@@ -132,23 +127,15 @@ export class Runeforge {
         }
     };
 
-    registerConditions(condition: OvaleConditionClass) {
-        condition.registerCondition(
-            "equippedruneforge",
-            false,
-            this.equippedRuneforge
-        );
-        condition.registerCondition("runeforge", false, this.equippedRuneforge);
-    }
-
-    private equippedRuneforge: ConditionFunction = (positionalParameters) => {
-        const id = positionalParameters[1] as number;
+    hasRuneforge(id: number) {
         /* Check both lists and return true if the ID is in either of them.
          * Technically could be incorrect, but chance of collision is very low.
          */
-        if (this.equippedLegendaryById[id] || this.equippedRuneforgeById[id]) {
-            return returnBoolean(true);
-        }
-        return returnBoolean(false);
-    };
+        return (
+            ((this.equippedLegendaryById[id] ||
+                this.equippedRuneforgeById[id]) &&
+                true) ||
+            false
+        );
+    }
 }

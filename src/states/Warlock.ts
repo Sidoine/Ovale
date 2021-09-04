@@ -7,10 +7,6 @@ import { StateModule } from "../engine/state";
 import { OvaleAuraClass } from "./Aura";
 import { OvalePaperDollClass } from "./PaperDoll";
 import { OvaleSpellBookClass } from "./SpellBook";
-import { OvaleConditionClass, returnConstant } from "../engine/condition";
-import { OvaleFutureClass } from "./Future";
-import { OvalePowerClass } from "./Power";
-import { AstFunctionNode, NamedParametersOf } from "../engine/ast";
 import { CombatLogEvent, SpellPayloadHeader } from "../engine/combat-log-event";
 
 interface CustomAura {
@@ -29,7 +25,7 @@ const customAuras: LuaArray<CustomAura> = {
     },
 };
 
-const enum DemonId {
+export const enum DemonId {
     WildImp = 55659,
     Dreadstalkers = 98035,
     Darkglare = 103673,
@@ -86,25 +82,12 @@ export class OvaleWarlockClass implements StateModule {
         private ovaleAura: OvaleAuraClass,
         private ovalePaperDoll: OvalePaperDollClass,
         private ovaleSpellBook: OvaleSpellBookClass,
-        private future: OvaleFutureClass,
-        private power: OvalePowerClass,
         private combatLogEvent: CombatLogEvent
     ) {
         ovale.createModule(
             "OvaleWarlock",
             this.handleInitialize,
             this.handleDisable
-        );
-    }
-
-    public registerConditions(condition: OvaleConditionClass) {
-        condition.registerCondition("timetoshard", false, this.timeToShard);
-        condition.registerCondition("demons", false, this.getDemonsCount);
-        condition.registerCondition("demonduration", false, this.demonDuration);
-        condition.registerCondition(
-            "impsspawnedduring",
-            false,
-            this.impsSpawnedDuring
         );
     }
 
@@ -192,70 +175,24 @@ export class OvaleWarlockClass implements StateModule {
     initializeState(): void {}
     resetState(): void {}
 
-    private impsSpawnedDuring = (
-        positionalParams: LuaArray<any>,
-        namedParams: NamedParametersOf<AstFunctionNode>,
-        atTime: number
-    ) => {
-        const ms = positionalParams[1];
-        const delay = (ms || 0) / 1000;
-        let impsSpawned = 0;
-        // check for Hand of Guldan
-        if (this.future.next.currentCast.spellId == SpellId.hand_of_guldan) {
-            let soulshards = this.power.current.power["soulshards"] || 0;
-            if (soulshards >= 3) {
-                soulshards = 3;
-            }
-            impsSpawned = impsSpawned + soulshards;
-        }
-
-        // inner demons talent
-        const talented =
-            this.ovaleSpellBook.getTalentPoints(TalentId.inner_demons_talent) >
-            0;
-        if (talented) {
-            const value = this.getRemainingDemonDuration(
-                DemonId.InnerDemonsWildImp,
-                atTime + delay
-            );
-            if (value <= 0) {
-                impsSpawned = impsSpawned + 1;
-            }
-        }
-        return returnConstant(impsSpawned);
-    };
-
-    private getDemonsCount = (
-        positionalParams: LuaArray<any>,
-        namedParams: NamedParametersOf<AstFunctionNode>,
-        atTime: number
-    ) => {
-        const creatureId = positionalParams[1];
+    getDemonsCount(creatureId: number, atTime?: number) {
+        atTime = atTime || GetTime();
         let count = 0;
         for (const [, d] of pairs(this.demonsCount)) {
             if (d.finish >= atTime && d.id == creatureId) {
                 count = count + 1;
             }
         }
-        return returnConstant(count);
-    };
+        return count;
+    }
 
-    private demonDuration = (
-        positionalParams: LuaArray<any>,
-        namedParams: NamedParametersOf<AstFunctionNode>,
-        atTime: number
-    ) => {
-        const creatureId = positionalParams[1];
-        const value = this.getRemainingDemonDuration(creatureId, atTime);
-        return returnConstant(value);
-    };
-
-    private getRemainingDemonDuration(creatureId: number, atTime: number) {
+    getRemainingDemonDuration(creatureId: number, atTime?: number) {
+        atTime = atTime || GetTime();
         let max = 0;
         for (const [, d] of pairs(this.demonsCount)) {
             if (d.finish >= atTime && d.id == creatureId) {
                 const remaining = d.finish - atTime;
-                if (remaining > max) {
+                if (max < remaining) {
                     max = remaining;
                 }
             }
@@ -291,15 +228,11 @@ export class OvaleWarlockClass implements StateModule {
         );
     }
 
-    /**
-     * Based on SimulationCraft function time_to_shard
-     * Seeks to return the average expected time for the player to generate a single soul shard.
-     */
-    private getTimeToShard(atTime: number) {
-        let value = 3600;
+    getTimeToShard(atTime: number) {
+        let average = 3600;
         const tickTime =
             2 / this.ovalePaperDoll.getHasteMultiplier("spell", atTime);
-        const [activeAgonies] = this.ovaleAura.auraCount(
+        const [numAgonies] = this.ovaleAura.auraCount(
             SpellId.agony,
             "HARMFUL",
             true,
@@ -307,27 +240,22 @@ export class OvaleWarlockClass implements StateModule {
             atTime,
             undefined
         );
-        if (activeAgonies > 0) {
-            value =
-                ((1 / (0.184 * pow(activeAgonies, -2 / 3))) * tickTime) /
-                activeAgonies;
-            if (
-                this.ovaleSpellBook.isKnownTalent(
-                    TalentId.creeping_death_talent
-                )
-            ) {
-                value = value * 0.85;
+        if (numAgonies > 0) {
+            /* This calculation is lifted directly from simc:sc_warlock.cpp,
+             * and is the average expected time for the player to generate
+             * one Soul Shard ("time_to_shard").
+             */
+            average =
+                ((1 / (0.184 * pow(numAgonies, -2 / 3))) * tickTime) /
+                numAgonies;
+            const hasCreepingDeath = this.ovaleSpellBook.isKnownTalent(
+                TalentId.creeping_death_talent
+            );
+            if (hasCreepingDeath) {
+                // Creeping Death makes Agony deal its full damage 15% faster.
+                average = average / 1.15;
             }
         }
-        return value;
+        return average;
     }
-
-    private timeToShard = (
-        positionalParams: LuaArray<any>,
-        namedParams: NamedParametersOf<AstFunctionNode>,
-        atTime: number
-    ) => {
-        const value = this.getTimeToShard(atTime);
-        return returnConstant(value);
-    };
 }

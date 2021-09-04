@@ -3,12 +3,7 @@ import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { AceModule } from "@wowts/tsaddon";
 import { CovenantChosenEvent, C_Covenants } from "@wowts/wow-mock";
 import { isNumber, AceEventHandler } from "../tools/tools";
-import {
-    ConditionFunction,
-    OvaleConditionClass,
-    returnBoolean,
-} from "../engine/condition";
-import { pairs, ipairs, LuaArray, LuaObj, unpack } from "@wowts/lua";
+import { LuaArray, LuaObj, ipairs, pairs } from "@wowts/lua";
 import { DebugTools } from "../engine/debug";
 import { OptionUiGroup } from "../ui/acegui-helpers";
 import { gsub, lower } from "@wowts/string";
@@ -61,10 +56,6 @@ export class Covenant {
         }
     }
 
-    public registerConditions(condition: OvaleConditionClass) {
-        condition.registerCondition("iscovenant", false, this.isCovenant);
-    }
-
     private onInitialize = () => {
         this.module.RegisterEvent("COVENANT_CHOSEN", this.onCovenantChosen);
         this.covenantId = C_Covenants.GetActiveCovenantID();
@@ -81,17 +72,13 @@ export class Covenant {
         this.covenantId = covenantId;
     };
 
-    private isCovenant: ConditionFunction = (positionalParameters) => {
-        const [covenant] = unpack(positionalParameters);
-        if (covenant === "none")
-            return returnBoolean(this.covenantId === undefined);
-        if (!covenant) return [];
-        let id: number | undefined;
-        if (isNumber(covenant)) {
-            id = covenant;
-        } else {
-            id = covenantIdByName[covenant as string];
+    isCovenant(covenant: number | string) {
+        if (covenant === "none") {
+            return this.covenantId === undefined;
         }
-        return returnBoolean(this.covenantId === id);
-    };
+        const id =
+            (isNumber(covenant) && covenant) ||
+            covenantIdByName[covenant as string];
+        return id == this.covenantId;
+    }
 }

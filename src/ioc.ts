@@ -177,7 +177,6 @@ export class IoC {
         this.aura = new OvaleAuraClass(
             this.state,
             this.paperDoll,
-            this.baseState,
             this.data,
             this.guid,
             this.lastSpell,
@@ -274,9 +273,6 @@ export class IoC {
         this.stagger = new OvaleStaggerClass(
             this.ovale,
             combat,
-            this.baseState,
-            this.aura,
-            this.health,
             this.combatLogEvent
         );
         this.actionBar = new OvaleActionBarClass(
@@ -305,8 +301,6 @@ export class IoC {
             this.aura,
             this.paperDoll,
             this.spellBook,
-            this.future,
-            this.power,
             this.combatLogEvent
         );
         this.version = new OvaleVersionClass(
@@ -430,9 +424,14 @@ export class IoC {
             this.data,
             this.paperDoll,
             this.azeriteEssence,
+            this.azeriteArmor,
             this.aura,
             this.baseState,
+            combat,
             this.cooldown,
+            covenant,
+            this.eclipse,
+            this.equipment,
             this.future,
             this.spellBook,
             this.frame,
@@ -450,7 +449,13 @@ export class IoC {
             this.demonHunterSoulFragments,
             this.runes,
             this.bossMod,
-            this.spells
+            runeforge,
+            soulbind,
+            this.spellActivationGlow,
+            this.spells,
+            this.stagger,
+            this.stance,
+            this.warlock
         );
 
         this.runner = runner;
@@ -473,21 +478,5 @@ export class IoC {
         this.state.registerState(this.warlock);
         this.state.registerState(this.runes);
         this.state.registerState(combat);
-
-        // Conditions
-        runeforge.registerConditions(this.condition);
-        covenant.registerConditions(this.condition);
-        combat.registerConditions(this.condition);
-        soulbind.registerConditions(this.condition);
-        this.warlock.registerConditions(this.condition);
-        this.aura.registerConditions(this.condition);
-        this.eclipse.registerConditions(this.condition);
-        this.future.registerConditions(this.condition);
-        this.paperDoll.registerConditions(this.condition);
-        this.equipment.registerConditions(this.condition);
-        this.azeriteArmor.registerConditions(this.condition);
-        this.stagger.registerConditions(this.condition);
-        this.stance.registerConditions(this.condition);
-        this.spellActivationGlow.registerConditions(this.condition);
     }
 }

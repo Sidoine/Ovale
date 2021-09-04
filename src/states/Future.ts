@@ -18,7 +18,6 @@ import {
     LuaArray,
     wipe,
     kpairs,
-    unpack,
 } from "@wowts/lua";
 import { insert, remove } from "@wowts/table";
 import {
@@ -44,11 +43,6 @@ import {
 import { Tracer, DebugTools } from "../engine/debug";
 import { OvaleStanceClass } from "./Stance";
 import { OvaleSpellBookClass } from "./SpellBook";
-import {
-    ConditionFunction,
-    OvaleConditionClass,
-    returnValueBetween,
-} from "../engine/condition";
 import { Runner } from "../engine/runner";
 
 let timeAuraAdded: undefined | number = undefined;
@@ -185,28 +179,6 @@ export class OvaleFutureClass
             aceEvent
         );
     }
-
-    public registerConditions(condition: OvaleConditionClass) {
-        condition.registerCondition("channeling", true, this.isChanneling);
-    }
-
-    private isChanneling: ConditionFunction = (
-        positionalParameters,
-        namedParameters,
-        atTime
-    ) => {
-        const [spellId] = unpack(positionalParameters);
-        const state = this.getState(atTime);
-        if (state.currentCast.spellId !== spellId || !state.currentCast.channel)
-            return [];
-        return returnValueBetween(
-            state.currentCast.start,
-            state.currentCast.stop,
-            1,
-            state.currentCast.start,
-            0
-        );
-    };
 
     updateStateCounters(
         state: OvaleFutureData,

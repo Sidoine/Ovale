@@ -3,12 +3,6 @@ import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { DebugTools, Tracer } from "../engine/debug";
 import { OvaleClass } from "../Ovale";
 import { LuaArray } from "@wowts/lua";
-import {
-    ConditionFunction,
-    OvaleConditionClass,
-    returnBoolean,
-} from "../engine/condition";
-import { AstFunctionNode, NamedParametersOf } from "../engine/ast";
 import { GetSpellInfo } from "@wowts/wow-mock";
 
 export class SpellActivationGlow {
@@ -54,32 +48,10 @@ export class SpellActivationGlow {
             spellName
         );
         this.spellActivationSpellsShown[spellId] =
-            event == "SPELL_ACTIVATION_OVERLAY_GLOW_SHOW" || false;
+            event === "SPELL_ACTIVATION_OVERLAY_GLOW_SHOW";
     };
 
     hasSpellActivationGlow(spellId: number) {
-        return this.spellActivationSpellsShown[spellId] || false;
+        return this.spellActivationSpellsShown[spellId] === true;
     }
-
-    public registerConditions(ovaleCondition: OvaleConditionClass) {
-        ovaleCondition.registerCondition(
-            "spellactivationglowactive",
-            false,
-            this.spellActivationGlowActive
-        );
-        ovaleCondition.registerAlias(
-            "spellactivationglowactive",
-            "spellactivationglowshown"
-        );
-    }
-
-    private spellActivationGlowActive: ConditionFunction = (
-        positionalParams: LuaArray<any>,
-        namedParams: NamedParametersOf<AstFunctionNode>,
-        atTime: number
-    ) => {
-        const spellId = positionalParams[1];
-        const retValue = this.hasSpellActivationGlow(spellId) || false;
-        return returnBoolean(retValue);
-    };
 }

@@ -16,8 +16,6 @@ import { AceModule } from "@wowts/tsaddon";
 import { OvaleClass } from "../Ovale";
 import { OvaleDataClass } from "../engine/data";
 import { OptionUiAll } from "../ui/acegui-helpers";
-import { OvaleConditionClass, returnBoolean } from "../engine/condition";
-import { AstFunctionNode, NamedParametersOf } from "../engine/ast";
 
 const [druidCatForm] = GetSpellInfo(SpellId.cat_form);
 const [druidTravelForm] = GetSpellInfo(SpellId.travel_form);
@@ -111,28 +109,6 @@ export class OvaleStanceClass
             ovaleDebug.defaultOptions.args[k] = v;
         }
     }
-
-    public registerConditions(ovaleCondition: OvaleConditionClass) {
-        ovaleCondition.registerCondition("stance", false, this.stance);
-    }
-
-    /** Test if the player is in a given stance.
-	 @name Stance
-	 @paramsig boolean
-	 @param stance The stance name or a number representing the stance index.
-	 @return A boolean value.
-	 @usage
-	 unless Stance(druid_bear_form) Spell(bear_form)
-     */
-    private stance = (
-        positionalParams: LuaArray<any>,
-        namedParams: NamedParametersOf<AstFunctionNode>,
-        atTime: number
-    ) => {
-        const stance = positionalParams[1];
-        const boolean = this.isStance(stance, atTime);
-        return returnBoolean(boolean);
-    };
 
     private handleInitialize = () => {
         this.module.RegisterEvent("PLAYER_ENTERING_WORLD", this.updateStances);

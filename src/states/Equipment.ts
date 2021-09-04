@@ -7,10 +7,8 @@ import {
     lualength,
     pairs,
     tonumber,
-    type,
     wipe,
 } from "@wowts/lua";
-import { huge as INFINITY } from "@wowts/math";
 import { find, len, lower, match, sub } from "@wowts/string";
 import { concat, insert, sort } from "@wowts/table";
 import { AceModule } from "@wowts/tsaddon";
@@ -18,25 +16,12 @@ import {
     C_Item,
     Enum,
     GetInventorySlotInfo,
-    GetItemCooldown,
     GetItemStats,
-    GetTime,
-    GetWeaponEnchantInfo,
     InventorySlotName,
     ItemLocation,
     ItemLocationMixin,
 } from "@wowts/wow-mock";
 import { OvaleClass } from "../Ovale";
-import { AstFunctionNode, NamedParametersOf } from "../engine/ast";
-import {
-    ConditionFunction,
-    ConditionResult,
-    OvaleConditionClass,
-    ParameterInfo,
-    returnBoolean,
-    returnConstant,
-    returnValueBetween,
-} from "../engine/condition";
 import { OvaleDataClass } from "../engine/data";
 import { DebugTools, Tracer } from "../engine/debug";
 import { KeyCheck } from "../tools/tools";
@@ -94,7 +79,7 @@ export type SlotName =
     | "waistslot"
     | "wristslot";
 
-const checkSlotName: KeyCheck<SlotName> = {
+export const checkSlotName: KeyCheck<SlotName> = {
     ammoslot: true,
     backslot: true,
     chestslot: true,
@@ -346,6 +331,10 @@ export class OvaleEquipmentClass {
         return (item && item.bonus) || {};
     }
 
+    hasEquippedItem(itemId: number) {
+        return (this.isEquippedItemById[itemId] && true) || false;
+    }
+
     hasRangedWeapon() {
         const item = this.equippedItem["MAINHANDSLOT"];
         if (item.exists && item.type != undefined) {
@@ -355,6 +344,28 @@ export class OvaleEquipmentClass {
             );
         }
         return false;
+    }
+
+    hasShield() {
+        const item = this.equippedItem["SECONDARYHANDSLOT"];
+        return item.exists && item.type == Enum.InventoryType.IndexShieldType;
+    }
+
+    hasTrinket(itemId: number) {
+        const trinket0 = this.equippedItem["TRINKET0SLOT"];
+        const trinket1 = this.equippedItem["TRINKET1SLOT"];
+        const isTrinket0 = trinket0.exists && trinket0.id === itemId;
+        const isTrinket1 = trinket1.exists && trinket1.id === itemId;
+        return isTrinket0 || isTrinket1;
+    }
+
+    hasWeapon(slot: SlotName, handedness: string) {
+        const invSlot = slotNameByName[slot];
+        const invType =
+            (handedness == "1h" && Enum.InventoryType.IndexWeaponType) ||
+            Enum.InventoryType.Index2HweaponType;
+        const item = this.equippedItem[invSlot];
+        return item.exists && item.type == invType;
     }
 
     private parseItemLink = (link: string, item: ItemInfo) => {
@@ -531,302 +542,5 @@ export class OvaleEquipmentClass {
         insert(output, `Main-hand DPS = ${this.mainHandDPS}`);
         insert(output, `Off-hand DPS = ${this.offHandDPS}`);
         return concat(output, "\n");
-    };
-
-    registerConditions(ovaleCondition: OvaleConditionClass) {
-        ovaleCondition.registerCondition(
-            "hasequippeditem",
-            false,
-            this.hasItemEquipped
-        );
-        ovaleCondition.registerCondition("hasshield", false, this.hasShield);
-        ovaleCondition.registerCondition("hastrinket", false, this.hasTrinket);
-        ovaleCondition.registerCondition("hasweapon", false, this.hasWeapon);
-        const slotParameter: ParameterInfo<SlotName> = {
-            type: "string",
-            name: "slot",
-            checkTokens: checkSlotName,
-            optional: true,
-        };
-        const itemParameter: ParameterInfo<number> = {
-            name: "item",
-            type: "number",
-            optional: true,
-            isItem: true,
-        };
-        ovaleCondition.register(
-            "itemcooldown",
-            this.itemCooldown,
-            { type: "number" },
-            itemParameter,
-            slotParameter,
-            { name: "shared", type: "string", optional: true }
-        );
-        ovaleCondition.register(
-            "itemrppm",
-            this.itemRppm,
-            { type: "number" },
-            { type: "number", name: "item", optional: true },
-            {
-                type: "string",
-                name: "slot",
-                checkTokens: checkSlotName,
-                optional: true,
-            }
-        );
-        ovaleCondition.register(
-            "itemcooldownduration",
-            this.itemCooldownDuration,
-            { type: "number" },
-            itemParameter,
-            slotParameter
-        );
-        ovaleCondition.registerCondition(
-            "weaponenchantexpires",
-            false,
-            this.weaponEnchantExpires
-        );
-        ovaleCondition.registerCondition(
-            "weaponenchantpresent",
-            false,
-            this.weaponEnchantPresent
-        );
-        ovaleCondition.register(
-            "iteminslot",
-            this.itemInSlot,
-            { type: "number" },
-            {
-                type: "string",
-                optional: false,
-                name: "slot",
-                checkTokens: checkSlotName,
-            }
-        );
-    }
-
-    /**  Test if the player has a particular item equipped.
-	 @name HasEquippedItem
-	 @paramsig boolean
-	 @param item Item to be checked whether it is equipped.
-     */
-    private hasItemEquipped = (
-        positionalParams: LuaArray<any>,
-        namedParams: NamedParametersOf<AstFunctionNode>,
-        atTime: number
-    ) => {
-        const itemId = positionalParams[1];
-        let boolean = false;
-        if (type(itemId) == "number") {
-            boolean = this.isEquippedItemById[itemId];
-        } else if (this.data.itemList[itemId] != undefined) {
-            for (const [, id] of pairs(this.data.itemList[itemId])) {
-                boolean = this.isEquippedItemById[id];
-                if (boolean) break;
-            }
-        }
-        return returnBoolean(boolean);
-    };
-
-    /** Test if the player has a shield equipped.
-	 @name HasShield
-	 @paramsig boolean
-	 @return A boolean value.
-	 @usage
-	 if HasShield() Spell(shield_wall)
-     */
-    private hasShield = (
-        positionalParams: LuaArray<any>,
-        namedParams: NamedParametersOf<AstFunctionNode>,
-        atTime: number
-    ) => {
-        const item = this.equippedItem["SECONDARYHANDSLOT"];
-        const boolean =
-            item.exists && item.type == Enum.InventoryType.IndexShieldType;
-        return returnBoolean(boolean);
-    };
-
-    /** Test if the player has a particular trinket equipped.
-	 @name HasTrinket
-	 @paramsig boolean
-	 @param id The item ID of the trinket or the name of an item list.
-	 @usage
-	 ItemList(rune_of_reorigination 94532 95802 96546)
-	 if HasTrinket(rune_of_reorigination) and BuffPresent(rune_of_reorigination_buff)
-	     Spell(rake)
-     */
-    private hasTrinket = (
-        positionalParams: LuaArray<any>,
-        namedParams: NamedParametersOf<AstFunctionNode>,
-        atTime: number
-    ) => {
-        const itemId = positionalParams[1];
-        let boolean = false;
-        if (type(itemId) == "number") {
-            // Check only in the trinket slots.
-            boolean =
-                (this.equippedItem["TRINKET0SLOT"].exists &&
-                    this.equippedItem["TRINKET0SLOT"].id == itemId) ||
-                (this.equippedItem["TRINKET1SLOT"].exists &&
-                    this.equippedItem["TRINKET1SLOT"].id == itemId);
-        } else if (this.data.itemList[itemId] != undefined) {
-            for (const [, id] of pairs(this.data.itemList[itemId])) {
-                boolean =
-                    (this.equippedItem["TRINKET0SLOT"].exists &&
-                        this.equippedItem["TRINKET0SLOT"].id == id) ||
-                    (this.equippedItem["TRINKET1SLOT"].exists &&
-                        this.equippedItem["TRINKET1SLOT"].id == id);
-                if (boolean) break;
-            }
-        }
-        return returnBoolean(boolean);
-    };
-
-    private hasWeapon: ConditionFunction = (
-        positionalParameter,
-        namedParameter,
-        atTime
-    ) => {
-        const slot = positionalParameter[1] as SlotName;
-        const handedness = positionalParameter[2];
-        const invSlot = slotNameByName[slot];
-        const invType =
-            (handedness == "1h" && Enum.InventoryType.IndexWeaponType) ||
-            Enum.InventoryType.Index2HweaponType;
-        const item = this.equippedItem[invSlot];
-        if (item.exists && item.type) {
-            return returnBoolean(item.type == invType);
-        }
-        return returnBoolean(false);
-    };
-
-    /** Get the cooldown time in seconds of an item, e.g., trinket.
-	 @name ItemCooldown
-	 @paramsig number or boolean
-	 @param id The item ID or the equipped slot name.
-	 @return The number of seconds.
-	 @usage
-	 if not ItemCooldown(ancient_petrified_seed) > 0
-	     Spell(berserk_cat)
-	 if not ItemCooldown(Trinket0Slot) > 0
-	     Spell(berserk_cat)
-     */
-    private itemCooldown = (
-        atTime: number,
-        itemId: number | undefined,
-        slot: SlotName | undefined,
-        sharedCooldown: string | undefined
-    ) => {
-        if (sharedCooldown) {
-            itemId = this.getEquippedItemIdBySharedCooldown(sharedCooldown);
-        }
-        if (slot != undefined) {
-            itemId = this.getEquippedItemId(slot);
-        }
-        if (itemId) {
-            const [start, duration] = GetItemCooldown(itemId);
-            if (start > 0 && duration > 0) {
-                const ending = start + duration;
-                return returnValueBetween(start, ending, duration, start, -1);
-            }
-        }
-        return returnConstant(0);
-    };
-
-    private itemCooldownDuration = (
-        atTime: number,
-        itemId: number | undefined,
-        slot: SlotName | undefined
-    ) => {
-        if (slot !== undefined) {
-            itemId = this.getEquippedItemId(slot);
-        }
-        if (!itemId) return returnConstant(0);
-
-        let [, duration] = GetItemCooldown(itemId);
-        if (duration <= 0) {
-            duration =
-                (this.data.getItemInfoProperty(
-                    itemId,
-                    atTime,
-                    "cd"
-                ) as number) || 0;
-        }
-        return returnConstant(duration);
-    };
-
-    private itemInSlot = (atTime: number, slot: SlotName) => {
-        const itemId = this.getEquippedItemId(slot);
-        return returnConstant(itemId);
-    };
-
-    /** Get the number of seconds since the enchantment has expired
-     */
-    private weaponEnchantExpires: ConditionFunction = (
-        positionalParams
-    ): ConditionResult => {
-        const expectedEnchantmentId = positionalParams[1];
-        const hand = positionalParams[2];
-        let [
-            hasMainHandEnchant,
-            mainHandExpiration,
-            enchantmentId,
-            hasOffHandEnchant,
-            offHandExpiration,
-        ] = GetWeaponEnchantInfo();
-        const now = GetTime();
-        if (hand == "main" || hand === undefined) {
-            if (hasMainHandEnchant && expectedEnchantmentId === enchantmentId) {
-                mainHandExpiration = mainHandExpiration / 1000;
-                return [now + mainHandExpiration, INFINITY];
-            }
-        } else if (hand == "offhand" || hand == "off") {
-            if (hasOffHandEnchant) {
-                offHandExpiration = offHandExpiration / 1000;
-                return [now + offHandExpiration, INFINITY];
-            }
-        }
-        return [0, INFINITY];
-    };
-
-    /** Get the number of seconds since the enchantment has expired
-     */
-    private weaponEnchantPresent: ConditionFunction = (positionalParams) => {
-        const expectedEnchantmentId = positionalParams[1];
-        const hand = positionalParams[2];
-        let [
-            hasMainHandEnchant,
-            mainHandExpiration,
-            enchantmentId,
-            hasOffHandEnchant,
-            offHandExpiration,
-        ] = GetWeaponEnchantInfo();
-        const now = GetTime();
-        if (hand == "main" || hand === undefined) {
-            if (hasMainHandEnchant && expectedEnchantmentId === enchantmentId) {
-                mainHandExpiration = mainHandExpiration / 1000;
-                return [0, now + mainHandExpiration];
-            }
-        } else if (hand == "offhand" || hand == "off") {
-            if (hasOffHandEnchant) {
-                offHandExpiration = offHandExpiration / 1000;
-                return [0, now + offHandExpiration];
-            }
-        }
-        return [];
-    };
-
-    private itemRppm = (
-        atTime: number,
-        itemId: number | undefined,
-        slot: SlotName | undefined
-    ): ConditionResult => {
-        if (slot) {
-            itemId = this.getEquippedItemId(slot);
-        }
-        if (itemId) {
-            const rppm = this.data.getItemInfoProperty(itemId, atTime, "rppm");
-            return returnConstant(rppm);
-        }
-        return [];
     };
 }

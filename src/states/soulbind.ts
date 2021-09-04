@@ -1,17 +1,10 @@
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import aceTimer, { AceTimer } from "@wowts/ace_timer-3.0";
-import { LuaArray, ipairs, pairs, unpack } from "@wowts/lua";
+import { LuaArray, ipairs, pairs } from "@wowts/lua";
 import { concat, insert, sort } from "@wowts/table";
 import { AceModule } from "@wowts/tsaddon";
 import { C_Soulbinds, Enum, GetSpellInfo } from "@wowts/wow-mock";
 import { OvaleClass } from "../Ovale";
-import {
-    ConditionFunction,
-    ConditionResult,
-    OvaleConditionClass,
-    returnBoolean,
-    returnConstant,
-} from "../engine/condition";
 import { conduits } from "../engine/dbc";
 import { DebugTools, Tracer } from "../engine/debug";
 import { OptionUiGroup } from "../ui/acegui-helpers";
@@ -234,65 +227,32 @@ export class Soulbind {
         return concat(output, "\n");
     };
 
-    registerConditions(condition: OvaleConditionClass) {
-        condition.registerCondition("conduit", false, this.conduitCondition);
-        condition.registerCondition(
-            "conduitrank",
-            false,
-            this.conduitRankCondition
-        );
-        condition.registerCondition(
-            "enabledsoulbind",
-            false,
-            this.soulbindCondition
-        );
-        condition.registerCondition("soulbind", false, this.soulbindCondition);
-        condition.register(
-            "conduitvalue",
-            this.conduitValue,
-            { type: "number" },
-            { name: "conduit", type: "number", optional: false }
-        );
+    getConduitRank(id: number) {
+        // Accept either a conduit ID or a spell ID for the parameter.
+        const conduitId = this.conduitId[id] || id;
+        const spellId = this.conduitSpellIdById[conduitId];
+        return this.conduitRank[spellId] || 0;
     }
 
-    private conduitCondition: ConditionFunction = (positionalParameters) => {
-        // Accept either a conduit ID or a spell ID for the parameter.
-        const [id] = unpack(positionalParameters);
-        const conduitId = this.conduitId[id as number] || (id as number);
-        const spellId = this.conduitSpellIdById[conduitId];
-        return returnBoolean(this.isActiveConduit[spellId]);
-    };
-
-    private conduitRankCondition: ConditionFunction = (
-        positionalParameters
-    ) => {
-        // Accept either a conduit ID or a spell ID for the parameter.
-        const [id] = unpack(positionalParameters);
-        const conduitId = this.conduitId[id as number] || (id as number);
-        const spellId = this.conduitSpellIdById[conduitId];
-        const rank = this.conduitRank[spellId];
-        if (rank) {
-            return returnConstant(rank);
-        } else {
-            return [];
-        }
-    };
-
-    private soulbindCondition: ConditionFunction = (positionalParameters) => {
-        const [spellId] = unpack(positionalParameters);
-        return returnBoolean(this.isActiveTrait[spellId as number]);
-    };
-
-    private conduitValue = (atTime: number, id: number): ConditionResult => {
+    getConduitValue(id: number) {
         // Accept either a conduit ID or a spell ID for the parameter.
         const conduitId = this.conduitId[id] || id;
         const spellId = this.conduitSpellIdById[conduitId];
         const rank = this.conduitRank[spellId];
         if (rank) {
-            const value = conduits[conduitId].ranks[rank];
-            return returnConstant(value);
-        } else {
-            return [];
+            return conduits[conduitId].ranks[rank] || 0;
         }
-    };
+        return 0;
+    }
+
+    hasActiveConduit(id: number) {
+        // Accept either a conduit ID or a spell ID for the parameter.
+        const conduitId = this.conduitId[id] || id;
+        const spellId = this.conduitSpellIdById[conduitId];
+        return this.isActiveConduit[spellId] === true;
+    }
+
+    hasActiveTrait(spellId: number) {
+        return this.isActiveTrait[spellId] === true;
+    }
 }
