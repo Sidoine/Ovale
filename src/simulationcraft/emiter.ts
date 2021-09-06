@@ -1430,8 +1430,11 @@ export class Emiter {
                 className === "DEMONHUNTER" &&
                 action === "pick_up_fragment"
             ) {
-                bodyCode = "texture(spell_shadow_soulgem text=pickup)";
-                conditionCode = "soulfragments() > 0";
+                bodyCode = "Texture(spell_shadow_soulgem text=pickup)";
+                conditionCode =
+                    "CheckBoxOn(opt_pick_up_soul_fragments) and SoulFragments() > 0";
+                if (!annotation.options) annotation.options = {};
+                annotation.options["opt_pick_up_soul_fragments"] = true;
                 isSpellAction = false;
             } else if (className == "DRUID" && action == "primal_wrath") {
                 conditionCode = "Enemies(tagged=1) > 1";
