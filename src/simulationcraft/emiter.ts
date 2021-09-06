@@ -3290,10 +3290,6 @@ export class Emiter {
             code = "1";
         } else if (operand == "rtb_buffs") {
             code = "BuffCount(roll_the_bones_buff)";
-        } else if (className == "ROGUE" && operand == "anticipation_charges") {
-            const name = "anticipation_buff";
-            code = format("BuffStacks(%s)", name);
-            this.addSymbol(annotation, name);
         } else if (sub(operand, 1, 22) == "active_enemies_within.") {
             code = "Enemies()";
         } else if (truthy(find(operand, "^incoming_damage_"))) {
