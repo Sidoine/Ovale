@@ -1453,28 +1453,6 @@ export class Emiter {
                 conditionCode = "SpellKnown(full_moon)";
             } else if (className == "MAGE" && truthy(find(action, "pet_"))) {
                 conditionCode = "pet.Present()";
-            } else if (
-                className == "MAGE" &&
-                (action == "start_burn_phase" ||
-                    action == "start_pyro_chain" ||
-                    action == "stop_burn_phase" ||
-                    action == "stop_pyro_chain")
-            ) {
-                const [stateAction, stateVariable] = match(
-                    action,
-                    "([^_]+)_(.*)"
-                );
-                const value = (stateAction == "start" && 1) || 0;
-                if (value == 0) {
-                    conditionCode = format("GetState(%s) > 0", stateVariable);
-                } else {
-                    conditionCode = format(
-                        "not GetState(%s) > 0",
-                        stateVariable
-                    );
-                }
-                bodyCode = format("SetState(%s %d)", stateVariable, value);
-                isSpellAction = false;
             } else if (className == "MAGE" && action == "time_warp") {
                 conditionCode =
                     "CheckBoxOn(opt_time_warp) and DebuffExpires(burst_haste_debuff any=1)";
@@ -1692,17 +1670,6 @@ export class Emiter {
                             annotation
                         );
                         bodyCode = `${functionName}()`;
-                        if (
-                            className == "MAGE" &&
-                            specialization == "arcane" &&
-                            (name == "burn" || name == "init_burn")
-                        ) {
-                            conditionCode =
-                                "CheckBoxOn(opt_arcane_mage_burn_phase)";
-                            if (!annotation.options) annotation.options = {};
-                            annotation.options["opt_arcane_mage_burn_phase"] =
-                                true;
-                        }
                     }
                     isSpellAction = false;
                 }
