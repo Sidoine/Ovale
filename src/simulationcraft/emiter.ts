@@ -1647,7 +1647,7 @@ export class Emiter {
                 isSpellAction = false;
             } else if (
                 className == "DEMONHUNTER" &&
-                action == "metamorphosis_havoc"
+                action == "metamorphosis"
             ) {
                 conditionCode =
                     "not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight()";
