@@ -59,6 +59,8 @@ AddFunction trinket_sync_slot
 AddCheckBox(opt_interrupt l(interrupt) default enabled=(specialization(havoc)))
 AddCheckBox(opt_melee_range l(not_in_melee_range) enabled=(specialization(havoc)))
 AddCheckBox(opt_use_consumables l(opt_use_consumables) default enabled=(specialization(havoc)))
+AddCheckBox(opt_pick_up_soul_fragments l(opt_pick_up_soul_fragments) default enabled=(specialization(havoc)))
+AddCheckBox(opt_meta_only_during_boss l(opt_meta_only_during_boss) default enabled=(specialization(havoc)))
 
 AddListItem(opt_havoc_desired_targets desired_targets_1 "Desired targets: 1" default enabled=(specialization(havoc)))
 AddListItem(opt_havoc_desired_targets desired_targets_2 "Desired targets: 2" enabled=(specialization(havoc)))
@@ -311,9 +313,9 @@ AddFunction havoccooldownshortcdpostconditions
 AddFunction havoccooldowncdactions
 {
  #metamorphosis,if=!talent.demonic.enabled&cooldown.eye_beam.remains>20&(!covenant.venthyr.enabled|!dot.sinful_brand.ticking)|fight_remains<25
- if not hastalent(demonic_talent) and spellcooldown(eye_beam) > 20 and { not iscovenant("venthyr") or not target.debuffpresent(sinful_brand) } or fightremains() < 25 spell(metamorphosis)
+ if { not hastalent(demonic_talent) and spellcooldown(eye_beam) > 20 and { not iscovenant("venthyr") or not target.debuffpresent(sinful_brand) } or fightremains() < 25 } and { not checkboxon(opt_meta_only_during_boss) or isbossfight() } spell(metamorphosis)
  #metamorphosis,if=talent.demonic.enabled&(cooldown.eye_beam.remains>20&(!variable.blade_dance|cooldown.blade_dance.remains>gcd.max))&(!covenant.venthyr.enabled|!dot.sinful_brand.ticking)|fight_remains<25
- if hastalent(demonic_talent) and spellcooldown(eye_beam) > 20 and { not blade_dance() or spellcooldown(blade_dance) > gcd() } and { not iscovenant("venthyr") or not target.debuffpresent(sinful_brand) } or fightremains() < 25 spell(metamorphosis)
+ if { hastalent(demonic_talent) and spellcooldown(eye_beam) > 20 and { not blade_dance() or spellcooldown(blade_dance) > gcd() } and { not iscovenant("venthyr") or not target.debuffpresent(sinful_brand) } or fightremains() < 25 } and { not checkboxon(opt_meta_only_during_boss) or isbossfight() } spell(metamorphosis)
  #potion,if=buff.metamorphosis.remains>25|fight_remains<60
  if { buffremaining(metamorphosis_buff) > 25 or fightremains() < 60 } and { checkboxon(opt_use_consumables) and target.classification(worldboss) } item(potion_of_phantom_fire_item usable=1)
  #use_items,slots=trinket1,if=variable.trinket_sync_slot=1&(buff.metamorphosis.up|(!talent.demonic.enabled&cooldown.metamorphosis.remains>(fight_remains>?trinket.1.cooldown.duration%2))|fight_remains<=20)|(variable.trinket_sync_slot=2&!trinket.2.cooldown.ready)|!variable.trinket_sync_slot
@@ -337,9 +339,9 @@ AddFunction havoc_defaultmainactions
  unless not gcdremaining() > 0 and havoccooldownmainpostconditions()
  {
   #pick_up_fragment,type=demon,if=demon_soul_fragments>0
-  if soulfragments() > 0 and soulfragments() > 0 texture(spell_shadow_soulgem text=pickup)
-  #pick_up_fragment,if=fury.deficit>=35
-  if furydeficit() >= 35 and soulfragments() > 0 texture(spell_shadow_soulgem text=pickup)
+  if soulfragments() > 0 and { checkboxon(opt_pick_up_soul_fragments) and soulfragments() > 0 } texture(spell_shadow_soulgem text=pickup)
+  #pick_up_fragment,mode=nearest,if=(talent.demonic_appetite.enabled&fury.deficit>=35|runeforge.blind_faith&buff.blind_faith.up)&(!cooldown.eye_beam.ready|fury<30)
+  if { hastalent(demonic_appetite_talent) and furydeficit() >= 35 or runeforge(blind_faith_runeforge) and buffpresent(blind_faith_buff) } and { not spellcooldown(eye_beam) <= 0 or fury() < 30 } and { checkboxon(opt_pick_up_soul_fragments) and soulfragments() > 0 } texture(spell_shadow_soulgem text=pickup)
   #throw_glaive,if=buff.fel_bombardment.stack=5&(buff.immolation_aura.up|!buff.metamorphosis.up)
   if buffstacks(fel_bombardment_buff) == 5 and { buffpresent(immolation_aura) or not buffpresent(metamorphosis_buff) } spell(throw_glaive)
   #run_action_list,name=demonic,if=talent.demonic.enabled
@@ -365,7 +367,7 @@ AddFunction havoc_defaultshortcdactions
  #call_action_list,name=cooldown,if=gcd.remains=0
  if not gcdremaining() > 0 havoccooldownshortcdactions()
 
- unless not gcdremaining() > 0 and havoccooldownshortcdpostconditions() or soulfragments() > 0 and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or furydeficit() >= 35 and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or buffstacks(fel_bombardment_buff) == 5 and { buffpresent(immolation_aura) or not buffpresent(metamorphosis_buff) } and spell(throw_glaive)
+ unless not gcdremaining() > 0 and havoccooldownshortcdpostconditions() or soulfragments() > 0 and { checkboxon(opt_pick_up_soul_fragments) and soulfragments() > 0 } and texture(spell_shadow_soulgem text=pickup) or { hastalent(demonic_appetite_talent) and furydeficit() >= 35 or runeforge(blind_faith_runeforge) and buffpresent(blind_faith_buff) } and { not spellcooldown(eye_beam) <= 0 or fury() < 30 } and { checkboxon(opt_pick_up_soul_fragments) and soulfragments() > 0 } and texture(spell_shadow_soulgem text=pickup) or buffstacks(fel_bombardment_buff) == 5 and { buffpresent(immolation_aura) or not buffpresent(metamorphosis_buff) } and spell(throw_glaive)
  {
   #run_action_list,name=demonic,if=talent.demonic.enabled
   if hastalent(demonic_talent) havocdemonicshortcdactions()
@@ -380,7 +382,7 @@ AddFunction havoc_defaultshortcdactions
 
 AddFunction havoc_defaultshortcdpostconditions
 {
- not gcdremaining() > 0 and havoccooldownshortcdpostconditions() or soulfragments() > 0 and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or furydeficit() >= 35 and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or buffstacks(fel_bombardment_buff) == 5 and { buffpresent(immolation_aura) or not buffpresent(metamorphosis_buff) } and spell(throw_glaive) or hastalent(demonic_talent) and havocdemonicshortcdpostconditions() or havocnormalshortcdpostconditions()
+ not gcdremaining() > 0 and havoccooldownshortcdpostconditions() or soulfragments() > 0 and { checkboxon(opt_pick_up_soul_fragments) and soulfragments() > 0 } and texture(spell_shadow_soulgem text=pickup) or { hastalent(demonic_appetite_talent) and furydeficit() >= 35 or runeforge(blind_faith_runeforge) and buffpresent(blind_faith_buff) } and { not spellcooldown(eye_beam) <= 0 or fury() < 30 } and { checkboxon(opt_pick_up_soul_fragments) and soulfragments() > 0 } and texture(spell_shadow_soulgem text=pickup) or buffstacks(fel_bombardment_buff) == 5 and { buffpresent(immolation_aura) or not buffpresent(metamorphosis_buff) } and spell(throw_glaive) or hastalent(demonic_talent) and havocdemonicshortcdpostconditions() or havocnormalshortcdpostconditions()
 }
 
 AddFunction havoc_defaultcdactions
@@ -399,7 +401,7 @@ AddFunction havoc_defaultcdactions
  #call_action_list,name=cooldown,if=gcd.remains=0
  if not gcdremaining() > 0 havoccooldowncdactions()
 
- unless not gcdremaining() > 0 and havoccooldowncdpostconditions() or soulfragments() > 0 and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or furydeficit() >= 35 and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or buffstacks(fel_bombardment_buff) == 5 and { buffpresent(immolation_aura) or not buffpresent(metamorphosis_buff) } and spell(throw_glaive)
+ unless not gcdremaining() > 0 and havoccooldowncdpostconditions() or soulfragments() > 0 and { checkboxon(opt_pick_up_soul_fragments) and soulfragments() > 0 } and texture(spell_shadow_soulgem text=pickup) or { hastalent(demonic_appetite_talent) and furydeficit() >= 35 or runeforge(blind_faith_runeforge) and buffpresent(blind_faith_buff) } and { not spellcooldown(eye_beam) <= 0 or fury() < 30 } and { checkboxon(opt_pick_up_soul_fragments) and soulfragments() > 0 } and texture(spell_shadow_soulgem text=pickup) or buffstacks(fel_bombardment_buff) == 5 and { buffpresent(immolation_aura) or not buffpresent(metamorphosis_buff) } and spell(throw_glaive)
  {
   #run_action_list,name=demonic,if=talent.demonic.enabled
   if hastalent(demonic_talent) havocdemoniccdactions()
@@ -414,7 +416,7 @@ AddFunction havoc_defaultcdactions
 
 AddFunction havoc_defaultcdpostconditions
 {
- not gcdremaining() > 0 and havoccooldowncdpostconditions() or soulfragments() > 0 and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or furydeficit() >= 35 and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or buffstacks(fel_bombardment_buff) == 5 and { buffpresent(immolation_aura) or not buffpresent(metamorphosis_buff) } and spell(throw_glaive) or hastalent(demonic_talent) and havocdemoniccdpostconditions() or havocnormalcdpostconditions()
+ not gcdremaining() > 0 and havoccooldowncdpostconditions() or soulfragments() > 0 and { checkboxon(opt_pick_up_soul_fragments) and soulfragments() > 0 } and texture(spell_shadow_soulgem text=pickup) or { hastalent(demonic_appetite_talent) and furydeficit() >= 35 or runeforge(blind_faith_runeforge) and buffpresent(blind_faith_buff) } and { not spellcooldown(eye_beam) <= 0 or fury() < 30 } and { checkboxon(opt_pick_up_soul_fragments) and soulfragments() > 0 } and texture(spell_shadow_soulgem text=pickup) or buffstacks(fel_bombardment_buff) == 5 and { buffpresent(immolation_aura) or not buffpresent(metamorphosis_buff) } and spell(throw_glaive) or hastalent(demonic_talent) and havocdemoniccdpostconditions() or havocnormalcdpostconditions()
 }
 
 ### Havoc icons.
@@ -460,6 +462,8 @@ AddIcon enabled=(checkboxon(opt_demonhunter_havoc_aoe) and specialization(havoc)
 ### Required symbols
 # annihilation
 # blade_dance
+# blind_faith_buff
+# blind_faith_runeforge
 # blind_fury_talent
 # burning_wound_debuff
 # burning_wound_runeforge
@@ -472,6 +476,7 @@ AddIcon enabled=(checkboxon(opt_demonhunter_havoc_aoe) and specialization(havoc)
 # darkglare_medallion_runeforge
 # death_sweep
 # demon_blades_talent
+# demonic_appetite_talent
 # demonic_talent
 # demons_bite
 # disrupt
@@ -571,6 +576,8 @@ AddFunction trinket_sync_slot
 AddCheckBox(opt_interrupt l(interrupt) default enabled=(specialization(havoc)))
 AddCheckBox(opt_melee_range l(not_in_melee_range) enabled=(specialization(havoc)))
 AddCheckBox(opt_use_consumables l(opt_use_consumables) default enabled=(specialization(havoc)))
+AddCheckBox(opt_pick_up_soul_fragments l(opt_pick_up_soul_fragments) default enabled=(specialization(havoc)))
+AddCheckBox(opt_meta_only_during_boss l(opt_meta_only_during_boss) default enabled=(specialization(havoc)))
 
 AddListItem(opt_havoc_desired_targets desired_targets_1 "Desired targets: 1" default enabled=(specialization(havoc)))
 AddListItem(opt_havoc_desired_targets desired_targets_2 "Desired targets: 2" enabled=(specialization(havoc)))
@@ -823,9 +830,9 @@ AddFunction havoccooldownshortcdpostconditions
 AddFunction havoccooldowncdactions
 {
  #metamorphosis,if=!talent.demonic.enabled&cooldown.eye_beam.remains>20&(!covenant.venthyr.enabled|!dot.sinful_brand.ticking)|fight_remains<25
- if not hastalent(demonic_talent) and spellcooldown(eye_beam) > 20 and { not iscovenant("venthyr") or not target.debuffpresent(sinful_brand) } or fightremains() < 25 spell(metamorphosis)
+ if { not hastalent(demonic_talent) and spellcooldown(eye_beam) > 20 and { not iscovenant("venthyr") or not target.debuffpresent(sinful_brand) } or fightremains() < 25 } and { not checkboxon(opt_meta_only_during_boss) or isbossfight() } spell(metamorphosis)
  #metamorphosis,if=talent.demonic.enabled&(cooldown.eye_beam.remains>20&(!variable.blade_dance|cooldown.blade_dance.remains>gcd.max))&(!covenant.venthyr.enabled|!dot.sinful_brand.ticking)|fight_remains<25
- if hastalent(demonic_talent) and spellcooldown(eye_beam) > 20 and { not blade_dance() or spellcooldown(blade_dance) > gcd() } and { not iscovenant("venthyr") or not target.debuffpresent(sinful_brand) } or fightremains() < 25 spell(metamorphosis)
+ if { hastalent(demonic_talent) and spellcooldown(eye_beam) > 20 and { not blade_dance() or spellcooldown(blade_dance) > gcd() } and { not iscovenant("venthyr") or not target.debuffpresent(sinful_brand) } or fightremains() < 25 } and { not checkboxon(opt_meta_only_during_boss) or isbossfight() } spell(metamorphosis)
  #potion,if=buff.metamorphosis.remains>25|fight_remains<60
  if { buffremaining(metamorphosis_buff) > 25 or fightremains() < 60 } and { checkboxon(opt_use_consumables) and target.classification(worldboss) } item(potion_of_phantom_fire_item usable=1)
  #use_items,slots=trinket1,if=variable.trinket_sync_slot=1&(buff.metamorphosis.up|(!talent.demonic.enabled&cooldown.metamorphosis.remains>(fight_remains>?trinket.1.cooldown.duration%2))|fight_remains<=20)|(variable.trinket_sync_slot=2&!trinket.2.cooldown.ready)|!variable.trinket_sync_slot
@@ -849,9 +856,9 @@ AddFunction havoc_defaultmainactions
  unless not gcdremaining() > 0 and havoccooldownmainpostconditions()
  {
   #pick_up_fragment,type=demon,if=demon_soul_fragments>0
-  if soulfragments() > 0 and soulfragments() > 0 texture(spell_shadow_soulgem text=pickup)
-  #pick_up_fragment,if=fury.deficit>=35
-  if furydeficit() >= 35 and soulfragments() > 0 texture(spell_shadow_soulgem text=pickup)
+  if soulfragments() > 0 and { checkboxon(opt_pick_up_soul_fragments) and soulfragments() > 0 } texture(spell_shadow_soulgem text=pickup)
+  #pick_up_fragment,mode=nearest,if=(talent.demonic_appetite.enabled&fury.deficit>=35|runeforge.blind_faith&buff.blind_faith.up)&(!cooldown.eye_beam.ready|fury<30)
+  if { hastalent(demonic_appetite_talent) and furydeficit() >= 35 or runeforge(blind_faith_runeforge) and buffpresent(blind_faith_buff) } and { not spellcooldown(eye_beam) <= 0 or fury() < 30 } and { checkboxon(opt_pick_up_soul_fragments) and soulfragments() > 0 } texture(spell_shadow_soulgem text=pickup)
   #throw_glaive,if=buff.fel_bombardment.stack=5&(buff.immolation_aura.up|!buff.metamorphosis.up)
   if buffstacks(fel_bombardment_buff) == 5 and { buffpresent(immolation_aura) or not buffpresent(metamorphosis_buff) } spell(throw_glaive)
   #run_action_list,name=demonic,if=talent.demonic.enabled
@@ -877,7 +884,7 @@ AddFunction havoc_defaultshortcdactions
  #call_action_list,name=cooldown,if=gcd.remains=0
  if not gcdremaining() > 0 havoccooldownshortcdactions()
 
- unless not gcdremaining() > 0 and havoccooldownshortcdpostconditions() or soulfragments() > 0 and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or furydeficit() >= 35 and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or buffstacks(fel_bombardment_buff) == 5 and { buffpresent(immolation_aura) or not buffpresent(metamorphosis_buff) } and spell(throw_glaive)
+ unless not gcdremaining() > 0 and havoccooldownshortcdpostconditions() or soulfragments() > 0 and { checkboxon(opt_pick_up_soul_fragments) and soulfragments() > 0 } and texture(spell_shadow_soulgem text=pickup) or { hastalent(demonic_appetite_talent) and furydeficit() >= 35 or runeforge(blind_faith_runeforge) and buffpresent(blind_faith_buff) } and { not spellcooldown(eye_beam) <= 0 or fury() < 30 } and { checkboxon(opt_pick_up_soul_fragments) and soulfragments() > 0 } and texture(spell_shadow_soulgem text=pickup) or buffstacks(fel_bombardment_buff) == 5 and { buffpresent(immolation_aura) or not buffpresent(metamorphosis_buff) } and spell(throw_glaive)
  {
   #run_action_list,name=demonic,if=talent.demonic.enabled
   if hastalent(demonic_talent) havocdemonicshortcdactions()
@@ -892,7 +899,7 @@ AddFunction havoc_defaultshortcdactions
 
 AddFunction havoc_defaultshortcdpostconditions
 {
- not gcdremaining() > 0 and havoccooldownshortcdpostconditions() or soulfragments() > 0 and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or furydeficit() >= 35 and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or buffstacks(fel_bombardment_buff) == 5 and { buffpresent(immolation_aura) or not buffpresent(metamorphosis_buff) } and spell(throw_glaive) or hastalent(demonic_talent) and havocdemonicshortcdpostconditions() or havocnormalshortcdpostconditions()
+ not gcdremaining() > 0 and havoccooldownshortcdpostconditions() or soulfragments() > 0 and { checkboxon(opt_pick_up_soul_fragments) and soulfragments() > 0 } and texture(spell_shadow_soulgem text=pickup) or { hastalent(demonic_appetite_talent) and furydeficit() >= 35 or runeforge(blind_faith_runeforge) and buffpresent(blind_faith_buff) } and { not spellcooldown(eye_beam) <= 0 or fury() < 30 } and { checkboxon(opt_pick_up_soul_fragments) and soulfragments() > 0 } and texture(spell_shadow_soulgem text=pickup) or buffstacks(fel_bombardment_buff) == 5 and { buffpresent(immolation_aura) or not buffpresent(metamorphosis_buff) } and spell(throw_glaive) or hastalent(demonic_talent) and havocdemonicshortcdpostconditions() or havocnormalshortcdpostconditions()
 }
 
 AddFunction havoc_defaultcdactions
@@ -911,7 +918,7 @@ AddFunction havoc_defaultcdactions
  #call_action_list,name=cooldown,if=gcd.remains=0
  if not gcdremaining() > 0 havoccooldowncdactions()
 
- unless not gcdremaining() > 0 and havoccooldowncdpostconditions() or soulfragments() > 0 and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or furydeficit() >= 35 and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or buffstacks(fel_bombardment_buff) == 5 and { buffpresent(immolation_aura) or not buffpresent(metamorphosis_buff) } and spell(throw_glaive)
+ unless not gcdremaining() > 0 and havoccooldowncdpostconditions() or soulfragments() > 0 and { checkboxon(opt_pick_up_soul_fragments) and soulfragments() > 0 } and texture(spell_shadow_soulgem text=pickup) or { hastalent(demonic_appetite_talent) and furydeficit() >= 35 or runeforge(blind_faith_runeforge) and buffpresent(blind_faith_buff) } and { not spellcooldown(eye_beam) <= 0 or fury() < 30 } and { checkboxon(opt_pick_up_soul_fragments) and soulfragments() > 0 } and texture(spell_shadow_soulgem text=pickup) or buffstacks(fel_bombardment_buff) == 5 and { buffpresent(immolation_aura) or not buffpresent(metamorphosis_buff) } and spell(throw_glaive)
  {
   #run_action_list,name=demonic,if=talent.demonic.enabled
   if hastalent(demonic_talent) havocdemoniccdactions()
@@ -926,7 +933,7 @@ AddFunction havoc_defaultcdactions
 
 AddFunction havoc_defaultcdpostconditions
 {
- not gcdremaining() > 0 and havoccooldowncdpostconditions() or soulfragments() > 0 and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or furydeficit() >= 35 and soulfragments() > 0 and texture(spell_shadow_soulgem text=pickup) or buffstacks(fel_bombardment_buff) == 5 and { buffpresent(immolation_aura) or not buffpresent(metamorphosis_buff) } and spell(throw_glaive) or hastalent(demonic_talent) and havocdemoniccdpostconditions() or havocnormalcdpostconditions()
+ not gcdremaining() > 0 and havoccooldowncdpostconditions() or soulfragments() > 0 and { checkboxon(opt_pick_up_soul_fragments) and soulfragments() > 0 } and texture(spell_shadow_soulgem text=pickup) or { hastalent(demonic_appetite_talent) and furydeficit() >= 35 or runeforge(blind_faith_runeforge) and buffpresent(blind_faith_buff) } and { not spellcooldown(eye_beam) <= 0 or fury() < 30 } and { checkboxon(opt_pick_up_soul_fragments) and soulfragments() > 0 } and texture(spell_shadow_soulgem text=pickup) or buffstacks(fel_bombardment_buff) == 5 and { buffpresent(immolation_aura) or not buffpresent(metamorphosis_buff) } and spell(throw_glaive) or hastalent(demonic_talent) and havocdemoniccdpostconditions() or havocnormalcdpostconditions()
 }
 
 ### Havoc icons.
@@ -972,6 +979,8 @@ AddIcon enabled=(checkboxon(opt_demonhunter_havoc_aoe) and specialization(havoc)
 ### Required symbols
 # annihilation
 # blade_dance
+# blind_faith_buff
+# blind_faith_runeforge
 # blind_fury_talent
 # burning_wound_debuff
 # burning_wound_runeforge
@@ -984,6 +993,7 @@ AddIcon enabled=(checkboxon(opt_demonhunter_havoc_aoe) and specialization(havoc)
 # darkglare_medallion_runeforge
 # death_sweep
 # demon_blades_talent
+# demonic_appetite_talent
 # demonic_talent
 # demons_bite
 # disrupt
