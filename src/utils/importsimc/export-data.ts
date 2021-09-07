@@ -4,9 +4,11 @@ import { DbcData } from "./importspells";
 export function exportData(dbc: DbcData) {
     const lines = [
         `import { LuaArray } from "@wowts/lua";
+
 interface ConduitData {
     ranks: LuaArray<number>;
-}`,
+}
+`,
     ];
     lines.push("export const conduits: LuaArray<ConduitData> = {");
     for (const [id, conduit] of dbc.conduitById.entries()) {
@@ -17,6 +19,11 @@ interface ConduitData {
         }
         lines.push(`   },`);
         lines.push(`},`);
+    }
+    lines.push("};\n");
+    lines.push("export const runeforgeBonusId: LuaArray<number> = {");
+    for (const [id, runeforge] of dbc.runeforgeById.entries()) {
+        lines.push(`[${runeforge.spell_id}]: ${id},`);
     }
     lines.push("};");
     writeFileSync("src/engine/dbc.ts", lines.join("\n"), { encoding: "utf8" });
