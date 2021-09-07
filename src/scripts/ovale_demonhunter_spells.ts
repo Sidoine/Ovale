@@ -12,6 +12,11 @@ Define(blade_dance 188499)
   SpellInfo(blade_dance fury=35 cd=15 duration=1)
   # Dodge chance increased by s2.
   SpellAddBuff(blade_dance blade_dance add=1)
+Define(blind_faith_buff 355894)
+# Elysian Decree shatters s1 additional Lesser Soul Fragments and grants you Blind Faith for 20 seconds. For each Lesser Soul Fragment you consume while Blind Faith is active you gain s2 Mastery and 356070s1 Fury.
+  SpellInfo(blind_faith_buff duration=20 gcd=0 offgcd=1)
+  # Mastery increased by w1.
+  SpellAddBuff(blind_faith_buff blind_faith_buff add=1)
 Define(bulk_extraction 320341)
 # Demolish the spirit of all those around you, dealing s1 Fire damage to nearby enemies and extracting up to s2 Lesser Soul Fragments, drawing them to you for immediate consumption.
   SpellInfo(bulk_extraction cd=90)
@@ -259,6 +264,8 @@ Define(demon_blades_talent 22799)
 # Your auto attacks have a s1 chance to deal additional Shadow damage and generate Fury.
 Define(demonic_talent 21900)
 # Eye Beam causes you to enter demon form for s1/1000 sec after it finishes dealing damage.
+Define(demonic_appetite_talent 22493)
+# Chaos Strike has a chance to spawn a Lesser Soul Fragment. Consuming any Soul Fragment grants 210041s1 Fury.
 Define(essence_break_talent 21868)
 # Slash all enemies in front of you for s1 Chaos damage, and increase the damage your Chaos Strike and Blade Dance deal to them by 320338s1 for 8 seconds.
 Define(fel_barrage_talent 22547)
@@ -287,6 +294,7 @@ Define(unbound_chaos_talent 22494)
 # Activating Immolation Aura increases the damage of your next Fel Rush by 347462s1. Lasts 20 seconds.
 Define(potion_of_phantom_fire_item 171349)
     ItemInfo(potion_of_phantom_fire_item cd=300 shared_cd="item_cd_4" rppm=12 proc=307495)
+Define(blind_faith_runeforge 7699)
 Define(burning_wound_runeforge 7219)
 Define(chaos_theory_runeforge 7050)
 Define(darkglare_medallion_runeforge 7043)

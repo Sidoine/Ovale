@@ -560,6 +560,8 @@ AddFunction froststandardmainactions
  if rw_buffs() spell(remorseless_winter)
  #obliterate,if=buff.killing_machine.react
  if buffpresent(killing_machine_buff) spell(obliterate)
+ #howling_blast,if=variable.rotfc_rime&buff.rime.remains<3
+ if rotfc_rime() and buffremaining(rime_buff) < 3 spell(howling_blast)
  #frost_strike,if=variable.frost_strike_conduits
  if frost_strike_conduits() spell(frost_strike)
  #glacial_advance,if=!death_knight.runeforge.razorice&(debuff.razorice.stack<5|debuff.razorice.remains<7)
@@ -584,7 +586,7 @@ AddFunction froststandardmainpostconditions
 
 AddFunction froststandardshortcdactions
 {
- unless rw_buffs() and spell(remorseless_winter) or buffpresent(killing_machine_buff) and spell(obliterate) or frost_strike_conduits() and spell(frost_strike) or not weaponenchantpresent(razorice_enchant) and { target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 7 } and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or { not runecount() < 3 and hastalent(frozen_pulse_talent) or deaths_due_active() and buffstacks(deaths_due_buff) < 4 or timetorunes(4) <= gcd() } and spell(obliterate) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 5 and spell(frost_strike) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or spell(frost_strike)
+ unless rw_buffs() and spell(remorseless_winter) or buffpresent(killing_machine_buff) and spell(obliterate) or rotfc_rime() and buffremaining(rime_buff) < 3 and spell(howling_blast) or frost_strike_conduits() and spell(frost_strike) or not weaponenchantpresent(razorice_enchant) and { target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 7 } and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or { not runecount() < 3 and hastalent(frozen_pulse_talent) or deaths_due_active() and buffstacks(deaths_due_buff) < 4 or timetorunes(4) <= gcd() } and spell(obliterate) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 5 and spell(frost_strike) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or spell(frost_strike)
  {
   #horn_of_winter
   spell(horn_of_winter)
@@ -593,12 +595,12 @@ AddFunction froststandardshortcdactions
 
 AddFunction froststandardshortcdpostconditions
 {
- rw_buffs() and spell(remorseless_winter) or buffpresent(killing_machine_buff) and spell(obliterate) or frost_strike_conduits() and spell(frost_strike) or not weaponenchantpresent(razorice_enchant) and { target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 7 } and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or { not runecount() < 3 and hastalent(frozen_pulse_talent) or deaths_due_active() and buffstacks(deaths_due_buff) < 4 or timetorunes(4) <= gcd() } and spell(obliterate) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 5 and spell(frost_strike) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or spell(frost_strike)
+ rw_buffs() and spell(remorseless_winter) or buffpresent(killing_machine_buff) and spell(obliterate) or rotfc_rime() and buffremaining(rime_buff) < 3 and spell(howling_blast) or frost_strike_conduits() and spell(frost_strike) or not weaponenchantpresent(razorice_enchant) and { target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 7 } and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or { not runecount() < 3 and hastalent(frozen_pulse_talent) or deaths_due_active() and buffstacks(deaths_due_buff) < 4 or timetorunes(4) <= gcd() } and spell(obliterate) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 5 and spell(frost_strike) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or spell(frost_strike)
 }
 
 AddFunction froststandardcdactions
 {
- unless rw_buffs() and spell(remorseless_winter) or buffpresent(killing_machine_buff) and spell(obliterate) or frost_strike_conduits() and spell(frost_strike) or not weaponenchantpresent(razorice_enchant) and { target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 7 } and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or { not runecount() < 3 and hastalent(frozen_pulse_talent) or deaths_due_active() and buffstacks(deaths_due_buff) < 4 or timetorunes(4) <= gcd() } and spell(obliterate) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 5 and spell(frost_strike) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or spell(frost_strike) or spell(horn_of_winter)
+ unless rw_buffs() and spell(remorseless_winter) or buffpresent(killing_machine_buff) and spell(obliterate) or rotfc_rime() and buffremaining(rime_buff) < 3 and spell(howling_blast) or frost_strike_conduits() and spell(frost_strike) or not weaponenchantpresent(razorice_enchant) and { target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 7 } and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or { not runecount() < 3 and hastalent(frozen_pulse_talent) or deaths_due_active() and buffstacks(deaths_due_buff) < 4 or timetorunes(4) <= gcd() } and spell(obliterate) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 5 and spell(frost_strike) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or spell(frost_strike) or spell(horn_of_winter)
  {
   #arcane_torrent
   spell(arcane_torrent)
@@ -607,7 +609,7 @@ AddFunction froststandardcdactions
 
 AddFunction froststandardcdpostconditions
 {
- rw_buffs() and spell(remorseless_winter) or buffpresent(killing_machine_buff) and spell(obliterate) or frost_strike_conduits() and spell(frost_strike) or not weaponenchantpresent(razorice_enchant) and { target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 7 } and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or { not runecount() < 3 and hastalent(frozen_pulse_talent) or deaths_due_active() and buffstacks(deaths_due_buff) < 4 or timetorunes(4) <= gcd() } and spell(obliterate) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 5 and spell(frost_strike) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or spell(frost_strike) or spell(horn_of_winter)
+ rw_buffs() and spell(remorseless_winter) or buffpresent(killing_machine_buff) and spell(obliterate) or rotfc_rime() and buffremaining(rime_buff) < 3 and spell(howling_blast) or frost_strike_conduits() and spell(frost_strike) or not weaponenchantpresent(razorice_enchant) and { target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 7 } and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or { not runecount() < 3 and hastalent(frozen_pulse_talent) or deaths_due_active() and buffstacks(deaths_due_buff) < 4 or timetorunes(4) <= gcd() } and spell(obliterate) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 5 and spell(frost_strike) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or spell(frost_strike) or spell(horn_of_winter)
 }
 
 ### actions.racials
@@ -642,8 +644,8 @@ AddFunction frostracialscdactions
  if buffpresent(pillar_of_frost) spell(lights_judgment)
  #ancestral_call,if=buff.pillar_of_frost.up&buff.empower_rune_weapon.up
  if buffpresent(pillar_of_frost) and buffpresent(empower_rune_weapon) spell(ancestral_call)
- #fireblood,if=buff.pillar_of_frost.remains<=8&buff.empower_rune_weapon.up
- if buffremaining(pillar_of_frost) <= 8 and buffpresent(empower_rune_weapon) spell(fireblood)
+ #fireblood,if=buff.pillar_of_frost.remains<=8&buff.pillar_of_frost.up&buff.empower_rune_weapon.up
+ if buffremaining(pillar_of_frost) <= 8 and buffpresent(pillar_of_frost) and buffpresent(empower_rune_weapon) spell(fireblood)
 }
 
 AddFunction frostracialscdpostconditions
@@ -733,8 +735,8 @@ AddFunction frostobliterationmainactions
 {
  #remorseless_winter,if=active_enemies>=3&variable.rw_buffs
  if enemies() >= 3 and rw_buffs() spell(remorseless_winter)
- #howling_blast,target_if=!dot.frost_fever.ticking&!buff.killing_machine.up&rune>=3
- if not target.debuffpresent(frost_fever_debuff) and not buffpresent(killing_machine_buff) and runecount() >= 3 spell(howling_blast)
+ #howling_blast,target_if=!buff.killing_machine.up&rune>=3&(buff.rime.remains<3&buff.rime.up|!dot.frost_fever.ticking)
+ if not buffpresent(killing_machine_buff) and runecount() >= 3 and { buffremaining(rime_buff) < 3 and buffpresent(rime_buff) or not target.debuffpresent(frost_fever_debuff) } spell(howling_blast)
  #frostscythe,if=buff.killing_machine.react&spell_targets.frostscythe>=2&!variable.deaths_due_active
  if buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() spell(frostscythe)
  #obliterate,target_if=max:(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,if=buff.killing_machine.react
@@ -765,7 +767,7 @@ AddFunction frostobliterationshortcdactions
 
 AddFunction frostobliterationshortcdpostconditions
 {
- enemies() >= 3 and rw_buffs() and spell(remorseless_winter) or not target.debuffpresent(frost_fever_debuff) and not buffpresent(killing_machine_buff) and runecount() >= 3 and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or buffpresent(killing_machine_buff) and spell(obliterate) or { enemies(tagged=1) >= 2 and { runicpowerdeficit() < 10 or timetorunes(2) > gcd() } or target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 15 } and spell(glacial_advance) or enemies() == 1 and frost_strike_conduits() and spell(frost_strike) or rotfc_rime() and enemies(tagged=1) >= 2 and spell(howling_blast) or enemies(tagged=1) >= 2 and spell(glacial_advance) or { not hastalent(avalanche_talent) and not buffpresent(killing_machine_buff) or hastalent(avalanche_talent) and not rotfc_rime() or rotfc_rime() and timetorunes(2) >= gcd() } and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or spell(obliterate)
+ enemies() >= 3 and rw_buffs() and spell(remorseless_winter) or not buffpresent(killing_machine_buff) and runecount() >= 3 and { buffremaining(rime_buff) < 3 and buffpresent(rime_buff) or not target.debuffpresent(frost_fever_debuff) } and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or buffpresent(killing_machine_buff) and spell(obliterate) or { enemies(tagged=1) >= 2 and { runicpowerdeficit() < 10 or timetorunes(2) > gcd() } or target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 15 } and spell(glacial_advance) or enemies() == 1 and frost_strike_conduits() and spell(frost_strike) or rotfc_rime() and enemies(tagged=1) >= 2 and spell(howling_blast) or enemies(tagged=1) >= 2 and spell(glacial_advance) or { not hastalent(avalanche_talent) and not buffpresent(killing_machine_buff) or hastalent(avalanche_talent) and not rotfc_rime() or rotfc_rime() and timetorunes(2) >= gcd() } and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or spell(obliterate)
 }
 
 AddFunction frostobliterationcdactions
@@ -774,7 +776,7 @@ AddFunction frostobliterationcdactions
 
 AddFunction frostobliterationcdpostconditions
 {
- enemies() >= 3 and rw_buffs() and spell(remorseless_winter) or not target.debuffpresent(frost_fever_debuff) and not buffpresent(killing_machine_buff) and runecount() >= 3 and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or buffpresent(killing_machine_buff) and spell(obliterate) or { enemies(tagged=1) >= 2 and { runicpowerdeficit() < 10 or timetorunes(2) > gcd() } or target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 15 } and spell(glacial_advance) or enemies() == 1 and frost_strike_conduits() and spell(frost_strike) or rotfc_rime() and enemies(tagged=1) >= 2 and spell(howling_blast) or enemies(tagged=1) >= 2 and spell(glacial_advance) or { not hastalent(avalanche_talent) and not buffpresent(killing_machine_buff) or hastalent(avalanche_talent) and not rotfc_rime() or rotfc_rime() and timetorunes(2) >= gcd() } and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or spell(obliterate)
+ enemies() >= 3 and rw_buffs() and spell(remorseless_winter) or not buffpresent(killing_machine_buff) and runecount() >= 3 and { buffremaining(rime_buff) < 3 and buffpresent(rime_buff) or not target.debuffpresent(frost_fever_debuff) } and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or buffpresent(killing_machine_buff) and spell(obliterate) or { enemies(tagged=1) >= 2 and { runicpowerdeficit() < 10 or timetorunes(2) > gcd() } or target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 15 } and spell(glacial_advance) or enemies() == 1 and frost_strike_conduits() and spell(frost_strike) or rotfc_rime() and enemies(tagged=1) >= 2 and spell(howling_blast) or enemies(tagged=1) >= 2 and spell(glacial_advance) or { not hastalent(avalanche_talent) and not buffpresent(killing_machine_buff) or hastalent(avalanche_talent) and not rotfc_rime() or rotfc_rime() and timetorunes(2) >= gcd() } and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or spell(obliterate)
 }
 
 ### actions.covenants
@@ -940,8 +942,8 @@ AddFunction frostbos_tickingmainactions
  if runicpowerdeficit() >= 45 + talentpoints(runic_attenuation_talent) * 5 spell(obliterate)
  #remorseless_winter,if=variable.rw_buffs|active_enemies>=2|runic_power<32
  if rw_buffs() or enemies() >= 2 or runicpower() < 32 spell(remorseless_winter)
- #howling_blast,if=variable.rotfc_rime&(runic_power.deficit<55|rune.time_to_3<=gcd|runeforge.rage_of_the_frozen_champion|spell_targets.howling_blast>=2)|runic_power<32
- if rotfc_rime() and { runicpowerdeficit() < 55 or timetorunes(3) <= gcd() or runeforge(rage_of_the_frozen_champion_runeforge) or enemies(tagged=1) >= 2 } or runicpower() < 32 spell(howling_blast)
+ #howling_blast,if=variable.rotfc_rime&(runic_power.deficit<55|rune.time_to_3<=gcd|runeforge.rage_of_the_frozen_champion|spell_targets.howling_blast>=2|buff.rime.remains<3)|runic_power<32
+ if rotfc_rime() and { runicpowerdeficit() < 55 or timetorunes(3) <= gcd() or runeforge(rage_of_the_frozen_champion_runeforge) or enemies(tagged=1) >= 2 or buffremaining(rime_buff) < 3 } or runicpower() < 32 spell(howling_blast)
  #frostscythe,if=buff.killing_machine.up&spell_targets.frostscythe>=2&!variable.deaths_due_active
  if buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() spell(frostscythe)
  #frostscythe,if=spell_targets.frostscythe>=2&!variable.deaths_due_active
@@ -963,7 +965,7 @@ AddFunction frostbos_tickingshortcdactions
   #death_and_decay,if=runic_power<32
   if runicpower() < 32 spell(death_and_decay)
 
-  unless { rotfc_rime() and { runicpowerdeficit() < 55 or timetorunes(3) <= gcd() or runeforge(rage_of_the_frozen_champion_runeforge) or enemies(tagged=1) >= 2 } or runicpower() < 32 } and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe)
+  unless { rotfc_rime() and { runicpowerdeficit() < 55 or timetorunes(3) <= gcd() or runeforge(rage_of_the_frozen_champion_runeforge) or enemies(tagged=1) >= 2 or buffremaining(rime_buff) < 3 } or runicpower() < 32 } and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe)
   {
    #horn_of_winter,if=runic_power.deficit>=40&rune.time_to_3>gcd
    if runicpowerdeficit() >= 40 and timetorunes(3) > gcd() spell(horn_of_winter)
@@ -973,12 +975,12 @@ AddFunction frostbos_tickingshortcdactions
 
 AddFunction frostbos_tickingshortcdpostconditions
 {
- runicpowerdeficit() >= 45 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or { rw_buffs() or enemies() >= 2 or runicpower() < 32 } and spell(remorseless_winter) or { rotfc_rime() and { runicpowerdeficit() < 55 or timetorunes(3) <= gcd() or runeforge(rage_of_the_frozen_champion_runeforge) or enemies(tagged=1) >= 2 } or runicpower() < 32 } and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or { runicpowerdeficit() > 25 or timetorunes(3) < gcd() } and spell(obliterate) or rotfc_rime() and spell(howling_blast)
+ runicpowerdeficit() >= 45 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or { rw_buffs() or enemies() >= 2 or runicpower() < 32 } and spell(remorseless_winter) or { rotfc_rime() and { runicpowerdeficit() < 55 or timetorunes(3) <= gcd() or runeforge(rage_of_the_frozen_champion_runeforge) or enemies(tagged=1) >= 2 or buffremaining(rime_buff) < 3 } or runicpower() < 32 } and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or { runicpowerdeficit() > 25 or timetorunes(3) < gcd() } and spell(obliterate) or rotfc_rime() and spell(howling_blast)
 }
 
 AddFunction frostbos_tickingcdactions
 {
- unless runicpowerdeficit() >= 45 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or { rw_buffs() or enemies() >= 2 or runicpower() < 32 } and spell(remorseless_winter) or runicpower() < 32 and spell(death_and_decay) or { rotfc_rime() and { runicpowerdeficit() < 55 or timetorunes(3) <= gcd() or runeforge(rage_of_the_frozen_champion_runeforge) or enemies(tagged=1) >= 2 } or runicpower() < 32 } and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or runicpowerdeficit() >= 40 and timetorunes(3) > gcd() and spell(horn_of_winter) or enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or { runicpowerdeficit() > 25 or timetorunes(3) < gcd() } and spell(obliterate) or rotfc_rime() and spell(howling_blast)
+ unless runicpowerdeficit() >= 45 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or { rw_buffs() or enemies() >= 2 or runicpower() < 32 } and spell(remorseless_winter) or runicpower() < 32 and spell(death_and_decay) or { rotfc_rime() and { runicpowerdeficit() < 55 or timetorunes(3) <= gcd() or runeforge(rage_of_the_frozen_champion_runeforge) or enemies(tagged=1) >= 2 or buffremaining(rime_buff) < 3 } or runicpower() < 32 } and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or runicpowerdeficit() >= 40 and timetorunes(3) > gcd() and spell(horn_of_winter) or enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or { runicpowerdeficit() > 25 or timetorunes(3) < gcd() } and spell(obliterate) or rotfc_rime() and spell(howling_blast)
  {
   #arcane_torrent,if=runic_power.deficit>50
   if runicpowerdeficit() > 50 spell(arcane_torrent)
@@ -987,7 +989,7 @@ AddFunction frostbos_tickingcdactions
 
 AddFunction frostbos_tickingcdpostconditions
 {
- runicpowerdeficit() >= 45 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or { rw_buffs() or enemies() >= 2 or runicpower() < 32 } and spell(remorseless_winter) or runicpower() < 32 and spell(death_and_decay) or { rotfc_rime() and { runicpowerdeficit() < 55 or timetorunes(3) <= gcd() or runeforge(rage_of_the_frozen_champion_runeforge) or enemies(tagged=1) >= 2 } or runicpower() < 32 } and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or runicpowerdeficit() >= 40 and timetorunes(3) > gcd() and spell(horn_of_winter) or enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or { runicpowerdeficit() > 25 or timetorunes(3) < gcd() } and spell(obliterate) or rotfc_rime() and spell(howling_blast)
+ runicpowerdeficit() >= 45 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or { rw_buffs() or enemies() >= 2 or runicpower() < 32 } and spell(remorseless_winter) or runicpower() < 32 and spell(death_and_decay) or { rotfc_rime() and { runicpowerdeficit() < 55 or timetorunes(3) <= gcd() or runeforge(rage_of_the_frozen_champion_runeforge) or enemies(tagged=1) >= 2 or buffremaining(rime_buff) < 3 } or runicpower() < 32 } and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or runicpowerdeficit() >= 40 and timetorunes(3) > gcd() and spell(horn_of_winter) or enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or { runicpowerdeficit() > 25 or timetorunes(3) < gcd() } and spell(obliterate) or rotfc_rime() and spell(howling_blast)
 }
 
 ### actions.bos_pooling
@@ -1592,6 +1594,8 @@ AddFunction froststandardmainactions
  if rw_buffs() spell(remorseless_winter)
  #obliterate,if=buff.killing_machine.react
  if buffpresent(killing_machine_buff) spell(obliterate)
+ #howling_blast,if=variable.rotfc_rime&buff.rime.remains<3
+ if rotfc_rime() and buffremaining(rime_buff) < 3 spell(howling_blast)
  #frost_strike,if=variable.frost_strike_conduits
  if frost_strike_conduits() spell(frost_strike)
  #glacial_advance,if=!death_knight.runeforge.razorice&(debuff.razorice.stack<5|debuff.razorice.remains<7)
@@ -1616,7 +1620,7 @@ AddFunction froststandardmainpostconditions
 
 AddFunction froststandardshortcdactions
 {
- unless rw_buffs() and spell(remorseless_winter) or buffpresent(killing_machine_buff) and spell(obliterate) or frost_strike_conduits() and spell(frost_strike) or not weaponenchantpresent(razorice_enchant) and { target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 7 } and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or { not runecount() < 3 and hastalent(frozen_pulse_talent) or deaths_due_active() and buffstacks(deaths_due_buff) < 4 or timetorunes(4) <= gcd() } and spell(obliterate) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 5 and spell(frost_strike) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or spell(frost_strike)
+ unless rw_buffs() and spell(remorseless_winter) or buffpresent(killing_machine_buff) and spell(obliterate) or rotfc_rime() and buffremaining(rime_buff) < 3 and spell(howling_blast) or frost_strike_conduits() and spell(frost_strike) or not weaponenchantpresent(razorice_enchant) and { target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 7 } and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or { not runecount() < 3 and hastalent(frozen_pulse_talent) or deaths_due_active() and buffstacks(deaths_due_buff) < 4 or timetorunes(4) <= gcd() } and spell(obliterate) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 5 and spell(frost_strike) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or spell(frost_strike)
  {
   #horn_of_winter
   spell(horn_of_winter)
@@ -1625,12 +1629,12 @@ AddFunction froststandardshortcdactions
 
 AddFunction froststandardshortcdpostconditions
 {
- rw_buffs() and spell(remorseless_winter) or buffpresent(killing_machine_buff) and spell(obliterate) or frost_strike_conduits() and spell(frost_strike) or not weaponenchantpresent(razorice_enchant) and { target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 7 } and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or { not runecount() < 3 and hastalent(frozen_pulse_talent) or deaths_due_active() and buffstacks(deaths_due_buff) < 4 or timetorunes(4) <= gcd() } and spell(obliterate) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 5 and spell(frost_strike) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or spell(frost_strike)
+ rw_buffs() and spell(remorseless_winter) or buffpresent(killing_machine_buff) and spell(obliterate) or rotfc_rime() and buffremaining(rime_buff) < 3 and spell(howling_blast) or frost_strike_conduits() and spell(frost_strike) or not weaponenchantpresent(razorice_enchant) and { target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 7 } and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or { not runecount() < 3 and hastalent(frozen_pulse_talent) or deaths_due_active() and buffstacks(deaths_due_buff) < 4 or timetorunes(4) <= gcd() } and spell(obliterate) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 5 and spell(frost_strike) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or spell(frost_strike)
 }
 
 AddFunction froststandardcdactions
 {
- unless rw_buffs() and spell(remorseless_winter) or buffpresent(killing_machine_buff) and spell(obliterate) or frost_strike_conduits() and spell(frost_strike) or not weaponenchantpresent(razorice_enchant) and { target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 7 } and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or { not runecount() < 3 and hastalent(frozen_pulse_talent) or deaths_due_active() and buffstacks(deaths_due_buff) < 4 or timetorunes(4) <= gcd() } and spell(obliterate) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 5 and spell(frost_strike) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or spell(frost_strike) or spell(horn_of_winter)
+ unless rw_buffs() and spell(remorseless_winter) or buffpresent(killing_machine_buff) and spell(obliterate) or rotfc_rime() and buffremaining(rime_buff) < 3 and spell(howling_blast) or frost_strike_conduits() and spell(frost_strike) or not weaponenchantpresent(razorice_enchant) and { target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 7 } and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or { not runecount() < 3 and hastalent(frozen_pulse_talent) or deaths_due_active() and buffstacks(deaths_due_buff) < 4 or timetorunes(4) <= gcd() } and spell(obliterate) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 5 and spell(frost_strike) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or spell(frost_strike) or spell(horn_of_winter)
  {
   #arcane_torrent
   spell(arcane_torrent)
@@ -1639,7 +1643,7 @@ AddFunction froststandardcdactions
 
 AddFunction froststandardcdpostconditions
 {
- rw_buffs() and spell(remorseless_winter) or buffpresent(killing_machine_buff) and spell(obliterate) or frost_strike_conduits() and spell(frost_strike) or not weaponenchantpresent(razorice_enchant) and { target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 7 } and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or { not runecount() < 3 and hastalent(frozen_pulse_talent) or deaths_due_active() and buffstacks(deaths_due_buff) < 4 or timetorunes(4) <= gcd() } and spell(obliterate) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 5 and spell(frost_strike) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or spell(frost_strike) or spell(horn_of_winter)
+ rw_buffs() and spell(remorseless_winter) or buffpresent(killing_machine_buff) and spell(obliterate) or rotfc_rime() and buffremaining(rime_buff) < 3 and spell(howling_blast) or frost_strike_conduits() and spell(frost_strike) or not weaponenchantpresent(razorice_enchant) and { target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 7 } and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or { not runecount() < 3 and hastalent(frozen_pulse_talent) or deaths_due_active() and buffstacks(deaths_due_buff) < 4 or timetorunes(4) <= gcd() } and spell(obliterate) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 5 and spell(frost_strike) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or spell(frost_strike) or spell(horn_of_winter)
 }
 
 ### actions.racials
@@ -1674,8 +1678,8 @@ AddFunction frostracialscdactions
  if buffpresent(pillar_of_frost) spell(lights_judgment)
  #ancestral_call,if=buff.pillar_of_frost.up&buff.empower_rune_weapon.up
  if buffpresent(pillar_of_frost) and buffpresent(empower_rune_weapon) spell(ancestral_call)
- #fireblood,if=buff.pillar_of_frost.remains<=8&buff.empower_rune_weapon.up
- if buffremaining(pillar_of_frost) <= 8 and buffpresent(empower_rune_weapon) spell(fireblood)
+ #fireblood,if=buff.pillar_of_frost.remains<=8&buff.pillar_of_frost.up&buff.empower_rune_weapon.up
+ if buffremaining(pillar_of_frost) <= 8 and buffpresent(pillar_of_frost) and buffpresent(empower_rune_weapon) spell(fireblood)
 }
 
 AddFunction frostracialscdpostconditions
@@ -1765,8 +1769,8 @@ AddFunction frostobliterationmainactions
 {
  #remorseless_winter,if=active_enemies>=3&variable.rw_buffs
  if enemies() >= 3 and rw_buffs() spell(remorseless_winter)
- #howling_blast,target_if=!dot.frost_fever.ticking&!buff.killing_machine.up&rune>=3
- if not target.debuffpresent(frost_fever_debuff) and not buffpresent(killing_machine_buff) and runecount() >= 3 spell(howling_blast)
+ #howling_blast,target_if=!buff.killing_machine.up&rune>=3&(buff.rime.remains<3&buff.rime.up|!dot.frost_fever.ticking)
+ if not buffpresent(killing_machine_buff) and runecount() >= 3 and { buffremaining(rime_buff) < 3 and buffpresent(rime_buff) or not target.debuffpresent(frost_fever_debuff) } spell(howling_blast)
  #frostscythe,if=buff.killing_machine.react&spell_targets.frostscythe>=2&!variable.deaths_due_active
  if buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() spell(frostscythe)
  #obliterate,target_if=max:(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,if=buff.killing_machine.react
@@ -1797,7 +1801,7 @@ AddFunction frostobliterationshortcdactions
 
 AddFunction frostobliterationshortcdpostconditions
 {
- enemies() >= 3 and rw_buffs() and spell(remorseless_winter) or not target.debuffpresent(frost_fever_debuff) and not buffpresent(killing_machine_buff) and runecount() >= 3 and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or buffpresent(killing_machine_buff) and spell(obliterate) or { enemies(tagged=1) >= 2 and { runicpowerdeficit() < 10 or timetorunes(2) > gcd() } or target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 15 } and spell(glacial_advance) or enemies() == 1 and frost_strike_conduits() and spell(frost_strike) or rotfc_rime() and enemies(tagged=1) >= 2 and spell(howling_blast) or enemies(tagged=1) >= 2 and spell(glacial_advance) or { not hastalent(avalanche_talent) and not buffpresent(killing_machine_buff) or hastalent(avalanche_talent) and not rotfc_rime() or rotfc_rime() and timetorunes(2) >= gcd() } and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or spell(obliterate)
+ enemies() >= 3 and rw_buffs() and spell(remorseless_winter) or not buffpresent(killing_machine_buff) and runecount() >= 3 and { buffremaining(rime_buff) < 3 and buffpresent(rime_buff) or not target.debuffpresent(frost_fever_debuff) } and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or buffpresent(killing_machine_buff) and spell(obliterate) or { enemies(tagged=1) >= 2 and { runicpowerdeficit() < 10 or timetorunes(2) > gcd() } or target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 15 } and spell(glacial_advance) or enemies() == 1 and frost_strike_conduits() and spell(frost_strike) or rotfc_rime() and enemies(tagged=1) >= 2 and spell(howling_blast) or enemies(tagged=1) >= 2 and spell(glacial_advance) or { not hastalent(avalanche_talent) and not buffpresent(killing_machine_buff) or hastalent(avalanche_talent) and not rotfc_rime() or rotfc_rime() and timetorunes(2) >= gcd() } and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or spell(obliterate)
 }
 
 AddFunction frostobliterationcdactions
@@ -1806,7 +1810,7 @@ AddFunction frostobliterationcdactions
 
 AddFunction frostobliterationcdpostconditions
 {
- enemies() >= 3 and rw_buffs() and spell(remorseless_winter) or not target.debuffpresent(frost_fever_debuff) and not buffpresent(killing_machine_buff) and runecount() >= 3 and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or buffpresent(killing_machine_buff) and spell(obliterate) or { enemies(tagged=1) >= 2 and { runicpowerdeficit() < 10 or timetorunes(2) > gcd() } or target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 15 } and spell(glacial_advance) or enemies() == 1 and frost_strike_conduits() and spell(frost_strike) or rotfc_rime() and enemies(tagged=1) >= 2 and spell(howling_blast) or enemies(tagged=1) >= 2 and spell(glacial_advance) or { not hastalent(avalanche_talent) and not buffpresent(killing_machine_buff) or hastalent(avalanche_talent) and not rotfc_rime() or rotfc_rime() and timetorunes(2) >= gcd() } and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or spell(obliterate)
+ enemies() >= 3 and rw_buffs() and spell(remorseless_winter) or not buffpresent(killing_machine_buff) and runecount() >= 3 and { buffremaining(rime_buff) < 3 and buffpresent(rime_buff) or not target.debuffpresent(frost_fever_debuff) } and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or buffpresent(killing_machine_buff) and spell(obliterate) or { enemies(tagged=1) >= 2 and { runicpowerdeficit() < 10 or timetorunes(2) > gcd() } or target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 15 } and spell(glacial_advance) or enemies() == 1 and frost_strike_conduits() and spell(frost_strike) or rotfc_rime() and enemies(tagged=1) >= 2 and spell(howling_blast) or enemies(tagged=1) >= 2 and spell(glacial_advance) or { not hastalent(avalanche_talent) and not buffpresent(killing_machine_buff) or hastalent(avalanche_talent) and not rotfc_rime() or rotfc_rime() and timetorunes(2) >= gcd() } and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or spell(obliterate)
 }
 
 ### actions.covenants
@@ -1972,8 +1976,8 @@ AddFunction frostbos_tickingmainactions
  if runicpowerdeficit() >= 45 + talentpoints(runic_attenuation_talent) * 5 spell(obliterate)
  #remorseless_winter,if=variable.rw_buffs|active_enemies>=2|runic_power<32
  if rw_buffs() or enemies() >= 2 or runicpower() < 32 spell(remorseless_winter)
- #howling_blast,if=variable.rotfc_rime&(runic_power.deficit<55|rune.time_to_3<=gcd|runeforge.rage_of_the_frozen_champion|spell_targets.howling_blast>=2)|runic_power<32
- if rotfc_rime() and { runicpowerdeficit() < 55 or timetorunes(3) <= gcd() or runeforge(rage_of_the_frozen_champion_runeforge) or enemies(tagged=1) >= 2 } or runicpower() < 32 spell(howling_blast)
+ #howling_blast,if=variable.rotfc_rime&(runic_power.deficit<55|rune.time_to_3<=gcd|runeforge.rage_of_the_frozen_champion|spell_targets.howling_blast>=2|buff.rime.remains<3)|runic_power<32
+ if rotfc_rime() and { runicpowerdeficit() < 55 or timetorunes(3) <= gcd() or runeforge(rage_of_the_frozen_champion_runeforge) or enemies(tagged=1) >= 2 or buffremaining(rime_buff) < 3 } or runicpower() < 32 spell(howling_blast)
  #frostscythe,if=buff.killing_machine.up&spell_targets.frostscythe>=2&!variable.deaths_due_active
  if buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() spell(frostscythe)
  #frostscythe,if=spell_targets.frostscythe>=2&!variable.deaths_due_active
@@ -1995,7 +1999,7 @@ AddFunction frostbos_tickingshortcdactions
   #death_and_decay,if=runic_power<32
   if runicpower() < 32 spell(death_and_decay)
 
-  unless { rotfc_rime() and { runicpowerdeficit() < 55 or timetorunes(3) <= gcd() or runeforge(rage_of_the_frozen_champion_runeforge) or enemies(tagged=1) >= 2 } or runicpower() < 32 } and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe)
+  unless { rotfc_rime() and { runicpowerdeficit() < 55 or timetorunes(3) <= gcd() or runeforge(rage_of_the_frozen_champion_runeforge) or enemies(tagged=1) >= 2 or buffremaining(rime_buff) < 3 } or runicpower() < 32 } and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe)
   {
    #horn_of_winter,if=runic_power.deficit>=40&rune.time_to_3>gcd
    if runicpowerdeficit() >= 40 and timetorunes(3) > gcd() spell(horn_of_winter)
@@ -2005,12 +2009,12 @@ AddFunction frostbos_tickingshortcdactions
 
 AddFunction frostbos_tickingshortcdpostconditions
 {
- runicpowerdeficit() >= 45 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or { rw_buffs() or enemies() >= 2 or runicpower() < 32 } and spell(remorseless_winter) or { rotfc_rime() and { runicpowerdeficit() < 55 or timetorunes(3) <= gcd() or runeforge(rage_of_the_frozen_champion_runeforge) or enemies(tagged=1) >= 2 } or runicpower() < 32 } and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or { runicpowerdeficit() > 25 or timetorunes(3) < gcd() } and spell(obliterate) or rotfc_rime() and spell(howling_blast)
+ runicpowerdeficit() >= 45 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or { rw_buffs() or enemies() >= 2 or runicpower() < 32 } and spell(remorseless_winter) or { rotfc_rime() and { runicpowerdeficit() < 55 or timetorunes(3) <= gcd() or runeforge(rage_of_the_frozen_champion_runeforge) or enemies(tagged=1) >= 2 or buffremaining(rime_buff) < 3 } or runicpower() < 32 } and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or { runicpowerdeficit() > 25 or timetorunes(3) < gcd() } and spell(obliterate) or rotfc_rime() and spell(howling_blast)
 }
 
 AddFunction frostbos_tickingcdactions
 {
- unless runicpowerdeficit() >= 45 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or { rw_buffs() or enemies() >= 2 or runicpower() < 32 } and spell(remorseless_winter) or runicpower() < 32 and spell(death_and_decay) or { rotfc_rime() and { runicpowerdeficit() < 55 or timetorunes(3) <= gcd() or runeforge(rage_of_the_frozen_champion_runeforge) or enemies(tagged=1) >= 2 } or runicpower() < 32 } and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or runicpowerdeficit() >= 40 and timetorunes(3) > gcd() and spell(horn_of_winter) or enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or { runicpowerdeficit() > 25 or timetorunes(3) < gcd() } and spell(obliterate) or rotfc_rime() and spell(howling_blast)
+ unless runicpowerdeficit() >= 45 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or { rw_buffs() or enemies() >= 2 or runicpower() < 32 } and spell(remorseless_winter) or runicpower() < 32 and spell(death_and_decay) or { rotfc_rime() and { runicpowerdeficit() < 55 or timetorunes(3) <= gcd() or runeforge(rage_of_the_frozen_champion_runeforge) or enemies(tagged=1) >= 2 or buffremaining(rime_buff) < 3 } or runicpower() < 32 } and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or runicpowerdeficit() >= 40 and timetorunes(3) > gcd() and spell(horn_of_winter) or enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or { runicpowerdeficit() > 25 or timetorunes(3) < gcd() } and spell(obliterate) or rotfc_rime() and spell(howling_blast)
  {
   #arcane_torrent,if=runic_power.deficit>50
   if runicpowerdeficit() > 50 spell(arcane_torrent)
@@ -2019,7 +2023,7 @@ AddFunction frostbos_tickingcdactions
 
 AddFunction frostbos_tickingcdpostconditions
 {
- runicpowerdeficit() >= 45 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or { rw_buffs() or enemies() >= 2 or runicpower() < 32 } and spell(remorseless_winter) or runicpower() < 32 and spell(death_and_decay) or { rotfc_rime() and { runicpowerdeficit() < 55 or timetorunes(3) <= gcd() or runeforge(rage_of_the_frozen_champion_runeforge) or enemies(tagged=1) >= 2 } or runicpower() < 32 } and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or runicpowerdeficit() >= 40 and timetorunes(3) > gcd() and spell(horn_of_winter) or enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or { runicpowerdeficit() > 25 or timetorunes(3) < gcd() } and spell(obliterate) or rotfc_rime() and spell(howling_blast)
+ runicpowerdeficit() >= 45 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or { rw_buffs() or enemies() >= 2 or runicpower() < 32 } and spell(remorseless_winter) or runicpower() < 32 and spell(death_and_decay) or { rotfc_rime() and { runicpowerdeficit() < 55 or timetorunes(3) <= gcd() or runeforge(rage_of_the_frozen_champion_runeforge) or enemies(tagged=1) >= 2 or buffremaining(rime_buff) < 3 } or runicpower() < 32 } and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or runicpowerdeficit() >= 40 and timetorunes(3) > gcd() and spell(horn_of_winter) or enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or { runicpowerdeficit() > 25 or timetorunes(3) < gcd() } and spell(obliterate) or rotfc_rime() and spell(howling_blast)
 }
 
 ### actions.bos_pooling
@@ -2624,6 +2628,8 @@ AddFunction froststandardmainactions
  if rw_buffs() spell(remorseless_winter)
  #obliterate,if=buff.killing_machine.react
  if buffpresent(killing_machine_buff) spell(obliterate)
+ #howling_blast,if=variable.rotfc_rime&buff.rime.remains<3
+ if rotfc_rime() and buffremaining(rime_buff) < 3 spell(howling_blast)
  #frost_strike,if=variable.frost_strike_conduits
  if frost_strike_conduits() spell(frost_strike)
  #glacial_advance,if=!death_knight.runeforge.razorice&(debuff.razorice.stack<5|debuff.razorice.remains<7)
@@ -2648,7 +2654,7 @@ AddFunction froststandardmainpostconditions
 
 AddFunction froststandardshortcdactions
 {
- unless rw_buffs() and spell(remorseless_winter) or buffpresent(killing_machine_buff) and spell(obliterate) or frost_strike_conduits() and spell(frost_strike) or not weaponenchantpresent(razorice_enchant) and { target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 7 } and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or { not runecount() < 3 and hastalent(frozen_pulse_talent) or deaths_due_active() and buffstacks(deaths_due_buff) < 4 or timetorunes(4) <= gcd() } and spell(obliterate) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 5 and spell(frost_strike) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or spell(frost_strike)
+ unless rw_buffs() and spell(remorseless_winter) or buffpresent(killing_machine_buff) and spell(obliterate) or rotfc_rime() and buffremaining(rime_buff) < 3 and spell(howling_blast) or frost_strike_conduits() and spell(frost_strike) or not weaponenchantpresent(razorice_enchant) and { target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 7 } and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or { not runecount() < 3 and hastalent(frozen_pulse_talent) or deaths_due_active() and buffstacks(deaths_due_buff) < 4 or timetorunes(4) <= gcd() } and spell(obliterate) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 5 and spell(frost_strike) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or spell(frost_strike)
  {
   #horn_of_winter
   spell(horn_of_winter)
@@ -2657,12 +2663,12 @@ AddFunction froststandardshortcdactions
 
 AddFunction froststandardshortcdpostconditions
 {
- rw_buffs() and spell(remorseless_winter) or buffpresent(killing_machine_buff) and spell(obliterate) or frost_strike_conduits() and spell(frost_strike) or not weaponenchantpresent(razorice_enchant) and { target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 7 } and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or { not runecount() < 3 and hastalent(frozen_pulse_talent) or deaths_due_active() and buffstacks(deaths_due_buff) < 4 or timetorunes(4) <= gcd() } and spell(obliterate) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 5 and spell(frost_strike) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or spell(frost_strike)
+ rw_buffs() and spell(remorseless_winter) or buffpresent(killing_machine_buff) and spell(obliterate) or rotfc_rime() and buffremaining(rime_buff) < 3 and spell(howling_blast) or frost_strike_conduits() and spell(frost_strike) or not weaponenchantpresent(razorice_enchant) and { target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 7 } and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or { not runecount() < 3 and hastalent(frozen_pulse_talent) or deaths_due_active() and buffstacks(deaths_due_buff) < 4 or timetorunes(4) <= gcd() } and spell(obliterate) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 5 and spell(frost_strike) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or spell(frost_strike)
 }
 
 AddFunction froststandardcdactions
 {
- unless rw_buffs() and spell(remorseless_winter) or buffpresent(killing_machine_buff) and spell(obliterate) or frost_strike_conduits() and spell(frost_strike) or not weaponenchantpresent(razorice_enchant) and { target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 7 } and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or { not runecount() < 3 and hastalent(frozen_pulse_talent) or deaths_due_active() and buffstacks(deaths_due_buff) < 4 or timetorunes(4) <= gcd() } and spell(obliterate) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 5 and spell(frost_strike) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or spell(frost_strike) or spell(horn_of_winter)
+ unless rw_buffs() and spell(remorseless_winter) or buffpresent(killing_machine_buff) and spell(obliterate) or rotfc_rime() and buffremaining(rime_buff) < 3 and spell(howling_blast) or frost_strike_conduits() and spell(frost_strike) or not weaponenchantpresent(razorice_enchant) and { target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 7 } and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or { not runecount() < 3 and hastalent(frozen_pulse_talent) or deaths_due_active() and buffstacks(deaths_due_buff) < 4 or timetorunes(4) <= gcd() } and spell(obliterate) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 5 and spell(frost_strike) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or spell(frost_strike) or spell(horn_of_winter)
  {
   #arcane_torrent
   spell(arcane_torrent)
@@ -2671,7 +2677,7 @@ AddFunction froststandardcdactions
 
 AddFunction froststandardcdpostconditions
 {
- rw_buffs() and spell(remorseless_winter) or buffpresent(killing_machine_buff) and spell(obliterate) or frost_strike_conduits() and spell(frost_strike) or not weaponenchantpresent(razorice_enchant) and { target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 7 } and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or { not runecount() < 3 and hastalent(frozen_pulse_talent) or deaths_due_active() and buffstacks(deaths_due_buff) < 4 or timetorunes(4) <= gcd() } and spell(obliterate) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 5 and spell(frost_strike) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or spell(frost_strike) or spell(horn_of_winter)
+ rw_buffs() and spell(remorseless_winter) or buffpresent(killing_machine_buff) and spell(obliterate) or rotfc_rime() and buffremaining(rime_buff) < 3 and spell(howling_blast) or frost_strike_conduits() and spell(frost_strike) or not weaponenchantpresent(razorice_enchant) and { target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 7 } and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or { not runecount() < 3 and hastalent(frozen_pulse_talent) or deaths_due_active() and buffstacks(deaths_due_buff) < 4 or timetorunes(4) <= gcd() } and spell(obliterate) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 5 and spell(frost_strike) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or spell(frost_strike) or spell(horn_of_winter)
 }
 
 ### actions.racials
@@ -2706,8 +2712,8 @@ AddFunction frostracialscdactions
  if buffpresent(pillar_of_frost) spell(lights_judgment)
  #ancestral_call,if=buff.pillar_of_frost.up&buff.empower_rune_weapon.up
  if buffpresent(pillar_of_frost) and buffpresent(empower_rune_weapon) spell(ancestral_call)
- #fireblood,if=buff.pillar_of_frost.remains<=8&buff.empower_rune_weapon.up
- if buffremaining(pillar_of_frost) <= 8 and buffpresent(empower_rune_weapon) spell(fireblood)
+ #fireblood,if=buff.pillar_of_frost.remains<=8&buff.pillar_of_frost.up&buff.empower_rune_weapon.up
+ if buffremaining(pillar_of_frost) <= 8 and buffpresent(pillar_of_frost) and buffpresent(empower_rune_weapon) spell(fireblood)
 }
 
 AddFunction frostracialscdpostconditions
@@ -2797,8 +2803,8 @@ AddFunction frostobliterationmainactions
 {
  #remorseless_winter,if=active_enemies>=3&variable.rw_buffs
  if enemies() >= 3 and rw_buffs() spell(remorseless_winter)
- #howling_blast,target_if=!dot.frost_fever.ticking&!buff.killing_machine.up&rune>=3
- if not target.debuffpresent(frost_fever_debuff) and not buffpresent(killing_machine_buff) and runecount() >= 3 spell(howling_blast)
+ #howling_blast,target_if=!buff.killing_machine.up&rune>=3&(buff.rime.remains<3&buff.rime.up|!dot.frost_fever.ticking)
+ if not buffpresent(killing_machine_buff) and runecount() >= 3 and { buffremaining(rime_buff) < 3 and buffpresent(rime_buff) or not target.debuffpresent(frost_fever_debuff) } spell(howling_blast)
  #frostscythe,if=buff.killing_machine.react&spell_targets.frostscythe>=2&!variable.deaths_due_active
  if buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() spell(frostscythe)
  #obliterate,target_if=max:(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,if=buff.killing_machine.react
@@ -2829,7 +2835,7 @@ AddFunction frostobliterationshortcdactions
 
 AddFunction frostobliterationshortcdpostconditions
 {
- enemies() >= 3 and rw_buffs() and spell(remorseless_winter) or not target.debuffpresent(frost_fever_debuff) and not buffpresent(killing_machine_buff) and runecount() >= 3 and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or buffpresent(killing_machine_buff) and spell(obliterate) or { enemies(tagged=1) >= 2 and { runicpowerdeficit() < 10 or timetorunes(2) > gcd() } or target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 15 } and spell(glacial_advance) or enemies() == 1 and frost_strike_conduits() and spell(frost_strike) or rotfc_rime() and enemies(tagged=1) >= 2 and spell(howling_blast) or enemies(tagged=1) >= 2 and spell(glacial_advance) or { not hastalent(avalanche_talent) and not buffpresent(killing_machine_buff) or hastalent(avalanche_talent) and not rotfc_rime() or rotfc_rime() and timetorunes(2) >= gcd() } and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or spell(obliterate)
+ enemies() >= 3 and rw_buffs() and spell(remorseless_winter) or not buffpresent(killing_machine_buff) and runecount() >= 3 and { buffremaining(rime_buff) < 3 and buffpresent(rime_buff) or not target.debuffpresent(frost_fever_debuff) } and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or buffpresent(killing_machine_buff) and spell(obliterate) or { enemies(tagged=1) >= 2 and { runicpowerdeficit() < 10 or timetorunes(2) > gcd() } or target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 15 } and spell(glacial_advance) or enemies() == 1 and frost_strike_conduits() and spell(frost_strike) or rotfc_rime() and enemies(tagged=1) >= 2 and spell(howling_blast) or enemies(tagged=1) >= 2 and spell(glacial_advance) or { not hastalent(avalanche_talent) and not buffpresent(killing_machine_buff) or hastalent(avalanche_talent) and not rotfc_rime() or rotfc_rime() and timetorunes(2) >= gcd() } and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or spell(obliterate)
 }
 
 AddFunction frostobliterationcdactions
@@ -2838,7 +2844,7 @@ AddFunction frostobliterationcdactions
 
 AddFunction frostobliterationcdpostconditions
 {
- enemies() >= 3 and rw_buffs() and spell(remorseless_winter) or not target.debuffpresent(frost_fever_debuff) and not buffpresent(killing_machine_buff) and runecount() >= 3 and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or buffpresent(killing_machine_buff) and spell(obliterate) or { enemies(tagged=1) >= 2 and { runicpowerdeficit() < 10 or timetorunes(2) > gcd() } or target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 15 } and spell(glacial_advance) or enemies() == 1 and frost_strike_conduits() and spell(frost_strike) or rotfc_rime() and enemies(tagged=1) >= 2 and spell(howling_blast) or enemies(tagged=1) >= 2 and spell(glacial_advance) or { not hastalent(avalanche_talent) and not buffpresent(killing_machine_buff) or hastalent(avalanche_talent) and not rotfc_rime() or rotfc_rime() and timetorunes(2) >= gcd() } and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or spell(obliterate)
+ enemies() >= 3 and rw_buffs() and spell(remorseless_winter) or not buffpresent(killing_machine_buff) and runecount() >= 3 and { buffremaining(rime_buff) < 3 and buffpresent(rime_buff) or not target.debuffpresent(frost_fever_debuff) } and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or buffpresent(killing_machine_buff) and spell(obliterate) or { enemies(tagged=1) >= 2 and { runicpowerdeficit() < 10 or timetorunes(2) > gcd() } or target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 15 } and spell(glacial_advance) or enemies() == 1 and frost_strike_conduits() and spell(frost_strike) or rotfc_rime() and enemies(tagged=1) >= 2 and spell(howling_blast) or enemies(tagged=1) >= 2 and spell(glacial_advance) or { not hastalent(avalanche_talent) and not buffpresent(killing_machine_buff) or hastalent(avalanche_talent) and not rotfc_rime() or rotfc_rime() and timetorunes(2) >= gcd() } and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or spell(obliterate)
 }
 
 ### actions.covenants
@@ -3004,8 +3010,8 @@ AddFunction frostbos_tickingmainactions
  if runicpowerdeficit() >= 45 + talentpoints(runic_attenuation_talent) * 5 spell(obliterate)
  #remorseless_winter,if=variable.rw_buffs|active_enemies>=2|runic_power<32
  if rw_buffs() or enemies() >= 2 or runicpower() < 32 spell(remorseless_winter)
- #howling_blast,if=variable.rotfc_rime&(runic_power.deficit<55|rune.time_to_3<=gcd|runeforge.rage_of_the_frozen_champion|spell_targets.howling_blast>=2)|runic_power<32
- if rotfc_rime() and { runicpowerdeficit() < 55 or timetorunes(3) <= gcd() or runeforge(rage_of_the_frozen_champion_runeforge) or enemies(tagged=1) >= 2 } or runicpower() < 32 spell(howling_blast)
+ #howling_blast,if=variable.rotfc_rime&(runic_power.deficit<55|rune.time_to_3<=gcd|runeforge.rage_of_the_frozen_champion|spell_targets.howling_blast>=2|buff.rime.remains<3)|runic_power<32
+ if rotfc_rime() and { runicpowerdeficit() < 55 or timetorunes(3) <= gcd() or runeforge(rage_of_the_frozen_champion_runeforge) or enemies(tagged=1) >= 2 or buffremaining(rime_buff) < 3 } or runicpower() < 32 spell(howling_blast)
  #frostscythe,if=buff.killing_machine.up&spell_targets.frostscythe>=2&!variable.deaths_due_active
  if buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() spell(frostscythe)
  #frostscythe,if=spell_targets.frostscythe>=2&!variable.deaths_due_active
@@ -3027,7 +3033,7 @@ AddFunction frostbos_tickingshortcdactions
   #death_and_decay,if=runic_power<32
   if runicpower() < 32 spell(death_and_decay)
 
-  unless { rotfc_rime() and { runicpowerdeficit() < 55 or timetorunes(3) <= gcd() or runeforge(rage_of_the_frozen_champion_runeforge) or enemies(tagged=1) >= 2 } or runicpower() < 32 } and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe)
+  unless { rotfc_rime() and { runicpowerdeficit() < 55 or timetorunes(3) <= gcd() or runeforge(rage_of_the_frozen_champion_runeforge) or enemies(tagged=1) >= 2 or buffremaining(rime_buff) < 3 } or runicpower() < 32 } and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe)
   {
    #horn_of_winter,if=runic_power.deficit>=40&rune.time_to_3>gcd
    if runicpowerdeficit() >= 40 and timetorunes(3) > gcd() spell(horn_of_winter)
@@ -3037,12 +3043,12 @@ AddFunction frostbos_tickingshortcdactions
 
 AddFunction frostbos_tickingshortcdpostconditions
 {
- runicpowerdeficit() >= 45 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or { rw_buffs() or enemies() >= 2 or runicpower() < 32 } and spell(remorseless_winter) or { rotfc_rime() and { runicpowerdeficit() < 55 or timetorunes(3) <= gcd() or runeforge(rage_of_the_frozen_champion_runeforge) or enemies(tagged=1) >= 2 } or runicpower() < 32 } and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or { runicpowerdeficit() > 25 or timetorunes(3) < gcd() } and spell(obliterate) or rotfc_rime() and spell(howling_blast)
+ runicpowerdeficit() >= 45 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or { rw_buffs() or enemies() >= 2 or runicpower() < 32 } and spell(remorseless_winter) or { rotfc_rime() and { runicpowerdeficit() < 55 or timetorunes(3) <= gcd() or runeforge(rage_of_the_frozen_champion_runeforge) or enemies(tagged=1) >= 2 or buffremaining(rime_buff) < 3 } or runicpower() < 32 } and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or { runicpowerdeficit() > 25 or timetorunes(3) < gcd() } and spell(obliterate) or rotfc_rime() and spell(howling_blast)
 }
 
 AddFunction frostbos_tickingcdactions
 {
- unless runicpowerdeficit() >= 45 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or { rw_buffs() or enemies() >= 2 or runicpower() < 32 } and spell(remorseless_winter) or runicpower() < 32 and spell(death_and_decay) or { rotfc_rime() and { runicpowerdeficit() < 55 or timetorunes(3) <= gcd() or runeforge(rage_of_the_frozen_champion_runeforge) or enemies(tagged=1) >= 2 } or runicpower() < 32 } and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or runicpowerdeficit() >= 40 and timetorunes(3) > gcd() and spell(horn_of_winter) or enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or { runicpowerdeficit() > 25 or timetorunes(3) < gcd() } and spell(obliterate) or rotfc_rime() and spell(howling_blast)
+ unless runicpowerdeficit() >= 45 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or { rw_buffs() or enemies() >= 2 or runicpower() < 32 } and spell(remorseless_winter) or runicpower() < 32 and spell(death_and_decay) or { rotfc_rime() and { runicpowerdeficit() < 55 or timetorunes(3) <= gcd() or runeforge(rage_of_the_frozen_champion_runeforge) or enemies(tagged=1) >= 2 or buffremaining(rime_buff) < 3 } or runicpower() < 32 } and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or runicpowerdeficit() >= 40 and timetorunes(3) > gcd() and spell(horn_of_winter) or enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or { runicpowerdeficit() > 25 or timetorunes(3) < gcd() } and spell(obliterate) or rotfc_rime() and spell(howling_blast)
  {
   #arcane_torrent,if=runic_power.deficit>50
   if runicpowerdeficit() > 50 spell(arcane_torrent)
@@ -3051,7 +3057,7 @@ AddFunction frostbos_tickingcdactions
 
 AddFunction frostbos_tickingcdpostconditions
 {
- runicpowerdeficit() >= 45 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or { rw_buffs() or enemies() >= 2 or runicpower() < 32 } and spell(remorseless_winter) or runicpower() < 32 and spell(death_and_decay) or { rotfc_rime() and { runicpowerdeficit() < 55 or timetorunes(3) <= gcd() or runeforge(rage_of_the_frozen_champion_runeforge) or enemies(tagged=1) >= 2 } or runicpower() < 32 } and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or runicpowerdeficit() >= 40 and timetorunes(3) > gcd() and spell(horn_of_winter) or enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or { runicpowerdeficit() > 25 or timetorunes(3) < gcd() } and spell(obliterate) or rotfc_rime() and spell(howling_blast)
+ runicpowerdeficit() >= 45 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or { rw_buffs() or enemies() >= 2 or runicpower() < 32 } and spell(remorseless_winter) or runicpower() < 32 and spell(death_and_decay) or { rotfc_rime() and { runicpowerdeficit() < 55 or timetorunes(3) <= gcd() or runeforge(rage_of_the_frozen_champion_runeforge) or enemies(tagged=1) >= 2 or buffremaining(rime_buff) < 3 } or runicpower() < 32 } and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or runicpowerdeficit() >= 40 and timetorunes(3) > gcd() and spell(horn_of_winter) or enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or { runicpowerdeficit() > 25 or timetorunes(3) < gcd() } and spell(obliterate) or rotfc_rime() and spell(howling_blast)
 }
 
 ### actions.bos_pooling
@@ -3656,6 +3662,8 @@ AddFunction froststandardmainactions
  if rw_buffs() spell(remorseless_winter)
  #obliterate,if=buff.killing_machine.react
  if buffpresent(killing_machine_buff) spell(obliterate)
+ #howling_blast,if=variable.rotfc_rime&buff.rime.remains<3
+ if rotfc_rime() and buffremaining(rime_buff) < 3 spell(howling_blast)
  #frost_strike,if=variable.frost_strike_conduits
  if frost_strike_conduits() spell(frost_strike)
  #glacial_advance,if=!death_knight.runeforge.razorice&(debuff.razorice.stack<5|debuff.razorice.remains<7)
@@ -3680,7 +3688,7 @@ AddFunction froststandardmainpostconditions
 
 AddFunction froststandardshortcdactions
 {
- unless rw_buffs() and spell(remorseless_winter) or buffpresent(killing_machine_buff) and spell(obliterate) or frost_strike_conduits() and spell(frost_strike) or not weaponenchantpresent(razorice_enchant) and { target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 7 } and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or { not runecount() < 3 and hastalent(frozen_pulse_talent) or deaths_due_active() and buffstacks(deaths_due_buff) < 4 or timetorunes(4) <= gcd() } and spell(obliterate) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 5 and spell(frost_strike) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or spell(frost_strike)
+ unless rw_buffs() and spell(remorseless_winter) or buffpresent(killing_machine_buff) and spell(obliterate) or rotfc_rime() and buffremaining(rime_buff) < 3 and spell(howling_blast) or frost_strike_conduits() and spell(frost_strike) or not weaponenchantpresent(razorice_enchant) and { target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 7 } and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or { not runecount() < 3 and hastalent(frozen_pulse_talent) or deaths_due_active() and buffstacks(deaths_due_buff) < 4 or timetorunes(4) <= gcd() } and spell(obliterate) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 5 and spell(frost_strike) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or spell(frost_strike)
  {
   #horn_of_winter
   spell(horn_of_winter)
@@ -3689,12 +3697,12 @@ AddFunction froststandardshortcdactions
 
 AddFunction froststandardshortcdpostconditions
 {
- rw_buffs() and spell(remorseless_winter) or buffpresent(killing_machine_buff) and spell(obliterate) or frost_strike_conduits() and spell(frost_strike) or not weaponenchantpresent(razorice_enchant) and { target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 7 } and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or { not runecount() < 3 and hastalent(frozen_pulse_talent) or deaths_due_active() and buffstacks(deaths_due_buff) < 4 or timetorunes(4) <= gcd() } and spell(obliterate) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 5 and spell(frost_strike) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or spell(frost_strike)
+ rw_buffs() and spell(remorseless_winter) or buffpresent(killing_machine_buff) and spell(obliterate) or rotfc_rime() and buffremaining(rime_buff) < 3 and spell(howling_blast) or frost_strike_conduits() and spell(frost_strike) or not weaponenchantpresent(razorice_enchant) and { target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 7 } and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or { not runecount() < 3 and hastalent(frozen_pulse_talent) or deaths_due_active() and buffstacks(deaths_due_buff) < 4 or timetorunes(4) <= gcd() } and spell(obliterate) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 5 and spell(frost_strike) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or spell(frost_strike)
 }
 
 AddFunction froststandardcdactions
 {
- unless rw_buffs() and spell(remorseless_winter) or buffpresent(killing_machine_buff) and spell(obliterate) or frost_strike_conduits() and spell(frost_strike) or not weaponenchantpresent(razorice_enchant) and { target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 7 } and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or { not runecount() < 3 and hastalent(frozen_pulse_talent) or deaths_due_active() and buffstacks(deaths_due_buff) < 4 or timetorunes(4) <= gcd() } and spell(obliterate) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 5 and spell(frost_strike) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or spell(frost_strike) or spell(horn_of_winter)
+ unless rw_buffs() and spell(remorseless_winter) or buffpresent(killing_machine_buff) and spell(obliterate) or rotfc_rime() and buffremaining(rime_buff) < 3 and spell(howling_blast) or frost_strike_conduits() and spell(frost_strike) or not weaponenchantpresent(razorice_enchant) and { target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 7 } and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or { not runecount() < 3 and hastalent(frozen_pulse_talent) or deaths_due_active() and buffstacks(deaths_due_buff) < 4 or timetorunes(4) <= gcd() } and spell(obliterate) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 5 and spell(frost_strike) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or spell(frost_strike) or spell(horn_of_winter)
  {
   #arcane_torrent
   spell(arcane_torrent)
@@ -3703,7 +3711,7 @@ AddFunction froststandardcdactions
 
 AddFunction froststandardcdpostconditions
 {
- rw_buffs() and spell(remorseless_winter) or buffpresent(killing_machine_buff) and spell(obliterate) or frost_strike_conduits() and spell(frost_strike) or not weaponenchantpresent(razorice_enchant) and { target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 7 } and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or { not runecount() < 3 and hastalent(frozen_pulse_talent) or deaths_due_active() and buffstacks(deaths_due_buff) < 4 or timetorunes(4) <= gcd() } and spell(obliterate) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 5 and spell(frost_strike) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or spell(frost_strike) or spell(horn_of_winter)
+ rw_buffs() and spell(remorseless_winter) or buffpresent(killing_machine_buff) and spell(obliterate) or rotfc_rime() and buffremaining(rime_buff) < 3 and spell(howling_blast) or frost_strike_conduits() and spell(frost_strike) or not weaponenchantpresent(razorice_enchant) and { target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 7 } and spell(glacial_advance) or spellcooldown(remorseless_winter) <= 2 * gcd() and hastalent(gathering_storm_talent) and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or { not runecount() < 3 and hastalent(frozen_pulse_talent) or deaths_due_active() and buffstacks(deaths_due_buff) < 4 or timetorunes(4) <= gcd() } and spell(obliterate) or runicpowerdeficit() < 15 + talentpoints(runic_attenuation_talent) * 5 and spell(frost_strike) or runicpowerdeficit() > 25 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or spell(frost_strike) or spell(horn_of_winter)
 }
 
 ### actions.racials
@@ -3738,8 +3746,8 @@ AddFunction frostracialscdactions
  if buffpresent(pillar_of_frost) spell(lights_judgment)
  #ancestral_call,if=buff.pillar_of_frost.up&buff.empower_rune_weapon.up
  if buffpresent(pillar_of_frost) and buffpresent(empower_rune_weapon) spell(ancestral_call)
- #fireblood,if=buff.pillar_of_frost.remains<=8&buff.empower_rune_weapon.up
- if buffremaining(pillar_of_frost) <= 8 and buffpresent(empower_rune_weapon) spell(fireblood)
+ #fireblood,if=buff.pillar_of_frost.remains<=8&buff.pillar_of_frost.up&buff.empower_rune_weapon.up
+ if buffremaining(pillar_of_frost) <= 8 and buffpresent(pillar_of_frost) and buffpresent(empower_rune_weapon) spell(fireblood)
 }
 
 AddFunction frostracialscdpostconditions
@@ -3829,8 +3837,8 @@ AddFunction frostobliterationmainactions
 {
  #remorseless_winter,if=active_enemies>=3&variable.rw_buffs
  if enemies() >= 3 and rw_buffs() spell(remorseless_winter)
- #howling_blast,target_if=!dot.frost_fever.ticking&!buff.killing_machine.up&rune>=3
- if not target.debuffpresent(frost_fever_debuff) and not buffpresent(killing_machine_buff) and runecount() >= 3 spell(howling_blast)
+ #howling_blast,target_if=!buff.killing_machine.up&rune>=3&(buff.rime.remains<3&buff.rime.up|!dot.frost_fever.ticking)
+ if not buffpresent(killing_machine_buff) and runecount() >= 3 and { buffremaining(rime_buff) < 3 and buffpresent(rime_buff) or not target.debuffpresent(frost_fever_debuff) } spell(howling_blast)
  #frostscythe,if=buff.killing_machine.react&spell_targets.frostscythe>=2&!variable.deaths_due_active
  if buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() spell(frostscythe)
  #obliterate,target_if=max:(debuff.razorice.stack+1)%(debuff.razorice.remains+1)*death_knight.runeforge.razorice,if=buff.killing_machine.react
@@ -3861,7 +3869,7 @@ AddFunction frostobliterationshortcdactions
 
 AddFunction frostobliterationshortcdpostconditions
 {
- enemies() >= 3 and rw_buffs() and spell(remorseless_winter) or not target.debuffpresent(frost_fever_debuff) and not buffpresent(killing_machine_buff) and runecount() >= 3 and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or buffpresent(killing_machine_buff) and spell(obliterate) or { enemies(tagged=1) >= 2 and { runicpowerdeficit() < 10 or timetorunes(2) > gcd() } or target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 15 } and spell(glacial_advance) or enemies() == 1 and frost_strike_conduits() and spell(frost_strike) or rotfc_rime() and enemies(tagged=1) >= 2 and spell(howling_blast) or enemies(tagged=1) >= 2 and spell(glacial_advance) or { not hastalent(avalanche_talent) and not buffpresent(killing_machine_buff) or hastalent(avalanche_talent) and not rotfc_rime() or rotfc_rime() and timetorunes(2) >= gcd() } and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or spell(obliterate)
+ enemies() >= 3 and rw_buffs() and spell(remorseless_winter) or not buffpresent(killing_machine_buff) and runecount() >= 3 and { buffremaining(rime_buff) < 3 and buffpresent(rime_buff) or not target.debuffpresent(frost_fever_debuff) } and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or buffpresent(killing_machine_buff) and spell(obliterate) or { enemies(tagged=1) >= 2 and { runicpowerdeficit() < 10 or timetorunes(2) > gcd() } or target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 15 } and spell(glacial_advance) or enemies() == 1 and frost_strike_conduits() and spell(frost_strike) or rotfc_rime() and enemies(tagged=1) >= 2 and spell(howling_blast) or enemies(tagged=1) >= 2 and spell(glacial_advance) or { not hastalent(avalanche_talent) and not buffpresent(killing_machine_buff) or hastalent(avalanche_talent) and not rotfc_rime() or rotfc_rime() and timetorunes(2) >= gcd() } and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or spell(obliterate)
 }
 
 AddFunction frostobliterationcdactions
@@ -3870,7 +3878,7 @@ AddFunction frostobliterationcdactions
 
 AddFunction frostobliterationcdpostconditions
 {
- enemies() >= 3 and rw_buffs() and spell(remorseless_winter) or not target.debuffpresent(frost_fever_debuff) and not buffpresent(killing_machine_buff) and runecount() >= 3 and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or buffpresent(killing_machine_buff) and spell(obliterate) or { enemies(tagged=1) >= 2 and { runicpowerdeficit() < 10 or timetorunes(2) > gcd() } or target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 15 } and spell(glacial_advance) or enemies() == 1 and frost_strike_conduits() and spell(frost_strike) or rotfc_rime() and enemies(tagged=1) >= 2 and spell(howling_blast) or enemies(tagged=1) >= 2 and spell(glacial_advance) or { not hastalent(avalanche_talent) and not buffpresent(killing_machine_buff) or hastalent(avalanche_talent) and not rotfc_rime() or rotfc_rime() and timetorunes(2) >= gcd() } and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or spell(obliterate)
+ enemies() >= 3 and rw_buffs() and spell(remorseless_winter) or not buffpresent(killing_machine_buff) and runecount() >= 3 and { buffremaining(rime_buff) < 3 and buffpresent(rime_buff) or not target.debuffpresent(frost_fever_debuff) } and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or buffpresent(killing_machine_buff) and spell(obliterate) or { enemies(tagged=1) >= 2 and { runicpowerdeficit() < 10 or timetorunes(2) > gcd() } or target.debuffstacks(razorice_debuff) < 5 or target.debuffremaining(razorice_debuff) < 15 } and spell(glacial_advance) or enemies() == 1 and frost_strike_conduits() and spell(frost_strike) or rotfc_rime() and enemies(tagged=1) >= 2 and spell(howling_blast) or enemies(tagged=1) >= 2 and spell(glacial_advance) or { not hastalent(avalanche_talent) and not buffpresent(killing_machine_buff) or hastalent(avalanche_talent) and not rotfc_rime() or rotfc_rime() and timetorunes(2) >= gcd() } and spell(frost_strike) or rotfc_rime() and spell(howling_blast) or spell(obliterate)
 }
 
 ### actions.covenants
@@ -4036,8 +4044,8 @@ AddFunction frostbos_tickingmainactions
  if runicpowerdeficit() >= 45 + talentpoints(runic_attenuation_talent) * 5 spell(obliterate)
  #remorseless_winter,if=variable.rw_buffs|active_enemies>=2|runic_power<32
  if rw_buffs() or enemies() >= 2 or runicpower() < 32 spell(remorseless_winter)
- #howling_blast,if=variable.rotfc_rime&(runic_power.deficit<55|rune.time_to_3<=gcd|runeforge.rage_of_the_frozen_champion|spell_targets.howling_blast>=2)|runic_power<32
- if rotfc_rime() and { runicpowerdeficit() < 55 or timetorunes(3) <= gcd() or runeforge(rage_of_the_frozen_champion_runeforge) or enemies(tagged=1) >= 2 } or runicpower() < 32 spell(howling_blast)
+ #howling_blast,if=variable.rotfc_rime&(runic_power.deficit<55|rune.time_to_3<=gcd|runeforge.rage_of_the_frozen_champion|spell_targets.howling_blast>=2|buff.rime.remains<3)|runic_power<32
+ if rotfc_rime() and { runicpowerdeficit() < 55 or timetorunes(3) <= gcd() or runeforge(rage_of_the_frozen_champion_runeforge) or enemies(tagged=1) >= 2 or buffremaining(rime_buff) < 3 } or runicpower() < 32 spell(howling_blast)
  #frostscythe,if=buff.killing_machine.up&spell_targets.frostscythe>=2&!variable.deaths_due_active
  if buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() spell(frostscythe)
  #frostscythe,if=spell_targets.frostscythe>=2&!variable.deaths_due_active
@@ -4059,7 +4067,7 @@ AddFunction frostbos_tickingshortcdactions
   #death_and_decay,if=runic_power<32
   if runicpower() < 32 spell(death_and_decay)
 
-  unless { rotfc_rime() and { runicpowerdeficit() < 55 or timetorunes(3) <= gcd() or runeforge(rage_of_the_frozen_champion_runeforge) or enemies(tagged=1) >= 2 } or runicpower() < 32 } and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe)
+  unless { rotfc_rime() and { runicpowerdeficit() < 55 or timetorunes(3) <= gcd() or runeforge(rage_of_the_frozen_champion_runeforge) or enemies(tagged=1) >= 2 or buffremaining(rime_buff) < 3 } or runicpower() < 32 } and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe)
   {
    #horn_of_winter,if=runic_power.deficit>=40&rune.time_to_3>gcd
    if runicpowerdeficit() >= 40 and timetorunes(3) > gcd() spell(horn_of_winter)
@@ -4069,12 +4077,12 @@ AddFunction frostbos_tickingshortcdactions
 
 AddFunction frostbos_tickingshortcdpostconditions
 {
- runicpowerdeficit() >= 45 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or { rw_buffs() or enemies() >= 2 or runicpower() < 32 } and spell(remorseless_winter) or { rotfc_rime() and { runicpowerdeficit() < 55 or timetorunes(3) <= gcd() or runeforge(rage_of_the_frozen_champion_runeforge) or enemies(tagged=1) >= 2 } or runicpower() < 32 } and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or { runicpowerdeficit() > 25 or timetorunes(3) < gcd() } and spell(obliterate) or rotfc_rime() and spell(howling_blast)
+ runicpowerdeficit() >= 45 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or { rw_buffs() or enemies() >= 2 or runicpower() < 32 } and spell(remorseless_winter) or { rotfc_rime() and { runicpowerdeficit() < 55 or timetorunes(3) <= gcd() or runeforge(rage_of_the_frozen_champion_runeforge) or enemies(tagged=1) >= 2 or buffremaining(rime_buff) < 3 } or runicpower() < 32 } and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or { runicpowerdeficit() > 25 or timetorunes(3) < gcd() } and spell(obliterate) or rotfc_rime() and spell(howling_blast)
 }
 
 AddFunction frostbos_tickingcdactions
 {
- unless runicpowerdeficit() >= 45 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or { rw_buffs() or enemies() >= 2 or runicpower() < 32 } and spell(remorseless_winter) or runicpower() < 32 and spell(death_and_decay) or { rotfc_rime() and { runicpowerdeficit() < 55 or timetorunes(3) <= gcd() or runeforge(rage_of_the_frozen_champion_runeforge) or enemies(tagged=1) >= 2 } or runicpower() < 32 } and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or runicpowerdeficit() >= 40 and timetorunes(3) > gcd() and spell(horn_of_winter) or enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or { runicpowerdeficit() > 25 or timetorunes(3) < gcd() } and spell(obliterate) or rotfc_rime() and spell(howling_blast)
+ unless runicpowerdeficit() >= 45 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or { rw_buffs() or enemies() >= 2 or runicpower() < 32 } and spell(remorseless_winter) or runicpower() < 32 and spell(death_and_decay) or { rotfc_rime() and { runicpowerdeficit() < 55 or timetorunes(3) <= gcd() or runeforge(rage_of_the_frozen_champion_runeforge) or enemies(tagged=1) >= 2 or buffremaining(rime_buff) < 3 } or runicpower() < 32 } and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or runicpowerdeficit() >= 40 and timetorunes(3) > gcd() and spell(horn_of_winter) or enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or { runicpowerdeficit() > 25 or timetorunes(3) < gcd() } and spell(obliterate) or rotfc_rime() and spell(howling_blast)
  {
   #arcane_torrent,if=runic_power.deficit>50
   if runicpowerdeficit() > 50 spell(arcane_torrent)
@@ -4083,7 +4091,7 @@ AddFunction frostbos_tickingcdactions
 
 AddFunction frostbos_tickingcdpostconditions
 {
- runicpowerdeficit() >= 45 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or { rw_buffs() or enemies() >= 2 or runicpower() < 32 } and spell(remorseless_winter) or runicpower() < 32 and spell(death_and_decay) or { rotfc_rime() and { runicpowerdeficit() < 55 or timetorunes(3) <= gcd() or runeforge(rage_of_the_frozen_champion_runeforge) or enemies(tagged=1) >= 2 } or runicpower() < 32 } and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or runicpowerdeficit() >= 40 and timetorunes(3) > gcd() and spell(horn_of_winter) or enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or { runicpowerdeficit() > 25 or timetorunes(3) < gcd() } and spell(obliterate) or rotfc_rime() and spell(howling_blast)
+ runicpowerdeficit() >= 45 + talentpoints(runic_attenuation_talent) * 5 and spell(obliterate) or { rw_buffs() or enemies() >= 2 or runicpower() < 32 } and spell(remorseless_winter) or runicpower() < 32 and spell(death_and_decay) or { rotfc_rime() and { runicpowerdeficit() < 55 or timetorunes(3) <= gcd() or runeforge(rage_of_the_frozen_champion_runeforge) or enemies(tagged=1) >= 2 or buffremaining(rime_buff) < 3 } or runicpower() < 32 } and spell(howling_blast) or buffpresent(killing_machine_buff) and enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or runicpowerdeficit() >= 40 and timetorunes(3) > gcd() and spell(horn_of_winter) or enemies(tagged=1) >= 2 and not deaths_due_active() and spell(frostscythe) or { runicpowerdeficit() > 25 or timetorunes(3) < gcd() } and spell(obliterate) or rotfc_rime() and spell(howling_blast)
 }
 
 ### actions.bos_pooling

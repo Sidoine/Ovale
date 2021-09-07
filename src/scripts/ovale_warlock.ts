@@ -1374,7 +1374,7 @@ Include(ovale_warlock_spells)
 
 AddFunction first_tyrant_time
 {
- 12
+ 10
 }
 
 AddCheckBox(opt_interrupt l(interrupt) default enabled=(specialization(demonology)))
@@ -1402,8 +1402,8 @@ AddFunction demonologyuseitemactions
 
 AddFunction demonologytyrant_setupmainactions
 {
- #call_dreadstalkers,if=cooldown.summon_demonic_tyrant.remains_expected<12-(action.summon_demonic_tyrant.execute_time+action.shadow_bolt.execute_time)&time>variable.first_tyrant_time-12-action.call_dreadstalkers.execute_time+action.summon_demonic_tyrant.execute_time+action.shadow_bolt.execute_time
- if spellcooldown(summon_demonic_tyrant) < 12 - { executetime(summon_demonic_tyrant) + executetime(shadow_bolt) } and timeincombat() > first_tyrant_time() - 12 - executetime(call_dreadstalkers) + executetime(summon_demonic_tyrant) + executetime(shadow_bolt) spell(call_dreadstalkers)
+ #call_dreadstalkers,if=cooldown.summon_demonic_tyrant.remains_expected<12-(action.summon_demonic_tyrant.execute_time+action.shadow_bolt.execute_time)
+ if spellcooldown(summon_demonic_tyrant) < 12 - { executetime(summon_demonic_tyrant) + executetime(shadow_bolt) } spell(call_dreadstalkers)
 }
 
 AddFunction demonologytyrant_setupmainpostconditions
@@ -1415,7 +1415,7 @@ AddFunction demonologytyrant_setupshortcdactions
  #summon_vilefiend,if=(cooldown.summon_demonic_tyrant.remains_expected<15-(action.summon_demonic_tyrant.execute_time)&(cooldown.call_dreadstalkers.remains<15-(action.summon_demonic_tyrant.execute_time+action.summon_vilefiend.execute_time)|pet.dreadstalker.remains>cooldown.summon_demonic_tyrant.remains_expected+action.summon_demonic_tyrant.execute_time))|(!runeforge.wilfreds_sigil_of_superior_summoning&cooldown.summon_demonic_tyrant.remains_expected>40)
  if spellcooldown(summon_demonic_tyrant) < 15 - executetime(summon_demonic_tyrant) and { spellcooldown(call_dreadstalkers) < 15 - { executetime(summon_demonic_tyrant) + executetime(summon_vilefiend) } or demonduration(dreadstalker) > spellcooldown(summon_demonic_tyrant) + executetime(summon_demonic_tyrant) } or not runeforge(wilfreds_sigil_of_superior_summoning_runeforge) and spellcooldown(summon_demonic_tyrant) > 40 spell(summon_vilefiend)
 
- unless spellcooldown(summon_demonic_tyrant) < 12 - { executetime(summon_demonic_tyrant) + executetime(shadow_bolt) } and timeincombat() > first_tyrant_time() - 12 - executetime(call_dreadstalkers) + executetime(summon_demonic_tyrant) + executetime(shadow_bolt) and spell(call_dreadstalkers)
+ unless spellcooldown(summon_demonic_tyrant) < 12 - { executetime(summon_demonic_tyrant) + executetime(shadow_bolt) } and spell(call_dreadstalkers)
  {
   #summon_demonic_tyrant,if=time>variable.first_tyrant_time&(pet.dreadstalker.active&pet.dreadstalker.remains>action.summon_demonic_tyrant.execute_time)&(!talent.summon_vilefiend.enabled|pet.vilefiend.active)&(soul_shard=0|(pet.dreadstalker.active&pet.dreadstalker.remains<action.summon_demonic_tyrant.execute_time+action.shadow_bolt.execute_time)|(pet.vilefiend.active&pet.vilefiend.remains<action.summon_demonic_tyrant.execute_time+action.shadow_bolt.execute_time)|(buff.grimoire_felguard.up&buff.grimoire_felguard.remains<action.summon_demonic_tyrant.execute_time+action.shadow_bolt.execute_time))
   if timeincombat() > first_tyrant_time() and demonduration(dreadstalker) > 0 and demonduration(dreadstalker) > executetime(summon_demonic_tyrant) and { not hastalent(summon_vilefiend_talent) or demonduration(vilefiend) > 0 } and { soulshards() == 0 or demonduration(dreadstalker) > 0 and demonduration(dreadstalker) < executetime(summon_demonic_tyrant) + executetime(shadow_bolt) or demonduration(vilefiend) > 0 and demonduration(vilefiend) < executetime(summon_demonic_tyrant) + executetime(shadow_bolt) or buffpresent(grimoire_felguard) and buffremaining(grimoire_felguard) < executetime(summon_demonic_tyrant) + executetime(shadow_bolt) } spell(summon_demonic_tyrant)
@@ -1424,7 +1424,7 @@ AddFunction demonologytyrant_setupshortcdactions
 
 AddFunction demonologytyrant_setupshortcdpostconditions
 {
- spellcooldown(summon_demonic_tyrant) < 12 - { executetime(summon_demonic_tyrant) + executetime(shadow_bolt) } and timeincombat() > first_tyrant_time() - 12 - executetime(call_dreadstalkers) + executetime(summon_demonic_tyrant) + executetime(shadow_bolt) and spell(call_dreadstalkers)
+ spellcooldown(summon_demonic_tyrant) < 12 - { executetime(summon_demonic_tyrant) + executetime(shadow_bolt) } and spell(call_dreadstalkers)
 }
 
 AddFunction demonologytyrant_setupcdactions
@@ -1437,7 +1437,7 @@ AddFunction demonologytyrant_setupcdactions
 
 AddFunction demonologytyrant_setupcdpostconditions
 {
- { spellcooldown(summon_demonic_tyrant) < 15 - executetime(summon_demonic_tyrant) and { spellcooldown(call_dreadstalkers) < 15 - { executetime(summon_demonic_tyrant) + executetime(summon_vilefiend) } or demonduration(dreadstalker) > spellcooldown(summon_demonic_tyrant) + executetime(summon_demonic_tyrant) } or not runeforge(wilfreds_sigil_of_superior_summoning_runeforge) and spellcooldown(summon_demonic_tyrant) > 40 } and spell(summon_vilefiend) or spellcooldown(summon_demonic_tyrant) < 12 - { executetime(summon_demonic_tyrant) + executetime(shadow_bolt) } and timeincombat() > first_tyrant_time() - 12 - executetime(call_dreadstalkers) + executetime(summon_demonic_tyrant) + executetime(shadow_bolt) and spell(call_dreadstalkers) or timeincombat() > first_tyrant_time() and demonduration(dreadstalker) > 0 and demonduration(dreadstalker) > executetime(summon_demonic_tyrant) and { not hastalent(summon_vilefiend_talent) or demonduration(vilefiend) > 0 } and { soulshards() == 0 or demonduration(dreadstalker) > 0 and demonduration(dreadstalker) < executetime(summon_demonic_tyrant) + executetime(shadow_bolt) or demonduration(vilefiend) > 0 and demonduration(vilefiend) < executetime(summon_demonic_tyrant) + executetime(shadow_bolt) or buffpresent(grimoire_felguard) and buffremaining(grimoire_felguard) < executetime(summon_demonic_tyrant) + executetime(shadow_bolt) } and spell(summon_demonic_tyrant)
+ { spellcooldown(summon_demonic_tyrant) < 15 - executetime(summon_demonic_tyrant) and { spellcooldown(call_dreadstalkers) < 15 - { executetime(summon_demonic_tyrant) + executetime(summon_vilefiend) } or demonduration(dreadstalker) > spellcooldown(summon_demonic_tyrant) + executetime(summon_demonic_tyrant) } or not runeforge(wilfreds_sigil_of_superior_summoning_runeforge) and spellcooldown(summon_demonic_tyrant) > 40 } and spell(summon_vilefiend) or spellcooldown(summon_demonic_tyrant) < 12 - { executetime(summon_demonic_tyrant) + executetime(shadow_bolt) } and spell(call_dreadstalkers) or timeincombat() > first_tyrant_time() and demonduration(dreadstalker) > 0 and demonduration(dreadstalker) > executetime(summon_demonic_tyrant) and { not hastalent(summon_vilefiend_talent) or demonduration(vilefiend) > 0 } and { soulshards() == 0 or demonduration(dreadstalker) > 0 and demonduration(dreadstalker) < executetime(summon_demonic_tyrant) + executetime(shadow_bolt) or demonduration(vilefiend) > 0 and demonduration(vilefiend) < executetime(summon_demonic_tyrant) + executetime(shadow_bolt) or buffpresent(grimoire_felguard) and buffremaining(grimoire_felguard) < executetime(summon_demonic_tyrant) + executetime(shadow_bolt) } and spell(summon_demonic_tyrant)
 }
 
 ### actions.trinkets
@@ -1594,12 +1594,56 @@ AddFunction demonologyprecombatcdactions
   #snapshot_stats
   #fleshcraft
   spell(fleshcraft)
+  #variable,name=first_tyrant_time,op=set,value=10
+  #use_item,name=shadowed_orb_of_torment
+  if hastrinket(shadowed_orb_of_torment_item) item(shadowed_orb_of_torment_item usable=1)
  }
 }
 
 AddFunction demonologyprecombatcdpostconditions
 {
  not pet.present() and spell(summon_felguard) or spell(demonbolt)
+}
+
+### actions.opener
+
+AddFunction demonologyopenermainactions
+{
+ #shadow_bolt,if=soul_shard<5&cooldown.call_dreadstalkers.up
+ if soulshards() < 5 and not spellcooldown(call_dreadstalkers) > 0 spell(shadow_bolt)
+ #call_dreadstalkers
+ spell(call_dreadstalkers)
+}
+
+AddFunction demonologyopenermainpostconditions
+{
+}
+
+AddFunction demonologyopenershortcdactions
+{
+ #soul_rot,if=soulbind.grove_invigoration
+ if soulbind(grove_invigoration_soulbind) spell(soul_rot)
+ #summon_vilefiend
+ spell(summon_vilefiend)
+}
+
+AddFunction demonologyopenershortcdpostconditions
+{
+ soulshards() < 5 and not spellcooldown(call_dreadstalkers) > 0 and spell(shadow_bolt) or spell(call_dreadstalkers)
+}
+
+AddFunction demonologyopenercdactions
+{
+ unless soulbind(grove_invigoration_soulbind) and spell(soul_rot)
+ {
+  #grimoire_felguard
+  spell(grimoire_felguard)
+ }
+}
+
+AddFunction demonologyopenercdpostconditions
+{
+ soulbind(grove_invigoration_soulbind) and spell(soul_rot) or spell(summon_vilefiend) or soulshards() < 5 and not spellcooldown(call_dreadstalkers) > 0 and spell(shadow_bolt) or spell(call_dreadstalkers)
 }
 
 ### actions.ogcd
@@ -1682,8 +1726,8 @@ AddFunction demonologycovenant_abilityshortcdactions
  if soulbind(grove_invigoration_soulbind) and { spellcooldown(summon_demonic_tyrant) < 20 or spellcooldown(summon_demonic_tyrant) > 30 } spell(soul_rot)
  #soul_rot,if=soulbind.field_of_blossoms&pet.demonic_tyrant.active
  if soulbind(field_of_blossoms_soulbind) and demonduration(demonic_tyrant) > 0 spell(soul_rot)
- #soul_rot,if=soulbind.wild_hunt_tactics
- if soulbind(wild_hunt_tactics_soulbind) spell(soul_rot)
+ #soul_rot,if=soulbind.wild_hunt_tactics&!pet.demonic_tyrant.active&cooldown.summon_demonic_tyrant.remains_expected>18
+ if soulbind(wild_hunt_tactics_soulbind) and not demonduration(demonic_tyrant) > 0 and spellcooldown(summon_demonic_tyrant) > 18 spell(soul_rot)
  #decimating_bolt,if=(soulbind.lead_by_example|soulbind.kevins_oozeling)&(pet.demonic_tyrant.active&soul_shard<2|!pet.demonic_tyrant.active&cooldown.summon_demonic_tyrant.remains_expected>40)
  if { soulbind(lead_by_example_soulbind) or soulbind(kevins_oozeling_soulbind) } and { demonduration(demonic_tyrant) > 0 and soulshards() < 2 or not demonduration(demonic_tyrant) > 0 and spellcooldown(summon_demonic_tyrant) > 40 } spell(decimating_bolt)
  #decimating_bolt,if=(soulbind.forgeborne_reveries|(soulbind.volatile_solvent&!soulbind.kevins_oozeling))&!pet.demonic_tyrant.active
@@ -1702,7 +1746,7 @@ AddFunction demonologycovenant_abilityshortcdpostconditions
 
 AddFunction demonologycovenant_abilitycdactions
 {
- unless soulbind(grove_invigoration_soulbind) and { spellcooldown(summon_demonic_tyrant) < 20 or spellcooldown(summon_demonic_tyrant) > 30 } and spell(soul_rot) or soulbind(field_of_blossoms_soulbind) and demonduration(demonic_tyrant) > 0 and spell(soul_rot) or soulbind(wild_hunt_tactics_soulbind) and spell(soul_rot) or { soulbind(lead_by_example_soulbind) or soulbind(kevins_oozeling_soulbind) } and { demonduration(demonic_tyrant) > 0 and soulshards() < 2 or not demonduration(demonic_tyrant) > 0 and spellcooldown(summon_demonic_tyrant) > 40 } and spell(decimating_bolt) or { soulbind(forgeborne_reveries_soulbind) or soulbind(volatile_solvent_soulbind) and not soulbind(kevins_oozeling_soulbind) } and not demonduration(demonic_tyrant) > 0 and spell(decimating_bolt)
+ unless soulbind(grove_invigoration_soulbind) and { spellcooldown(summon_demonic_tyrant) < 20 or spellcooldown(summon_demonic_tyrant) > 30 } and spell(soul_rot) or soulbind(field_of_blossoms_soulbind) and demonduration(demonic_tyrant) > 0 and spell(soul_rot) or soulbind(wild_hunt_tactics_soulbind) and not demonduration(demonic_tyrant) > 0 and spellcooldown(summon_demonic_tyrant) > 18 and spell(soul_rot) or { soulbind(lead_by_example_soulbind) or soulbind(kevins_oozeling_soulbind) } and { demonduration(demonic_tyrant) > 0 and soulshards() < 2 or not demonduration(demonic_tyrant) > 0 and spellcooldown(summon_demonic_tyrant) > 40 } and spell(decimating_bolt) or { soulbind(forgeborne_reveries_soulbind) or soulbind(volatile_solvent_soulbind) and not soulbind(kevins_oozeling_soulbind) } and not demonduration(demonic_tyrant) > 0 and spell(decimating_bolt)
  {
   #fleshcraft,if=soulbind.volatile_solvent,cancel_if=buff.volatile_solvent_humanoid.up
   if soulbind(volatile_solvent_soulbind) spell(fleshcraft)
@@ -1711,7 +1755,7 @@ AddFunction demonologycovenant_abilitycdactions
 
 AddFunction demonologycovenant_abilitycdpostconditions
 {
- soulbind(grove_invigoration_soulbind) and { spellcooldown(summon_demonic_tyrant) < 20 or spellcooldown(summon_demonic_tyrant) > 30 } and spell(soul_rot) or soulbind(field_of_blossoms_soulbind) and demonduration(demonic_tyrant) > 0 and spell(soul_rot) or soulbind(wild_hunt_tactics_soulbind) and spell(soul_rot) or { soulbind(lead_by_example_soulbind) or soulbind(kevins_oozeling_soulbind) } and { demonduration(demonic_tyrant) > 0 and soulshards() < 2 or not demonduration(demonic_tyrant) > 0 and spellcooldown(summon_demonic_tyrant) > 40 } and spell(decimating_bolt) or { soulbind(forgeborne_reveries_soulbind) or soulbind(volatile_solvent_soulbind) and not soulbind(kevins_oozeling_soulbind) } and not demonduration(demonic_tyrant) > 0 and spell(decimating_bolt) or soulbind(combat_meditation_soulbind) and demonduration(demonic_tyrant) > 0 and spell(scouring_tithe) or not soulbind(combat_meditation_soulbind) and spell(scouring_tithe) or demonduration(demonic_tyrant) > 0 and soulshards() == 0 and spell(impending_catastrophe)
+ soulbind(grove_invigoration_soulbind) and { spellcooldown(summon_demonic_tyrant) < 20 or spellcooldown(summon_demonic_tyrant) > 30 } and spell(soul_rot) or soulbind(field_of_blossoms_soulbind) and demonduration(demonic_tyrant) > 0 and spell(soul_rot) or soulbind(wild_hunt_tactics_soulbind) and not demonduration(demonic_tyrant) > 0 and spellcooldown(summon_demonic_tyrant) > 18 and spell(soul_rot) or { soulbind(lead_by_example_soulbind) or soulbind(kevins_oozeling_soulbind) } and { demonduration(demonic_tyrant) > 0 and soulshards() < 2 or not demonduration(demonic_tyrant) > 0 and spellcooldown(summon_demonic_tyrant) > 40 } and spell(decimating_bolt) or { soulbind(forgeborne_reveries_soulbind) or soulbind(volatile_solvent_soulbind) and not soulbind(kevins_oozeling_soulbind) } and not demonduration(demonic_tyrant) > 0 and spell(decimating_bolt) or soulbind(combat_meditation_soulbind) and demonduration(demonic_tyrant) > 0 and spell(scouring_tithe) or not soulbind(combat_meditation_soulbind) and spell(scouring_tithe) or demonduration(demonic_tyrant) > 0 and soulshards() == 0 and spell(impending_catastrophe)
 }
 
 ### actions.default
@@ -1723,69 +1767,75 @@ AddFunction demonology_defaultmainactions
 
  unless demonologytrinketsmainpostconditions()
  {
-  #doom,if=refreshable
-  if target.refreshable(doom) spell(doom)
-  #call_action_list,name=covenant_ability,if=soulbind.grove_invigoration|soulbind.field_of_blossoms|soulbind.combat_meditation|covenant.necrolord
-  if soulbind(grove_invigoration_soulbind) or soulbind(field_of_blossoms_soulbind) or soulbind(combat_meditation_soulbind) or iscovenant("necrolord") demonologycovenant_abilitymainactions()
+  #call_action_list,name=opener,if=time<variable.first_tyrant_time
+  if timeincombat() < first_tyrant_time() demonologyopenermainactions()
 
-  unless { soulbind(grove_invigoration_soulbind) or soulbind(field_of_blossoms_soulbind) or soulbind(combat_meditation_soulbind) or iscovenant("necrolord") } and demonologycovenant_abilitymainpostconditions()
+  unless timeincombat() < first_tyrant_time() and demonologyopenermainpostconditions()
   {
-   #call_action_list,name=tyrant_setup
-   demonologytyrant_setupmainactions()
+   #doom,if=refreshable
+   if target.refreshable(doom) spell(doom)
+   #call_action_list,name=covenant_ability,if=soulbind.grove_invigoration|soulbind.field_of_blossoms|soulbind.combat_meditation|covenant.necrolord
+   if soulbind(grove_invigoration_soulbind) or soulbind(field_of_blossoms_soulbind) or soulbind(combat_meditation_soulbind) or iscovenant("necrolord") demonologycovenant_abilitymainactions()
 
-   unless demonologytyrant_setupmainpostconditions()
+   unless { soulbind(grove_invigoration_soulbind) or soulbind(field_of_blossoms_soulbind) or soulbind(combat_meditation_soulbind) or iscovenant("necrolord") } and demonologycovenant_abilitymainpostconditions()
    {
-    #call_action_list,name=ogcd,if=pet.demonic_tyrant.active
-    if demonduration(demonic_tyrant) > 0 demonologyogcdmainactions()
+    #call_action_list,name=tyrant_setup
+    demonologytyrant_setupmainactions()
 
-    unless demonduration(demonic_tyrant) > 0 and demonologyogcdmainpostconditions()
+    unless demonologytyrant_setupmainpostconditions()
     {
-     #call_dreadstalkers,if=cooldown.summon_demonic_tyrant.remains_expected>20-5*!runeforge.wilfreds_sigil_of_superior_summoning
-     if spellcooldown(summon_demonic_tyrant) > 20 - 5 * { not runeforge(wilfreds_sigil_of_superior_summoning_runeforge) } spell(call_dreadstalkers)
-     #implosion,if=active_enemies>1+(1*talent.sacrificed_souls.enabled)&buff.wild_imps.stack>=6&buff.tyrant.down&cooldown.summon_demonic_tyrant.remains_expected>5
-     if enemies() > 1 + 1 * talentpoints(sacrificed_souls_talent) and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 spell(implosion)
-     #implosion,if=active_enemies>2&buff.wild_imps.stack>=6&buff.tyrant.down&cooldown.summon_demonic_tyrant.remains_expected>5&!runeforge.implosive_potential&(!talent.from_the_shadows.enabled|buff.from_the_shadows.up)
-     if enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and not runeforge(implosive_potential_runeforge) and { not hastalent(from_the_shadows_talent) or target.debuffpresent(from_the_shadows_debuff) } spell(implosion)
-     #implosion,if=active_enemies>2&buff.wild_imps.stack>=6&buff.implosive_potential.remains<2&runeforge.implosive_potential
-     if enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and buffremaining(implosive_potential_buff) < 2 and runeforge(implosive_potential_runeforge) spell(implosion)
-     #implosion,if=buff.wild_imps.stack>=12&talent.soul_conduit.enabled&talent.from_the_shadows.enabled&runeforge.implosive_potential&buff.tyrant.down&cooldown.summon_demonic_tyrant.remains_expected>5
-     if demons(wild_imp) + demons(wild_imp_inner_demons) >= 12 and hastalent(soul_conduit_talent_demonology) and hastalent(from_the_shadows_talent) and runeforge(implosive_potential_runeforge) and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 spell(implosion)
-     #hand_of_guldan,if=soul_shard=5
-     if soulshards() == 5 spell(hand_of_guldan)
-     #hand_of_guldan,if=soul_shard>=3&(pet.dreadstalker.active|pet.demonic_tyrant.active)
-     if soulshards() >= 3 and { demonduration(dreadstalker) > 0 or demonduration(demonic_tyrant) > 0 } spell(hand_of_guldan)
-     #hand_of_guldan,if=soul_shard>=1&buff.nether_portal.up&cooldown.call_dreadstalkers.remains>2*gcd.max
-     if soulshards() >= 1 and buffpresent(nether_portal) and spellcooldown(call_dreadstalkers) > 2 * gcd() spell(hand_of_guldan)
-     #hand_of_guldan,if=soul_shard>=1&cooldown.summon_demonic_tyrant.remains_expected<gcd.max&time>variable.first_tyrant_time-gcd.max
-     if soulshards() >= 1 and spellcooldown(summon_demonic_tyrant) < gcd() and timeincombat() > first_tyrant_time() - gcd() spell(hand_of_guldan)
-     #call_action_list,name=covenant_ability,if=!covenant.venthyr
-     if not iscovenant("venthyr") demonologycovenant_abilitymainactions()
+     #call_action_list,name=ogcd,if=pet.demonic_tyrant.active
+     if demonduration(demonic_tyrant) > 0 demonologyogcdmainactions()
 
-     unless not iscovenant("venthyr") and demonologycovenant_abilitymainpostconditions()
+     unless demonduration(demonic_tyrant) > 0 and demonologyogcdmainpostconditions()
      {
-      #soul_strike,if=!talent.sacrificed_souls.enabled
-      if not hastalent(sacrificed_souls_talent) spell(soul_strike)
-      #demonbolt,if=buff.demonic_core.react&soul_shard<4&cooldown.summon_demonic_tyrant.remains_expected>20
-      if buffpresent(demonic_core_buff) and soulshards() < 4 and spellcooldown(summon_demonic_tyrant) > 20 spell(demonbolt)
-      #demonbolt,if=buff.demonic_core.react&soul_shard<4&cooldown.summon_demonic_tyrant.remains_expected<12
-      if buffpresent(demonic_core_buff) and soulshards() < 4 and spellcooldown(summon_demonic_tyrant) < 12 spell(demonbolt)
-      #demonbolt,if=buff.demonic_core.react&soul_shard<4&(buff.demonic_core.stack>2|talent.sacrificed_souls.enabled)
-      if buffpresent(demonic_core_buff) and soulshards() < 4 and { buffstacks(demonic_core_buff) > 2 or hastalent(sacrificed_souls_talent) } spell(demonbolt)
-      #demonbolt,if=buff.demonic_core.react&soul_shard<4&active_enemies>1
-      if buffpresent(demonic_core_buff) and soulshards() < 4 and enemies() > 1 spell(demonbolt)
-      #soul_strike
-      spell(soul_strike)
-      #call_action_list,name=covenant_ability
-      demonologycovenant_abilitymainactions()
+      #call_dreadstalkers,if=cooldown.summon_demonic_tyrant.remains_expected>20-5*!runeforge.wilfreds_sigil_of_superior_summoning
+      if spellcooldown(summon_demonic_tyrant) > 20 - 5 * { not runeforge(wilfreds_sigil_of_superior_summoning_runeforge) } spell(call_dreadstalkers)
+      #implosion,if=active_enemies>1+(1*talent.sacrificed_souls.enabled)&buff.wild_imps.stack>=6&buff.tyrant.down&cooldown.summon_demonic_tyrant.remains_expected>5
+      if enemies() > 1 + 1 * talentpoints(sacrificed_souls_talent) and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 spell(implosion)
+      #implosion,if=active_enemies>2&buff.wild_imps.stack>=6&buff.tyrant.down&cooldown.summon_demonic_tyrant.remains_expected>5&!runeforge.implosive_potential&(!talent.from_the_shadows.enabled|buff.from_the_shadows.up)
+      if enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and not runeforge(implosive_potential_runeforge) and { not hastalent(from_the_shadows_talent) or target.debuffpresent(from_the_shadows_debuff) } spell(implosion)
+      #implosion,if=active_enemies>2&buff.wild_imps.stack>=6&buff.implosive_potential.remains<2&runeforge.implosive_potential
+      if enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and buffremaining(implosive_potential_buff) < 2 and runeforge(implosive_potential_runeforge) spell(implosion)
+      #implosion,if=buff.wild_imps.stack>=12&talent.soul_conduit.enabled&talent.from_the_shadows.enabled&runeforge.implosive_potential&buff.tyrant.down&cooldown.summon_demonic_tyrant.remains_expected>5
+      if demons(wild_imp) + demons(wild_imp_inner_demons) >= 12 and hastalent(soul_conduit_talent_demonology) and hastalent(from_the_shadows_talent) and runeforge(implosive_potential_runeforge) and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 spell(implosion)
+      #hand_of_guldan,if=soul_shard=5
+      if soulshards() == 5 spell(hand_of_guldan)
+      #hand_of_guldan,if=soul_shard>=3&(pet.dreadstalker.active|pet.demonic_tyrant.active)
+      if soulshards() >= 3 and { demonduration(dreadstalker) > 0 or demonduration(demonic_tyrant) > 0 } spell(hand_of_guldan)
+      #hand_of_guldan,if=soul_shard>=1&buff.nether_portal.up&cooldown.call_dreadstalkers.remains>2*gcd.max
+      if soulshards() >= 1 and buffpresent(nether_portal) and spellcooldown(call_dreadstalkers) > 2 * gcd() spell(hand_of_guldan)
+      #hand_of_guldan,if=soul_shard>=1&cooldown.summon_demonic_tyrant.remains_expected<gcd.max&time>variable.first_tyrant_time-gcd.max
+      if soulshards() >= 1 and spellcooldown(summon_demonic_tyrant) < gcd() and timeincombat() > first_tyrant_time() - gcd() spell(hand_of_guldan)
+      #call_action_list,name=covenant_ability,if=!covenant.venthyr
+      if not iscovenant("venthyr") demonologycovenant_abilitymainactions()
 
-      unless demonologycovenant_abilitymainpostconditions()
+      unless not iscovenant("venthyr") and demonologycovenant_abilitymainpostconditions()
       {
-       #hand_of_guldan,if=soul_shard>=3&cooldown.summon_demonic_tyrant.remains_expected>25&(talent.demonic_calling.enabled|cooldown.call_dreadstalkers.remains>((5-soul_shard)*action.shadow_bolt.execute_time)+action.hand_of_guldan.execute_time)
-       if soulshards() >= 3 and spellcooldown(summon_demonic_tyrant) > 25 and { hastalent(demonic_calling_talent) or spellcooldown(call_dreadstalkers) > { 5 - soulshards() } * executetime(shadow_bolt) + executetime(hand_of_guldan) } spell(hand_of_guldan)
-       #doom,cycle_targets=1,if=refreshable&time>variable.first_tyrant_time
-       if target.refreshable(doom) and timeincombat() > first_tyrant_time() spell(doom)
-       #shadow_bolt
-       spell(shadow_bolt)
+       #soul_strike,if=!talent.sacrificed_souls.enabled
+       if not hastalent(sacrificed_souls_talent) spell(soul_strike)
+       #demonbolt,if=buff.demonic_core.react&soul_shard<4&cooldown.summon_demonic_tyrant.remains_expected>20
+       if buffpresent(demonic_core_buff) and soulshards() < 4 and spellcooldown(summon_demonic_tyrant) > 20 spell(demonbolt)
+       #demonbolt,if=buff.demonic_core.react&soul_shard<4&cooldown.summon_demonic_tyrant.remains_expected<12
+       if buffpresent(demonic_core_buff) and soulshards() < 4 and spellcooldown(summon_demonic_tyrant) < 12 spell(demonbolt)
+       #demonbolt,if=buff.demonic_core.react&soul_shard<4&(buff.demonic_core.stack>2|talent.sacrificed_souls.enabled)
+       if buffpresent(demonic_core_buff) and soulshards() < 4 and { buffstacks(demonic_core_buff) > 2 or hastalent(sacrificed_souls_talent) } spell(demonbolt)
+       #demonbolt,if=buff.demonic_core.react&soul_shard<4&active_enemies>1
+       if buffpresent(demonic_core_buff) and soulshards() < 4 and enemies() > 1 spell(demonbolt)
+       #soul_strike
+       spell(soul_strike)
+       #call_action_list,name=covenant_ability
+       demonologycovenant_abilitymainactions()
+
+       unless demonologycovenant_abilitymainpostconditions()
+       {
+        #hand_of_guldan,if=soul_shard>=3&cooldown.summon_demonic_tyrant.remains_expected>25&(talent.demonic_calling.enabled|cooldown.call_dreadstalkers.remains>((5-soul_shard)*action.shadow_bolt.execute_time)+action.hand_of_guldan.execute_time)
+        if soulshards() >= 3 and spellcooldown(summon_demonic_tyrant) > 25 and { hastalent(demonic_calling_talent) or spellcooldown(call_dreadstalkers) > { 5 - soulshards() } * executetime(shadow_bolt) + executetime(hand_of_guldan) } spell(hand_of_guldan)
+        #doom,cycle_targets=1,if=refreshable&time>variable.first_tyrant_time
+        if target.refreshable(doom) and timeincombat() > first_tyrant_time() spell(doom)
+        #shadow_bolt
+        spell(shadow_bolt)
+       }
       }
      }
     }
@@ -1796,7 +1846,7 @@ AddFunction demonology_defaultmainactions
 
 AddFunction demonology_defaultmainpostconditions
 {
- demonologytrinketsmainpostconditions() or { soulbind(grove_invigoration_soulbind) or soulbind(field_of_blossoms_soulbind) or soulbind(combat_meditation_soulbind) or iscovenant("necrolord") } and demonologycovenant_abilitymainpostconditions() or demonologytyrant_setupmainpostconditions() or demonduration(demonic_tyrant) > 0 and demonologyogcdmainpostconditions() or not iscovenant("venthyr") and demonologycovenant_abilitymainpostconditions() or demonologycovenant_abilitymainpostconditions()
+ demonologytrinketsmainpostconditions() or timeincombat() < first_tyrant_time() and demonologyopenermainpostconditions() or { soulbind(grove_invigoration_soulbind) or soulbind(field_of_blossoms_soulbind) or soulbind(combat_meditation_soulbind) or iscovenant("necrolord") } and demonologycovenant_abilitymainpostconditions() or demonologytyrant_setupmainpostconditions() or demonduration(demonic_tyrant) > 0 and demonologyogcdmainpostconditions() or not iscovenant("venthyr") and demonologycovenant_abilitymainpostconditions() or demonologycovenant_abilitymainpostconditions()
 }
 
 AddFunction demonology_defaultshortcdactions
@@ -1804,49 +1854,55 @@ AddFunction demonology_defaultshortcdactions
  #call_action_list,name=trinkets
  demonologytrinketsshortcdactions()
 
- unless demonologytrinketsshortcdpostconditions() or target.refreshable(doom) and spell(doom)
+ unless demonologytrinketsshortcdpostconditions()
  {
-  #call_action_list,name=covenant_ability,if=soulbind.grove_invigoration|soulbind.field_of_blossoms|soulbind.combat_meditation|covenant.necrolord
-  if soulbind(grove_invigoration_soulbind) or soulbind(field_of_blossoms_soulbind) or soulbind(combat_meditation_soulbind) or iscovenant("necrolord") demonologycovenant_abilityshortcdactions()
+  #call_action_list,name=opener,if=time<variable.first_tyrant_time
+  if timeincombat() < first_tyrant_time() demonologyopenershortcdactions()
 
-  unless { soulbind(grove_invigoration_soulbind) or soulbind(field_of_blossoms_soulbind) or soulbind(combat_meditation_soulbind) or iscovenant("necrolord") } and demonologycovenant_abilityshortcdpostconditions()
+  unless timeincombat() < first_tyrant_time() and demonologyopenershortcdpostconditions() or target.refreshable(doom) and spell(doom)
   {
-   #call_action_list,name=tyrant_setup
-   demonologytyrant_setupshortcdactions()
+   #call_action_list,name=covenant_ability,if=soulbind.grove_invigoration|soulbind.field_of_blossoms|soulbind.combat_meditation|covenant.necrolord
+   if soulbind(grove_invigoration_soulbind) or soulbind(field_of_blossoms_soulbind) or soulbind(combat_meditation_soulbind) or iscovenant("necrolord") demonologycovenant_abilityshortcdactions()
 
-   unless demonologytyrant_setupshortcdpostconditions()
+   unless { soulbind(grove_invigoration_soulbind) or soulbind(field_of_blossoms_soulbind) or soulbind(combat_meditation_soulbind) or iscovenant("necrolord") } and demonologycovenant_abilityshortcdpostconditions()
    {
-    #call_action_list,name=ogcd,if=pet.demonic_tyrant.active
-    if demonduration(demonic_tyrant) > 0 demonologyogcdshortcdactions()
+    #call_action_list,name=tyrant_setup
+    demonologytyrant_setupshortcdactions()
 
-    unless demonduration(demonic_tyrant) > 0 and demonologyogcdshortcdpostconditions()
+    unless demonologytyrant_setupshortcdpostconditions()
     {
-     #demonic_strength,if=(!runeforge.wilfreds_sigil_of_superior_summoning&cooldown.summon_demonic_tyrant.remains_expected>9)|(pet.demonic_tyrant.active&pet.demonic_tyrant.remains<6*gcd.max)
-     if not runeforge(wilfreds_sigil_of_superior_summoning_runeforge) and spellcooldown(summon_demonic_tyrant) > 9 or demonduration(demonic_tyrant) > 0 and demonduration(demonic_tyrant) < 6 * gcd() spell(demonic_strength)
+     #call_action_list,name=ogcd,if=pet.demonic_tyrant.active
+     if demonduration(demonic_tyrant) > 0 demonologyogcdshortcdactions()
 
-     unless spellcooldown(summon_demonic_tyrant) > 20 - 5 * { not runeforge(wilfreds_sigil_of_superior_summoning_runeforge) } and spell(call_dreadstalkers)
+     unless demonduration(demonic_tyrant) > 0 and demonologyogcdshortcdpostconditions()
      {
-      #power_siphon,if=buff.wild_imps.stack>1&buff.demonic_core.stack<3
-      if demons(wild_imp) + demons(wild_imp_inner_demons) > 1 and buffstacks(demonic_core_buff) < 3 spell(power_siphon)
-      #bilescourge_bombers,if=buff.tyrant.down&cooldown.summon_demonic_tyrant.remains_expected>5
-      if demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 spell(bilescourge_bombers)
+      #demonic_strength,if=(!runeforge.wilfreds_sigil_of_superior_summoning&cooldown.summon_demonic_tyrant.remains_expected>9)|(pet.demonic_tyrant.active&pet.demonic_tyrant.remains<6*gcd.max)
+      if not runeforge(wilfreds_sigil_of_superior_summoning_runeforge) and spellcooldown(summon_demonic_tyrant) > 9 or demonduration(demonic_tyrant) > 0 and demonduration(demonic_tyrant) < 6 * gcd() spell(demonic_strength)
 
-      unless enemies() > 1 + 1 * talentpoints(sacrificed_souls_talent) and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and spell(implosion) or enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and not runeforge(implosive_potential_runeforge) and { not hastalent(from_the_shadows_talent) or target.debuffpresent(from_the_shadows_debuff) } and spell(implosion) or enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and buffremaining(implosive_potential_buff) < 2 and runeforge(implosive_potential_runeforge) and spell(implosion) or demons(wild_imp) + demons(wild_imp_inner_demons) >= 12 and hastalent(soul_conduit_talent_demonology) and hastalent(from_the_shadows_talent) and runeforge(implosive_potential_runeforge) and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and spell(implosion)
+      unless spellcooldown(summon_demonic_tyrant) > 20 - 5 * { not runeforge(wilfreds_sigil_of_superior_summoning_runeforge) } and spell(call_dreadstalkers)
       {
-       #summon_vilefiend,if=time_to_die<28
-       if target.timetodie() < 28 spell(summon_vilefiend)
-       #summon_demonic_tyrant,if=time_to_die<15
-       if target.timetodie() < 15 spell(summon_demonic_tyrant)
+       #power_siphon,if=buff.wild_imps.stack>1&buff.demonic_core.stack<3
+       if demons(wild_imp) + demons(wild_imp_inner_demons) > 1 and buffstacks(demonic_core_buff) < 3 spell(power_siphon)
+       #bilescourge_bombers,if=buff.tyrant.down&cooldown.summon_demonic_tyrant.remains_expected>5
+       if demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 spell(bilescourge_bombers)
 
-       unless soulshards() == 5 and spell(hand_of_guldan) or soulshards() >= 3 and { demonduration(dreadstalker) > 0 or demonduration(demonic_tyrant) > 0 } and spell(hand_of_guldan) or soulshards() >= 1 and buffpresent(nether_portal) and spellcooldown(call_dreadstalkers) > 2 * gcd() and spell(hand_of_guldan) or soulshards() >= 1 and spellcooldown(summon_demonic_tyrant) < gcd() and timeincombat() > first_tyrant_time() - gcd() and spell(hand_of_guldan)
+       unless enemies() > 1 + 1 * talentpoints(sacrificed_souls_talent) and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and spell(implosion) or enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and not runeforge(implosive_potential_runeforge) and { not hastalent(from_the_shadows_talent) or target.debuffpresent(from_the_shadows_debuff) } and spell(implosion) or enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and buffremaining(implosive_potential_buff) < 2 and runeforge(implosive_potential_runeforge) and spell(implosion) or demons(wild_imp) + demons(wild_imp_inner_demons) >= 12 and hastalent(soul_conduit_talent_demonology) and hastalent(from_the_shadows_talent) and runeforge(implosive_potential_runeforge) and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and spell(implosion)
        {
-        #call_action_list,name=covenant_ability,if=!covenant.venthyr
-        if not iscovenant("venthyr") demonologycovenant_abilityshortcdactions()
+        #summon_vilefiend,if=time_to_die<28
+        if target.timetodie() < 28 spell(summon_vilefiend)
+        #summon_demonic_tyrant,if=time_to_die<15
+        if target.timetodie() < 15 spell(summon_demonic_tyrant)
 
-        unless not iscovenant("venthyr") and demonologycovenant_abilityshortcdpostconditions() or not hastalent(sacrificed_souls_talent) and spell(soul_strike) or buffpresent(demonic_core_buff) and soulshards() < 4 and spellcooldown(summon_demonic_tyrant) > 20 and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and spellcooldown(summon_demonic_tyrant) < 12 and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and { buffstacks(demonic_core_buff) > 2 or hastalent(sacrificed_souls_talent) } and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and enemies() > 1 and spell(demonbolt) or spell(soul_strike)
+        unless soulshards() == 5 and spell(hand_of_guldan) or soulshards() >= 3 and { demonduration(dreadstalker) > 0 or demonduration(demonic_tyrant) > 0 } and spell(hand_of_guldan) or soulshards() >= 1 and buffpresent(nether_portal) and spellcooldown(call_dreadstalkers) > 2 * gcd() and spell(hand_of_guldan) or soulshards() >= 1 and spellcooldown(summon_demonic_tyrant) < gcd() and timeincombat() > first_tyrant_time() - gcd() and spell(hand_of_guldan)
         {
-         #call_action_list,name=covenant_ability
-         demonologycovenant_abilityshortcdactions()
+         #call_action_list,name=covenant_ability,if=!covenant.venthyr
+         if not iscovenant("venthyr") demonologycovenant_abilityshortcdactions()
+
+         unless not iscovenant("venthyr") and demonologycovenant_abilityshortcdpostconditions() or not hastalent(sacrificed_souls_talent) and spell(soul_strike) or buffpresent(demonic_core_buff) and soulshards() < 4 and spellcooldown(summon_demonic_tyrant) > 20 and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and spellcooldown(summon_demonic_tyrant) < 12 and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and { buffstacks(demonic_core_buff) > 2 or hastalent(sacrificed_souls_talent) } and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and enemies() > 1 and spell(demonbolt) or spell(soul_strike)
+         {
+          #call_action_list,name=covenant_ability
+          demonologycovenant_abilityshortcdactions()
+         }
         }
        }
       }
@@ -1859,7 +1915,7 @@ AddFunction demonology_defaultshortcdactions
 
 AddFunction demonology_defaultshortcdpostconditions
 {
- demonologytrinketsshortcdpostconditions() or target.refreshable(doom) and spell(doom) or { soulbind(grove_invigoration_soulbind) or soulbind(field_of_blossoms_soulbind) or soulbind(combat_meditation_soulbind) or iscovenant("necrolord") } and demonologycovenant_abilityshortcdpostconditions() or demonologytyrant_setupshortcdpostconditions() or demonduration(demonic_tyrant) > 0 and demonologyogcdshortcdpostconditions() or spellcooldown(summon_demonic_tyrant) > 20 - 5 * { not runeforge(wilfreds_sigil_of_superior_summoning_runeforge) } and spell(call_dreadstalkers) or enemies() > 1 + 1 * talentpoints(sacrificed_souls_talent) and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and spell(implosion) or enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and not runeforge(implosive_potential_runeforge) and { not hastalent(from_the_shadows_talent) or target.debuffpresent(from_the_shadows_debuff) } and spell(implosion) or enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and buffremaining(implosive_potential_buff) < 2 and runeforge(implosive_potential_runeforge) and spell(implosion) or demons(wild_imp) + demons(wild_imp_inner_demons) >= 12 and hastalent(soul_conduit_talent_demonology) and hastalent(from_the_shadows_talent) and runeforge(implosive_potential_runeforge) and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and spell(implosion) or soulshards() == 5 and spell(hand_of_guldan) or soulshards() >= 3 and { demonduration(dreadstalker) > 0 or demonduration(demonic_tyrant) > 0 } and spell(hand_of_guldan) or soulshards() >= 1 and buffpresent(nether_portal) and spellcooldown(call_dreadstalkers) > 2 * gcd() and spell(hand_of_guldan) or soulshards() >= 1 and spellcooldown(summon_demonic_tyrant) < gcd() and timeincombat() > first_tyrant_time() - gcd() and spell(hand_of_guldan) or not iscovenant("venthyr") and demonologycovenant_abilityshortcdpostconditions() or not hastalent(sacrificed_souls_talent) and spell(soul_strike) or buffpresent(demonic_core_buff) and soulshards() < 4 and spellcooldown(summon_demonic_tyrant) > 20 and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and spellcooldown(summon_demonic_tyrant) < 12 and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and { buffstacks(demonic_core_buff) > 2 or hastalent(sacrificed_souls_talent) } and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and enemies() > 1 and spell(demonbolt) or spell(soul_strike) or demonologycovenant_abilityshortcdpostconditions() or soulshards() >= 3 and spellcooldown(summon_demonic_tyrant) > 25 and { hastalent(demonic_calling_talent) or spellcooldown(call_dreadstalkers) > { 5 - soulshards() } * executetime(shadow_bolt) + executetime(hand_of_guldan) } and spell(hand_of_guldan) or target.refreshable(doom) and timeincombat() > first_tyrant_time() and spell(doom) or spell(shadow_bolt)
+ demonologytrinketsshortcdpostconditions() or timeincombat() < first_tyrant_time() and demonologyopenershortcdpostconditions() or target.refreshable(doom) and spell(doom) or { soulbind(grove_invigoration_soulbind) or soulbind(field_of_blossoms_soulbind) or soulbind(combat_meditation_soulbind) or iscovenant("necrolord") } and demonologycovenant_abilityshortcdpostconditions() or demonologytyrant_setupshortcdpostconditions() or demonduration(demonic_tyrant) > 0 and demonologyogcdshortcdpostconditions() or spellcooldown(summon_demonic_tyrant) > 20 - 5 * { not runeforge(wilfreds_sigil_of_superior_summoning_runeforge) } and spell(call_dreadstalkers) or enemies() > 1 + 1 * talentpoints(sacrificed_souls_talent) and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and spell(implosion) or enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and not runeforge(implosive_potential_runeforge) and { not hastalent(from_the_shadows_talent) or target.debuffpresent(from_the_shadows_debuff) } and spell(implosion) or enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and buffremaining(implosive_potential_buff) < 2 and runeforge(implosive_potential_runeforge) and spell(implosion) or demons(wild_imp) + demons(wild_imp_inner_demons) >= 12 and hastalent(soul_conduit_talent_demonology) and hastalent(from_the_shadows_talent) and runeforge(implosive_potential_runeforge) and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and spell(implosion) or soulshards() == 5 and spell(hand_of_guldan) or soulshards() >= 3 and { demonduration(dreadstalker) > 0 or demonduration(demonic_tyrant) > 0 } and spell(hand_of_guldan) or soulshards() >= 1 and buffpresent(nether_portal) and spellcooldown(call_dreadstalkers) > 2 * gcd() and spell(hand_of_guldan) or soulshards() >= 1 and spellcooldown(summon_demonic_tyrant) < gcd() and timeincombat() > first_tyrant_time() - gcd() and spell(hand_of_guldan) or not iscovenant("venthyr") and demonologycovenant_abilityshortcdpostconditions() or not hastalent(sacrificed_souls_talent) and spell(soul_strike) or buffpresent(demonic_core_buff) and soulshards() < 4 and spellcooldown(summon_demonic_tyrant) > 20 and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and spellcooldown(summon_demonic_tyrant) < 12 and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and { buffstacks(demonic_core_buff) > 2 or hastalent(sacrificed_souls_talent) } and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and enemies() > 1 and spell(demonbolt) or spell(soul_strike) or demonologycovenant_abilityshortcdpostconditions() or soulshards() >= 3 and spellcooldown(summon_demonic_tyrant) > 25 and { hastalent(demonic_calling_talent) or spellcooldown(call_dreadstalkers) > { 5 - soulshards() } * executetime(shadow_bolt) + executetime(hand_of_guldan) } and spell(hand_of_guldan) or target.refreshable(doom) and timeincombat() > first_tyrant_time() and spell(doom) or spell(shadow_bolt)
 }
 
 AddFunction demonology_defaultcdactions
@@ -1869,40 +1925,46 @@ AddFunction demonology_defaultcdactions
 
  unless demonologytrinketscdpostconditions()
  {
-  #interrupt,if=target.debuff.casting.react
-  if target.isinterruptible() demonologyinterruptactions()
+  #call_action_list,name=opener,if=time<variable.first_tyrant_time
+  if timeincombat() < first_tyrant_time() demonologyopenercdactions()
 
-  unless target.refreshable(doom) and spell(doom)
+  unless timeincombat() < first_tyrant_time() and demonologyopenercdpostconditions()
   {
-   #call_action_list,name=covenant_ability,if=soulbind.grove_invigoration|soulbind.field_of_blossoms|soulbind.combat_meditation|covenant.necrolord
-   if soulbind(grove_invigoration_soulbind) or soulbind(field_of_blossoms_soulbind) or soulbind(combat_meditation_soulbind) or iscovenant("necrolord") demonologycovenant_abilitycdactions()
+   #interrupt,if=target.debuff.casting.react
+   if target.isinterruptible() demonologyinterruptactions()
 
-   unless { soulbind(grove_invigoration_soulbind) or soulbind(field_of_blossoms_soulbind) or soulbind(combat_meditation_soulbind) or iscovenant("necrolord") } and demonologycovenant_abilitycdpostconditions()
+   unless target.refreshable(doom) and spell(doom)
    {
-    #call_action_list,name=tyrant_setup
-    demonologytyrant_setupcdactions()
+    #call_action_list,name=covenant_ability,if=soulbind.grove_invigoration|soulbind.field_of_blossoms|soulbind.combat_meditation|covenant.necrolord
+    if soulbind(grove_invigoration_soulbind) or soulbind(field_of_blossoms_soulbind) or soulbind(combat_meditation_soulbind) or iscovenant("necrolord") demonologycovenant_abilitycdactions()
 
-    unless demonologytyrant_setupcdpostconditions()
+    unless { soulbind(grove_invigoration_soulbind) or soulbind(field_of_blossoms_soulbind) or soulbind(combat_meditation_soulbind) or iscovenant("necrolord") } and demonologycovenant_abilitycdpostconditions()
     {
-     #potion,if=(cooldown.summon_demonic_tyrant.remains_expected<10&time>variable.first_tyrant_time-10|soulbind.refined_palate&cooldown.summon_demonic_tyrant.remains_expected<38)
-     if { spellcooldown(summon_demonic_tyrant) < 10 and timeincombat() > first_tyrant_time() - 10 or soulbind(refined_palate_soulbind) and spellcooldown(summon_demonic_tyrant) < 38 } and { checkboxon(opt_use_consumables) and target.classification(worldboss) } item(potion_of_spectral_intellect_item usable=1)
-     #call_action_list,name=ogcd,if=pet.demonic_tyrant.active
-     if demonduration(demonic_tyrant) > 0 demonologyogcdcdactions()
+     #call_action_list,name=tyrant_setup
+     demonologytyrant_setupcdactions()
 
-     unless demonduration(demonic_tyrant) > 0 and demonologyogcdcdpostconditions() or { not runeforge(wilfreds_sigil_of_superior_summoning_runeforge) and spellcooldown(summon_demonic_tyrant) > 9 or demonduration(demonic_tyrant) > 0 and demonduration(demonic_tyrant) < 6 * gcd() } and spell(demonic_strength) or spellcooldown(summon_demonic_tyrant) > 20 - 5 * { not runeforge(wilfreds_sigil_of_superior_summoning_runeforge) } and spell(call_dreadstalkers) or demons(wild_imp) + demons(wild_imp_inner_demons) > 1 and buffstacks(demonic_core_buff) < 3 and spell(power_siphon) or demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and spell(bilescourge_bombers) or enemies() > 1 + 1 * talentpoints(sacrificed_souls_talent) and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and spell(implosion) or enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and not runeforge(implosive_potential_runeforge) and { not hastalent(from_the_shadows_talent) or target.debuffpresent(from_the_shadows_debuff) } and spell(implosion) or enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and buffremaining(implosive_potential_buff) < 2 and runeforge(implosive_potential_runeforge) and spell(implosion) or demons(wild_imp) + demons(wild_imp_inner_demons) >= 12 and hastalent(soul_conduit_talent_demonology) and hastalent(from_the_shadows_talent) and runeforge(implosive_potential_runeforge) and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and spell(implosion)
+     unless demonologytyrant_setupcdpostconditions()
      {
-      #grimoire_felguard,if=time_to_die<30
-      if target.timetodie() < 30 spell(grimoire_felguard)
+      #potion,if=(cooldown.summon_demonic_tyrant.remains_expected<10&time>variable.first_tyrant_time-10|soulbind.refined_palate&cooldown.summon_demonic_tyrant.remains_expected<38)
+      if { spellcooldown(summon_demonic_tyrant) < 10 and timeincombat() > first_tyrant_time() - 10 or soulbind(refined_palate_soulbind) and spellcooldown(summon_demonic_tyrant) < 38 } and { checkboxon(opt_use_consumables) and target.classification(worldboss) } item(potion_of_spectral_intellect_item usable=1)
+      #call_action_list,name=ogcd,if=pet.demonic_tyrant.active
+      if demonduration(demonic_tyrant) > 0 demonologyogcdcdactions()
 
-      unless target.timetodie() < 28 and spell(summon_vilefiend) or target.timetodie() < 15 and spell(summon_demonic_tyrant) or soulshards() == 5 and spell(hand_of_guldan) or soulshards() >= 3 and { demonduration(dreadstalker) > 0 or demonduration(demonic_tyrant) > 0 } and spell(hand_of_guldan) or soulshards() >= 1 and buffpresent(nether_portal) and spellcooldown(call_dreadstalkers) > 2 * gcd() and spell(hand_of_guldan) or soulshards() >= 1 and spellcooldown(summon_demonic_tyrant) < gcd() and timeincombat() > first_tyrant_time() - gcd() and spell(hand_of_guldan)
+      unless demonduration(demonic_tyrant) > 0 and demonologyogcdcdpostconditions() or { not runeforge(wilfreds_sigil_of_superior_summoning_runeforge) and spellcooldown(summon_demonic_tyrant) > 9 or demonduration(demonic_tyrant) > 0 and demonduration(demonic_tyrant) < 6 * gcd() } and spell(demonic_strength) or spellcooldown(summon_demonic_tyrant) > 20 - 5 * { not runeforge(wilfreds_sigil_of_superior_summoning_runeforge) } and spell(call_dreadstalkers) or demons(wild_imp) + demons(wild_imp_inner_demons) > 1 and buffstacks(demonic_core_buff) < 3 and spell(power_siphon) or demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and spell(bilescourge_bombers) or enemies() > 1 + 1 * talentpoints(sacrificed_souls_talent) and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and spell(implosion) or enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and not runeforge(implosive_potential_runeforge) and { not hastalent(from_the_shadows_talent) or target.debuffpresent(from_the_shadows_debuff) } and spell(implosion) or enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and buffremaining(implosive_potential_buff) < 2 and runeforge(implosive_potential_runeforge) and spell(implosion) or demons(wild_imp) + demons(wild_imp_inner_demons) >= 12 and hastalent(soul_conduit_talent_demonology) and hastalent(from_the_shadows_talent) and runeforge(implosive_potential_runeforge) and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and spell(implosion)
       {
-       #call_action_list,name=covenant_ability,if=!covenant.venthyr
-       if not iscovenant("venthyr") demonologycovenant_abilitycdactions()
+       #grimoire_felguard,if=time_to_die<30
+       if target.timetodie() < 30 spell(grimoire_felguard)
 
-       unless not iscovenant("venthyr") and demonologycovenant_abilitycdpostconditions() or not hastalent(sacrificed_souls_talent) and spell(soul_strike) or buffpresent(demonic_core_buff) and soulshards() < 4 and spellcooldown(summon_demonic_tyrant) > 20 and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and spellcooldown(summon_demonic_tyrant) < 12 and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and { buffstacks(demonic_core_buff) > 2 or hastalent(sacrificed_souls_talent) } and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and enemies() > 1 and spell(demonbolt) or spell(soul_strike)
+       unless target.timetodie() < 28 and spell(summon_vilefiend) or target.timetodie() < 15 and spell(summon_demonic_tyrant) or soulshards() == 5 and spell(hand_of_guldan) or soulshards() >= 3 and { demonduration(dreadstalker) > 0 or demonduration(demonic_tyrant) > 0 } and spell(hand_of_guldan) or soulshards() >= 1 and buffpresent(nether_portal) and spellcooldown(call_dreadstalkers) > 2 * gcd() and spell(hand_of_guldan) or soulshards() >= 1 and spellcooldown(summon_demonic_tyrant) < gcd() and timeincombat() > first_tyrant_time() - gcd() and spell(hand_of_guldan)
        {
-        #call_action_list,name=covenant_ability
-        demonologycovenant_abilitycdactions()
+        #call_action_list,name=covenant_ability,if=!covenant.venthyr
+        if not iscovenant("venthyr") demonologycovenant_abilitycdactions()
+
+        unless not iscovenant("venthyr") and demonologycovenant_abilitycdpostconditions() or not hastalent(sacrificed_souls_talent) and spell(soul_strike) or buffpresent(demonic_core_buff) and soulshards() < 4 and spellcooldown(summon_demonic_tyrant) > 20 and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and spellcooldown(summon_demonic_tyrant) < 12 and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and { buffstacks(demonic_core_buff) > 2 or hastalent(sacrificed_souls_talent) } and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and enemies() > 1 and spell(demonbolt) or spell(soul_strike)
+        {
+         #call_action_list,name=covenant_ability
+         demonologycovenant_abilitycdactions()
+        }
        }
       }
      }
@@ -1914,7 +1976,7 @@ AddFunction demonology_defaultcdactions
 
 AddFunction demonology_defaultcdpostconditions
 {
- demonologytrinketscdpostconditions() or target.refreshable(doom) and spell(doom) or { soulbind(grove_invigoration_soulbind) or soulbind(field_of_blossoms_soulbind) or soulbind(combat_meditation_soulbind) or iscovenant("necrolord") } and demonologycovenant_abilitycdpostconditions() or demonologytyrant_setupcdpostconditions() or demonduration(demonic_tyrant) > 0 and demonologyogcdcdpostconditions() or { not runeforge(wilfreds_sigil_of_superior_summoning_runeforge) and spellcooldown(summon_demonic_tyrant) > 9 or demonduration(demonic_tyrant) > 0 and demonduration(demonic_tyrant) < 6 * gcd() } and spell(demonic_strength) or spellcooldown(summon_demonic_tyrant) > 20 - 5 * { not runeforge(wilfreds_sigil_of_superior_summoning_runeforge) } and spell(call_dreadstalkers) or demons(wild_imp) + demons(wild_imp_inner_demons) > 1 and buffstacks(demonic_core_buff) < 3 and spell(power_siphon) or demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and spell(bilescourge_bombers) or enemies() > 1 + 1 * talentpoints(sacrificed_souls_talent) and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and spell(implosion) or enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and not runeforge(implosive_potential_runeforge) and { not hastalent(from_the_shadows_talent) or target.debuffpresent(from_the_shadows_debuff) } and spell(implosion) or enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and buffremaining(implosive_potential_buff) < 2 and runeforge(implosive_potential_runeforge) and spell(implosion) or demons(wild_imp) + demons(wild_imp_inner_demons) >= 12 and hastalent(soul_conduit_talent_demonology) and hastalent(from_the_shadows_talent) and runeforge(implosive_potential_runeforge) and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and spell(implosion) or target.timetodie() < 28 and spell(summon_vilefiend) or target.timetodie() < 15 and spell(summon_demonic_tyrant) or soulshards() == 5 and spell(hand_of_guldan) or soulshards() >= 3 and { demonduration(dreadstalker) > 0 or demonduration(demonic_tyrant) > 0 } and spell(hand_of_guldan) or soulshards() >= 1 and buffpresent(nether_portal) and spellcooldown(call_dreadstalkers) > 2 * gcd() and spell(hand_of_guldan) or soulshards() >= 1 and spellcooldown(summon_demonic_tyrant) < gcd() and timeincombat() > first_tyrant_time() - gcd() and spell(hand_of_guldan) or not iscovenant("venthyr") and demonologycovenant_abilitycdpostconditions() or not hastalent(sacrificed_souls_talent) and spell(soul_strike) or buffpresent(demonic_core_buff) and soulshards() < 4 and spellcooldown(summon_demonic_tyrant) > 20 and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and spellcooldown(summon_demonic_tyrant) < 12 and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and { buffstacks(demonic_core_buff) > 2 or hastalent(sacrificed_souls_talent) } and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and enemies() > 1 and spell(demonbolt) or spell(soul_strike) or demonologycovenant_abilitycdpostconditions() or soulshards() >= 3 and spellcooldown(summon_demonic_tyrant) > 25 and { hastalent(demonic_calling_talent) or spellcooldown(call_dreadstalkers) > { 5 - soulshards() } * executetime(shadow_bolt) + executetime(hand_of_guldan) } and spell(hand_of_guldan) or target.refreshable(doom) and timeincombat() > first_tyrant_time() and spell(doom) or spell(shadow_bolt)
+ demonologytrinketscdpostconditions() or timeincombat() < first_tyrant_time() and demonologyopenercdpostconditions() or target.refreshable(doom) and spell(doom) or { soulbind(grove_invigoration_soulbind) or soulbind(field_of_blossoms_soulbind) or soulbind(combat_meditation_soulbind) or iscovenant("necrolord") } and demonologycovenant_abilitycdpostconditions() or demonologytyrant_setupcdpostconditions() or demonduration(demonic_tyrant) > 0 and demonologyogcdcdpostconditions() or { not runeforge(wilfreds_sigil_of_superior_summoning_runeforge) and spellcooldown(summon_demonic_tyrant) > 9 or demonduration(demonic_tyrant) > 0 and demonduration(demonic_tyrant) < 6 * gcd() } and spell(demonic_strength) or spellcooldown(summon_demonic_tyrant) > 20 - 5 * { not runeforge(wilfreds_sigil_of_superior_summoning_runeforge) } and spell(call_dreadstalkers) or demons(wild_imp) + demons(wild_imp_inner_demons) > 1 and buffstacks(demonic_core_buff) < 3 and spell(power_siphon) or demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and spell(bilescourge_bombers) or enemies() > 1 + 1 * talentpoints(sacrificed_souls_talent) and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and spell(implosion) or enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and not runeforge(implosive_potential_runeforge) and { not hastalent(from_the_shadows_talent) or target.debuffpresent(from_the_shadows_debuff) } and spell(implosion) or enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and buffremaining(implosive_potential_buff) < 2 and runeforge(implosive_potential_runeforge) and spell(implosion) or demons(wild_imp) + demons(wild_imp_inner_demons) >= 12 and hastalent(soul_conduit_talent_demonology) and hastalent(from_the_shadows_talent) and runeforge(implosive_potential_runeforge) and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and spell(implosion) or target.timetodie() < 28 and spell(summon_vilefiend) or target.timetodie() < 15 and spell(summon_demonic_tyrant) or soulshards() == 5 and spell(hand_of_guldan) or soulshards() >= 3 and { demonduration(dreadstalker) > 0 or demonduration(demonic_tyrant) > 0 } and spell(hand_of_guldan) or soulshards() >= 1 and buffpresent(nether_portal) and spellcooldown(call_dreadstalkers) > 2 * gcd() and spell(hand_of_guldan) or soulshards() >= 1 and spellcooldown(summon_demonic_tyrant) < gcd() and timeincombat() > first_tyrant_time() - gcd() and spell(hand_of_guldan) or not iscovenant("venthyr") and demonologycovenant_abilitycdpostconditions() or not hastalent(sacrificed_souls_talent) and spell(soul_strike) or buffpresent(demonic_core_buff) and soulshards() < 4 and spellcooldown(summon_demonic_tyrant) > 20 and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and spellcooldown(summon_demonic_tyrant) < 12 and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and { buffstacks(demonic_core_buff) > 2 or hastalent(sacrificed_souls_talent) } and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and enemies() > 1 and spell(demonbolt) or spell(soul_strike) or demonologycovenant_abilitycdpostconditions() or soulshards() >= 3 and spellcooldown(summon_demonic_tyrant) > 25 and { hastalent(demonic_calling_talent) or spellcooldown(call_dreadstalkers) > { 5 - soulshards() } * executetime(shadow_bolt) + executetime(hand_of_guldan) } and spell(hand_of_guldan) or target.refreshable(doom) and timeincombat() > first_tyrant_time() and spell(doom) or spell(shadow_bolt)
 }
 
 ### actions.5y_per_sec_trinkets
@@ -2084,7 +2146,7 @@ Include(ovale_warlock_spells)
 
 AddFunction first_tyrant_time
 {
- 12
+ 10
 }
 
 AddCheckBox(opt_interrupt l(interrupt) default enabled=(specialization(demonology)))
@@ -2112,8 +2174,8 @@ AddFunction demonologyuseitemactions
 
 AddFunction demonologytyrant_setupmainactions
 {
- #call_dreadstalkers,if=cooldown.summon_demonic_tyrant.remains_expected<12-(action.summon_demonic_tyrant.execute_time+action.shadow_bolt.execute_time)&time>variable.first_tyrant_time-12-action.call_dreadstalkers.execute_time+action.summon_demonic_tyrant.execute_time+action.shadow_bolt.execute_time
- if spellcooldown(summon_demonic_tyrant) < 12 - { executetime(summon_demonic_tyrant) + executetime(shadow_bolt) } and timeincombat() > first_tyrant_time() - 12 - executetime(call_dreadstalkers) + executetime(summon_demonic_tyrant) + executetime(shadow_bolt) spell(call_dreadstalkers)
+ #call_dreadstalkers,if=cooldown.summon_demonic_tyrant.remains_expected<12-(action.summon_demonic_tyrant.execute_time+action.shadow_bolt.execute_time)
+ if spellcooldown(summon_demonic_tyrant) < 12 - { executetime(summon_demonic_tyrant) + executetime(shadow_bolt) } spell(call_dreadstalkers)
 }
 
 AddFunction demonologytyrant_setupmainpostconditions
@@ -2125,7 +2187,7 @@ AddFunction demonologytyrant_setupshortcdactions
  #summon_vilefiend,if=(cooldown.summon_demonic_tyrant.remains_expected<15-(action.summon_demonic_tyrant.execute_time)&(cooldown.call_dreadstalkers.remains<15-(action.summon_demonic_tyrant.execute_time+action.summon_vilefiend.execute_time)|pet.dreadstalker.remains>cooldown.summon_demonic_tyrant.remains_expected+action.summon_demonic_tyrant.execute_time))|(!runeforge.wilfreds_sigil_of_superior_summoning&cooldown.summon_demonic_tyrant.remains_expected>40)
  if spellcooldown(summon_demonic_tyrant) < 15 - executetime(summon_demonic_tyrant) and { spellcooldown(call_dreadstalkers) < 15 - { executetime(summon_demonic_tyrant) + executetime(summon_vilefiend) } or demonduration(dreadstalker) > spellcooldown(summon_demonic_tyrant) + executetime(summon_demonic_tyrant) } or not runeforge(wilfreds_sigil_of_superior_summoning_runeforge) and spellcooldown(summon_demonic_tyrant) > 40 spell(summon_vilefiend)
 
- unless spellcooldown(summon_demonic_tyrant) < 12 - { executetime(summon_demonic_tyrant) + executetime(shadow_bolt) } and timeincombat() > first_tyrant_time() - 12 - executetime(call_dreadstalkers) + executetime(summon_demonic_tyrant) + executetime(shadow_bolt) and spell(call_dreadstalkers)
+ unless spellcooldown(summon_demonic_tyrant) < 12 - { executetime(summon_demonic_tyrant) + executetime(shadow_bolt) } and spell(call_dreadstalkers)
  {
   #summon_demonic_tyrant,if=time>variable.first_tyrant_time&(pet.dreadstalker.active&pet.dreadstalker.remains>action.summon_demonic_tyrant.execute_time)&(!talent.summon_vilefiend.enabled|pet.vilefiend.active)&(soul_shard=0|(pet.dreadstalker.active&pet.dreadstalker.remains<action.summon_demonic_tyrant.execute_time+action.shadow_bolt.execute_time)|(pet.vilefiend.active&pet.vilefiend.remains<action.summon_demonic_tyrant.execute_time+action.shadow_bolt.execute_time)|(buff.grimoire_felguard.up&buff.grimoire_felguard.remains<action.summon_demonic_tyrant.execute_time+action.shadow_bolt.execute_time))
   if timeincombat() > first_tyrant_time() and demonduration(dreadstalker) > 0 and demonduration(dreadstalker) > executetime(summon_demonic_tyrant) and { not hastalent(summon_vilefiend_talent) or demonduration(vilefiend) > 0 } and { soulshards() == 0 or demonduration(dreadstalker) > 0 and demonduration(dreadstalker) < executetime(summon_demonic_tyrant) + executetime(shadow_bolt) or demonduration(vilefiend) > 0 and demonduration(vilefiend) < executetime(summon_demonic_tyrant) + executetime(shadow_bolt) or buffpresent(grimoire_felguard) and buffremaining(grimoire_felguard) < executetime(summon_demonic_tyrant) + executetime(shadow_bolt) } spell(summon_demonic_tyrant)
@@ -2134,7 +2196,7 @@ AddFunction demonologytyrant_setupshortcdactions
 
 AddFunction demonologytyrant_setupshortcdpostconditions
 {
- spellcooldown(summon_demonic_tyrant) < 12 - { executetime(summon_demonic_tyrant) + executetime(shadow_bolt) } and timeincombat() > first_tyrant_time() - 12 - executetime(call_dreadstalkers) + executetime(summon_demonic_tyrant) + executetime(shadow_bolt) and spell(call_dreadstalkers)
+ spellcooldown(summon_demonic_tyrant) < 12 - { executetime(summon_demonic_tyrant) + executetime(shadow_bolt) } and spell(call_dreadstalkers)
 }
 
 AddFunction demonologytyrant_setupcdactions
@@ -2147,7 +2209,7 @@ AddFunction demonologytyrant_setupcdactions
 
 AddFunction demonologytyrant_setupcdpostconditions
 {
- { spellcooldown(summon_demonic_tyrant) < 15 - executetime(summon_demonic_tyrant) and { spellcooldown(call_dreadstalkers) < 15 - { executetime(summon_demonic_tyrant) + executetime(summon_vilefiend) } or demonduration(dreadstalker) > spellcooldown(summon_demonic_tyrant) + executetime(summon_demonic_tyrant) } or not runeforge(wilfreds_sigil_of_superior_summoning_runeforge) and spellcooldown(summon_demonic_tyrant) > 40 } and spell(summon_vilefiend) or spellcooldown(summon_demonic_tyrant) < 12 - { executetime(summon_demonic_tyrant) + executetime(shadow_bolt) } and timeincombat() > first_tyrant_time() - 12 - executetime(call_dreadstalkers) + executetime(summon_demonic_tyrant) + executetime(shadow_bolt) and spell(call_dreadstalkers) or timeincombat() > first_tyrant_time() and demonduration(dreadstalker) > 0 and demonduration(dreadstalker) > executetime(summon_demonic_tyrant) and { not hastalent(summon_vilefiend_talent) or demonduration(vilefiend) > 0 } and { soulshards() == 0 or demonduration(dreadstalker) > 0 and demonduration(dreadstalker) < executetime(summon_demonic_tyrant) + executetime(shadow_bolt) or demonduration(vilefiend) > 0 and demonduration(vilefiend) < executetime(summon_demonic_tyrant) + executetime(shadow_bolt) or buffpresent(grimoire_felguard) and buffremaining(grimoire_felguard) < executetime(summon_demonic_tyrant) + executetime(shadow_bolt) } and spell(summon_demonic_tyrant)
+ { spellcooldown(summon_demonic_tyrant) < 15 - executetime(summon_demonic_tyrant) and { spellcooldown(call_dreadstalkers) < 15 - { executetime(summon_demonic_tyrant) + executetime(summon_vilefiend) } or demonduration(dreadstalker) > spellcooldown(summon_demonic_tyrant) + executetime(summon_demonic_tyrant) } or not runeforge(wilfreds_sigil_of_superior_summoning_runeforge) and spellcooldown(summon_demonic_tyrant) > 40 } and spell(summon_vilefiend) or spellcooldown(summon_demonic_tyrant) < 12 - { executetime(summon_demonic_tyrant) + executetime(shadow_bolt) } and spell(call_dreadstalkers) or timeincombat() > first_tyrant_time() and demonduration(dreadstalker) > 0 and demonduration(dreadstalker) > executetime(summon_demonic_tyrant) and { not hastalent(summon_vilefiend_talent) or demonduration(vilefiend) > 0 } and { soulshards() == 0 or demonduration(dreadstalker) > 0 and demonduration(dreadstalker) < executetime(summon_demonic_tyrant) + executetime(shadow_bolt) or demonduration(vilefiend) > 0 and demonduration(vilefiend) < executetime(summon_demonic_tyrant) + executetime(shadow_bolt) or buffpresent(grimoire_felguard) and buffremaining(grimoire_felguard) < executetime(summon_demonic_tyrant) + executetime(shadow_bolt) } and spell(summon_demonic_tyrant)
 }
 
 ### actions.trinkets
@@ -2304,12 +2366,56 @@ AddFunction demonologyprecombatcdactions
   #snapshot_stats
   #fleshcraft
   spell(fleshcraft)
+  #variable,name=first_tyrant_time,op=set,value=10
+  #use_item,name=shadowed_orb_of_torment
+  if hastrinket(shadowed_orb_of_torment_item) item(shadowed_orb_of_torment_item usable=1)
  }
 }
 
 AddFunction demonologyprecombatcdpostconditions
 {
  not pet.present() and spell(summon_felguard) or spell(demonbolt)
+}
+
+### actions.opener
+
+AddFunction demonologyopenermainactions
+{
+ #shadow_bolt,if=soul_shard<5&cooldown.call_dreadstalkers.up
+ if soulshards() < 5 and not spellcooldown(call_dreadstalkers) > 0 spell(shadow_bolt)
+ #call_dreadstalkers
+ spell(call_dreadstalkers)
+}
+
+AddFunction demonologyopenermainpostconditions
+{
+}
+
+AddFunction demonologyopenershortcdactions
+{
+ #soul_rot,if=soulbind.grove_invigoration
+ if soulbind(grove_invigoration_soulbind) spell(soul_rot)
+ #summon_vilefiend
+ spell(summon_vilefiend)
+}
+
+AddFunction demonologyopenershortcdpostconditions
+{
+ soulshards() < 5 and not spellcooldown(call_dreadstalkers) > 0 and spell(shadow_bolt) or spell(call_dreadstalkers)
+}
+
+AddFunction demonologyopenercdactions
+{
+ unless soulbind(grove_invigoration_soulbind) and spell(soul_rot)
+ {
+  #grimoire_felguard
+  spell(grimoire_felguard)
+ }
+}
+
+AddFunction demonologyopenercdpostconditions
+{
+ soulbind(grove_invigoration_soulbind) and spell(soul_rot) or spell(summon_vilefiend) or soulshards() < 5 and not spellcooldown(call_dreadstalkers) > 0 and spell(shadow_bolt) or spell(call_dreadstalkers)
 }
 
 ### actions.ogcd
@@ -2392,8 +2498,8 @@ AddFunction demonologycovenant_abilityshortcdactions
  if soulbind(grove_invigoration_soulbind) and { spellcooldown(summon_demonic_tyrant) < 20 or spellcooldown(summon_demonic_tyrant) > 30 } spell(soul_rot)
  #soul_rot,if=soulbind.field_of_blossoms&pet.demonic_tyrant.active
  if soulbind(field_of_blossoms_soulbind) and demonduration(demonic_tyrant) > 0 spell(soul_rot)
- #soul_rot,if=soulbind.wild_hunt_tactics
- if soulbind(wild_hunt_tactics_soulbind) spell(soul_rot)
+ #soul_rot,if=soulbind.wild_hunt_tactics&!pet.demonic_tyrant.active&cooldown.summon_demonic_tyrant.remains_expected>18
+ if soulbind(wild_hunt_tactics_soulbind) and not demonduration(demonic_tyrant) > 0 and spellcooldown(summon_demonic_tyrant) > 18 spell(soul_rot)
  #decimating_bolt,if=(soulbind.lead_by_example|soulbind.kevins_oozeling)&(pet.demonic_tyrant.active&soul_shard<2|!pet.demonic_tyrant.active&cooldown.summon_demonic_tyrant.remains_expected>40)
  if { soulbind(lead_by_example_soulbind) or soulbind(kevins_oozeling_soulbind) } and { demonduration(demonic_tyrant) > 0 and soulshards() < 2 or not demonduration(demonic_tyrant) > 0 and spellcooldown(summon_demonic_tyrant) > 40 } spell(decimating_bolt)
  #decimating_bolt,if=(soulbind.forgeborne_reveries|(soulbind.volatile_solvent&!soulbind.kevins_oozeling))&!pet.demonic_tyrant.active
@@ -2412,7 +2518,7 @@ AddFunction demonologycovenant_abilityshortcdpostconditions
 
 AddFunction demonologycovenant_abilitycdactions
 {
- unless soulbind(grove_invigoration_soulbind) and { spellcooldown(summon_demonic_tyrant) < 20 or spellcooldown(summon_demonic_tyrant) > 30 } and spell(soul_rot) or soulbind(field_of_blossoms_soulbind) and demonduration(demonic_tyrant) > 0 and spell(soul_rot) or soulbind(wild_hunt_tactics_soulbind) and spell(soul_rot) or { soulbind(lead_by_example_soulbind) or soulbind(kevins_oozeling_soulbind) } and { demonduration(demonic_tyrant) > 0 and soulshards() < 2 or not demonduration(demonic_tyrant) > 0 and spellcooldown(summon_demonic_tyrant) > 40 } and spell(decimating_bolt) or { soulbind(forgeborne_reveries_soulbind) or soulbind(volatile_solvent_soulbind) and not soulbind(kevins_oozeling_soulbind) } and not demonduration(demonic_tyrant) > 0 and spell(decimating_bolt)
+ unless soulbind(grove_invigoration_soulbind) and { spellcooldown(summon_demonic_tyrant) < 20 or spellcooldown(summon_demonic_tyrant) > 30 } and spell(soul_rot) or soulbind(field_of_blossoms_soulbind) and demonduration(demonic_tyrant) > 0 and spell(soul_rot) or soulbind(wild_hunt_tactics_soulbind) and not demonduration(demonic_tyrant) > 0 and spellcooldown(summon_demonic_tyrant) > 18 and spell(soul_rot) or { soulbind(lead_by_example_soulbind) or soulbind(kevins_oozeling_soulbind) } and { demonduration(demonic_tyrant) > 0 and soulshards() < 2 or not demonduration(demonic_tyrant) > 0 and spellcooldown(summon_demonic_tyrant) > 40 } and spell(decimating_bolt) or { soulbind(forgeborne_reveries_soulbind) or soulbind(volatile_solvent_soulbind) and not soulbind(kevins_oozeling_soulbind) } and not demonduration(demonic_tyrant) > 0 and spell(decimating_bolt)
  {
   #fleshcraft,if=soulbind.volatile_solvent,cancel_if=buff.volatile_solvent_humanoid.up
   if soulbind(volatile_solvent_soulbind) spell(fleshcraft)
@@ -2421,7 +2527,7 @@ AddFunction demonologycovenant_abilitycdactions
 
 AddFunction demonologycovenant_abilitycdpostconditions
 {
- soulbind(grove_invigoration_soulbind) and { spellcooldown(summon_demonic_tyrant) < 20 or spellcooldown(summon_demonic_tyrant) > 30 } and spell(soul_rot) or soulbind(field_of_blossoms_soulbind) and demonduration(demonic_tyrant) > 0 and spell(soul_rot) or soulbind(wild_hunt_tactics_soulbind) and spell(soul_rot) or { soulbind(lead_by_example_soulbind) or soulbind(kevins_oozeling_soulbind) } and { demonduration(demonic_tyrant) > 0 and soulshards() < 2 or not demonduration(demonic_tyrant) > 0 and spellcooldown(summon_demonic_tyrant) > 40 } and spell(decimating_bolt) or { soulbind(forgeborne_reveries_soulbind) or soulbind(volatile_solvent_soulbind) and not soulbind(kevins_oozeling_soulbind) } and not demonduration(demonic_tyrant) > 0 and spell(decimating_bolt) or soulbind(combat_meditation_soulbind) and demonduration(demonic_tyrant) > 0 and spell(scouring_tithe) or not soulbind(combat_meditation_soulbind) and spell(scouring_tithe) or demonduration(demonic_tyrant) > 0 and soulshards() == 0 and spell(impending_catastrophe)
+ soulbind(grove_invigoration_soulbind) and { spellcooldown(summon_demonic_tyrant) < 20 or spellcooldown(summon_demonic_tyrant) > 30 } and spell(soul_rot) or soulbind(field_of_blossoms_soulbind) and demonduration(demonic_tyrant) > 0 and spell(soul_rot) or soulbind(wild_hunt_tactics_soulbind) and not demonduration(demonic_tyrant) > 0 and spellcooldown(summon_demonic_tyrant) > 18 and spell(soul_rot) or { soulbind(lead_by_example_soulbind) or soulbind(kevins_oozeling_soulbind) } and { demonduration(demonic_tyrant) > 0 and soulshards() < 2 or not demonduration(demonic_tyrant) > 0 and spellcooldown(summon_demonic_tyrant) > 40 } and spell(decimating_bolt) or { soulbind(forgeborne_reveries_soulbind) or soulbind(volatile_solvent_soulbind) and not soulbind(kevins_oozeling_soulbind) } and not demonduration(demonic_tyrant) > 0 and spell(decimating_bolt) or soulbind(combat_meditation_soulbind) and demonduration(demonic_tyrant) > 0 and spell(scouring_tithe) or not soulbind(combat_meditation_soulbind) and spell(scouring_tithe) or demonduration(demonic_tyrant) > 0 and soulshards() == 0 and spell(impending_catastrophe)
 }
 
 ### actions.default
@@ -2433,69 +2539,75 @@ AddFunction demonology_defaultmainactions
 
  unless demonologytrinketsmainpostconditions()
  {
-  #doom,if=refreshable
-  if target.refreshable(doom) spell(doom)
-  #call_action_list,name=covenant_ability,if=soulbind.grove_invigoration|soulbind.field_of_blossoms|soulbind.combat_meditation|covenant.necrolord
-  if soulbind(grove_invigoration_soulbind) or soulbind(field_of_blossoms_soulbind) or soulbind(combat_meditation_soulbind) or iscovenant("necrolord") demonologycovenant_abilitymainactions()
+  #call_action_list,name=opener,if=time<variable.first_tyrant_time
+  if timeincombat() < first_tyrant_time() demonologyopenermainactions()
 
-  unless { soulbind(grove_invigoration_soulbind) or soulbind(field_of_blossoms_soulbind) or soulbind(combat_meditation_soulbind) or iscovenant("necrolord") } and demonologycovenant_abilitymainpostconditions()
+  unless timeincombat() < first_tyrant_time() and demonologyopenermainpostconditions()
   {
-   #call_action_list,name=tyrant_setup
-   demonologytyrant_setupmainactions()
+   #doom,if=refreshable
+   if target.refreshable(doom) spell(doom)
+   #call_action_list,name=covenant_ability,if=soulbind.grove_invigoration|soulbind.field_of_blossoms|soulbind.combat_meditation|covenant.necrolord
+   if soulbind(grove_invigoration_soulbind) or soulbind(field_of_blossoms_soulbind) or soulbind(combat_meditation_soulbind) or iscovenant("necrolord") demonologycovenant_abilitymainactions()
 
-   unless demonologytyrant_setupmainpostconditions()
+   unless { soulbind(grove_invigoration_soulbind) or soulbind(field_of_blossoms_soulbind) or soulbind(combat_meditation_soulbind) or iscovenant("necrolord") } and demonologycovenant_abilitymainpostconditions()
    {
-    #call_action_list,name=ogcd,if=pet.demonic_tyrant.active
-    if demonduration(demonic_tyrant) > 0 demonologyogcdmainactions()
+    #call_action_list,name=tyrant_setup
+    demonologytyrant_setupmainactions()
 
-    unless demonduration(demonic_tyrant) > 0 and demonologyogcdmainpostconditions()
+    unless demonologytyrant_setupmainpostconditions()
     {
-     #call_dreadstalkers,if=cooldown.summon_demonic_tyrant.remains_expected>20-5*!runeforge.wilfreds_sigil_of_superior_summoning
-     if spellcooldown(summon_demonic_tyrant) > 20 - 5 * { not runeforge(wilfreds_sigil_of_superior_summoning_runeforge) } spell(call_dreadstalkers)
-     #implosion,if=active_enemies>1+(1*talent.sacrificed_souls.enabled)&buff.wild_imps.stack>=6&buff.tyrant.down&cooldown.summon_demonic_tyrant.remains_expected>5
-     if enemies() > 1 + 1 * talentpoints(sacrificed_souls_talent) and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 spell(implosion)
-     #implosion,if=active_enemies>2&buff.wild_imps.stack>=6&buff.tyrant.down&cooldown.summon_demonic_tyrant.remains_expected>5&!runeforge.implosive_potential&(!talent.from_the_shadows.enabled|buff.from_the_shadows.up)
-     if enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and not runeforge(implosive_potential_runeforge) and { not hastalent(from_the_shadows_talent) or target.debuffpresent(from_the_shadows_debuff) } spell(implosion)
-     #implosion,if=active_enemies>2&buff.wild_imps.stack>=6&buff.implosive_potential.remains<2&runeforge.implosive_potential
-     if enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and buffremaining(implosive_potential_buff) < 2 and runeforge(implosive_potential_runeforge) spell(implosion)
-     #implosion,if=buff.wild_imps.stack>=12&talent.soul_conduit.enabled&talent.from_the_shadows.enabled&runeforge.implosive_potential&buff.tyrant.down&cooldown.summon_demonic_tyrant.remains_expected>5
-     if demons(wild_imp) + demons(wild_imp_inner_demons) >= 12 and hastalent(soul_conduit_talent_demonology) and hastalent(from_the_shadows_talent) and runeforge(implosive_potential_runeforge) and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 spell(implosion)
-     #hand_of_guldan,if=soul_shard=5
-     if soulshards() == 5 spell(hand_of_guldan)
-     #hand_of_guldan,if=soul_shard>=3&(pet.dreadstalker.active|pet.demonic_tyrant.active)
-     if soulshards() >= 3 and { demonduration(dreadstalker) > 0 or demonduration(demonic_tyrant) > 0 } spell(hand_of_guldan)
-     #hand_of_guldan,if=soul_shard>=1&buff.nether_portal.up&cooldown.call_dreadstalkers.remains>2*gcd.max
-     if soulshards() >= 1 and buffpresent(nether_portal) and spellcooldown(call_dreadstalkers) > 2 * gcd() spell(hand_of_guldan)
-     #hand_of_guldan,if=soul_shard>=1&cooldown.summon_demonic_tyrant.remains_expected<gcd.max&time>variable.first_tyrant_time-gcd.max
-     if soulshards() >= 1 and spellcooldown(summon_demonic_tyrant) < gcd() and timeincombat() > first_tyrant_time() - gcd() spell(hand_of_guldan)
-     #call_action_list,name=covenant_ability,if=!covenant.venthyr
-     if not iscovenant("venthyr") demonologycovenant_abilitymainactions()
+     #call_action_list,name=ogcd,if=pet.demonic_tyrant.active
+     if demonduration(demonic_tyrant) > 0 demonologyogcdmainactions()
 
-     unless not iscovenant("venthyr") and demonologycovenant_abilitymainpostconditions()
+     unless demonduration(demonic_tyrant) > 0 and demonologyogcdmainpostconditions()
      {
-      #soul_strike,if=!talent.sacrificed_souls.enabled
-      if not hastalent(sacrificed_souls_talent) spell(soul_strike)
-      #demonbolt,if=buff.demonic_core.react&soul_shard<4&cooldown.summon_demonic_tyrant.remains_expected>20
-      if buffpresent(demonic_core_buff) and soulshards() < 4 and spellcooldown(summon_demonic_tyrant) > 20 spell(demonbolt)
-      #demonbolt,if=buff.demonic_core.react&soul_shard<4&cooldown.summon_demonic_tyrant.remains_expected<12
-      if buffpresent(demonic_core_buff) and soulshards() < 4 and spellcooldown(summon_demonic_tyrant) < 12 spell(demonbolt)
-      #demonbolt,if=buff.demonic_core.react&soul_shard<4&(buff.demonic_core.stack>2|talent.sacrificed_souls.enabled)
-      if buffpresent(demonic_core_buff) and soulshards() < 4 and { buffstacks(demonic_core_buff) > 2 or hastalent(sacrificed_souls_talent) } spell(demonbolt)
-      #demonbolt,if=buff.demonic_core.react&soul_shard<4&active_enemies>1
-      if buffpresent(demonic_core_buff) and soulshards() < 4 and enemies() > 1 spell(demonbolt)
-      #soul_strike
-      spell(soul_strike)
-      #call_action_list,name=covenant_ability
-      demonologycovenant_abilitymainactions()
+      #call_dreadstalkers,if=cooldown.summon_demonic_tyrant.remains_expected>20-5*!runeforge.wilfreds_sigil_of_superior_summoning
+      if spellcooldown(summon_demonic_tyrant) > 20 - 5 * { not runeforge(wilfreds_sigil_of_superior_summoning_runeforge) } spell(call_dreadstalkers)
+      #implosion,if=active_enemies>1+(1*talent.sacrificed_souls.enabled)&buff.wild_imps.stack>=6&buff.tyrant.down&cooldown.summon_demonic_tyrant.remains_expected>5
+      if enemies() > 1 + 1 * talentpoints(sacrificed_souls_talent) and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 spell(implosion)
+      #implosion,if=active_enemies>2&buff.wild_imps.stack>=6&buff.tyrant.down&cooldown.summon_demonic_tyrant.remains_expected>5&!runeforge.implosive_potential&(!talent.from_the_shadows.enabled|buff.from_the_shadows.up)
+      if enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and not runeforge(implosive_potential_runeforge) and { not hastalent(from_the_shadows_talent) or target.debuffpresent(from_the_shadows_debuff) } spell(implosion)
+      #implosion,if=active_enemies>2&buff.wild_imps.stack>=6&buff.implosive_potential.remains<2&runeforge.implosive_potential
+      if enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and buffremaining(implosive_potential_buff) < 2 and runeforge(implosive_potential_runeforge) spell(implosion)
+      #implosion,if=buff.wild_imps.stack>=12&talent.soul_conduit.enabled&talent.from_the_shadows.enabled&runeforge.implosive_potential&buff.tyrant.down&cooldown.summon_demonic_tyrant.remains_expected>5
+      if demons(wild_imp) + demons(wild_imp_inner_demons) >= 12 and hastalent(soul_conduit_talent_demonology) and hastalent(from_the_shadows_talent) and runeforge(implosive_potential_runeforge) and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 spell(implosion)
+      #hand_of_guldan,if=soul_shard=5
+      if soulshards() == 5 spell(hand_of_guldan)
+      #hand_of_guldan,if=soul_shard>=3&(pet.dreadstalker.active|pet.demonic_tyrant.active)
+      if soulshards() >= 3 and { demonduration(dreadstalker) > 0 or demonduration(demonic_tyrant) > 0 } spell(hand_of_guldan)
+      #hand_of_guldan,if=soul_shard>=1&buff.nether_portal.up&cooldown.call_dreadstalkers.remains>2*gcd.max
+      if soulshards() >= 1 and buffpresent(nether_portal) and spellcooldown(call_dreadstalkers) > 2 * gcd() spell(hand_of_guldan)
+      #hand_of_guldan,if=soul_shard>=1&cooldown.summon_demonic_tyrant.remains_expected<gcd.max&time>variable.first_tyrant_time-gcd.max
+      if soulshards() >= 1 and spellcooldown(summon_demonic_tyrant) < gcd() and timeincombat() > first_tyrant_time() - gcd() spell(hand_of_guldan)
+      #call_action_list,name=covenant_ability,if=!covenant.venthyr
+      if not iscovenant("venthyr") demonologycovenant_abilitymainactions()
 
-      unless demonologycovenant_abilitymainpostconditions()
+      unless not iscovenant("venthyr") and demonologycovenant_abilitymainpostconditions()
       {
-       #hand_of_guldan,if=soul_shard>=3&cooldown.summon_demonic_tyrant.remains_expected>25&(talent.demonic_calling.enabled|cooldown.call_dreadstalkers.remains>((5-soul_shard)*action.shadow_bolt.execute_time)+action.hand_of_guldan.execute_time)
-       if soulshards() >= 3 and spellcooldown(summon_demonic_tyrant) > 25 and { hastalent(demonic_calling_talent) or spellcooldown(call_dreadstalkers) > { 5 - soulshards() } * executetime(shadow_bolt) + executetime(hand_of_guldan) } spell(hand_of_guldan)
-       #doom,cycle_targets=1,if=refreshable&time>variable.first_tyrant_time
-       if target.refreshable(doom) and timeincombat() > first_tyrant_time() spell(doom)
-       #shadow_bolt
-       spell(shadow_bolt)
+       #soul_strike,if=!talent.sacrificed_souls.enabled
+       if not hastalent(sacrificed_souls_talent) spell(soul_strike)
+       #demonbolt,if=buff.demonic_core.react&soul_shard<4&cooldown.summon_demonic_tyrant.remains_expected>20
+       if buffpresent(demonic_core_buff) and soulshards() < 4 and spellcooldown(summon_demonic_tyrant) > 20 spell(demonbolt)
+       #demonbolt,if=buff.demonic_core.react&soul_shard<4&cooldown.summon_demonic_tyrant.remains_expected<12
+       if buffpresent(demonic_core_buff) and soulshards() < 4 and spellcooldown(summon_demonic_tyrant) < 12 spell(demonbolt)
+       #demonbolt,if=buff.demonic_core.react&soul_shard<4&(buff.demonic_core.stack>2|talent.sacrificed_souls.enabled)
+       if buffpresent(demonic_core_buff) and soulshards() < 4 and { buffstacks(demonic_core_buff) > 2 or hastalent(sacrificed_souls_talent) } spell(demonbolt)
+       #demonbolt,if=buff.demonic_core.react&soul_shard<4&active_enemies>1
+       if buffpresent(demonic_core_buff) and soulshards() < 4 and enemies() > 1 spell(demonbolt)
+       #soul_strike
+       spell(soul_strike)
+       #call_action_list,name=covenant_ability
+       demonologycovenant_abilitymainactions()
+
+       unless demonologycovenant_abilitymainpostconditions()
+       {
+        #hand_of_guldan,if=soul_shard>=3&cooldown.summon_demonic_tyrant.remains_expected>25&(talent.demonic_calling.enabled|cooldown.call_dreadstalkers.remains>((5-soul_shard)*action.shadow_bolt.execute_time)+action.hand_of_guldan.execute_time)
+        if soulshards() >= 3 and spellcooldown(summon_demonic_tyrant) > 25 and { hastalent(demonic_calling_talent) or spellcooldown(call_dreadstalkers) > { 5 - soulshards() } * executetime(shadow_bolt) + executetime(hand_of_guldan) } spell(hand_of_guldan)
+        #doom,cycle_targets=1,if=refreshable&time>variable.first_tyrant_time
+        if target.refreshable(doom) and timeincombat() > first_tyrant_time() spell(doom)
+        #shadow_bolt
+        spell(shadow_bolt)
+       }
       }
      }
     }
@@ -2506,7 +2618,7 @@ AddFunction demonology_defaultmainactions
 
 AddFunction demonology_defaultmainpostconditions
 {
- demonologytrinketsmainpostconditions() or { soulbind(grove_invigoration_soulbind) or soulbind(field_of_blossoms_soulbind) or soulbind(combat_meditation_soulbind) or iscovenant("necrolord") } and demonologycovenant_abilitymainpostconditions() or demonologytyrant_setupmainpostconditions() or demonduration(demonic_tyrant) > 0 and demonologyogcdmainpostconditions() or not iscovenant("venthyr") and demonologycovenant_abilitymainpostconditions() or demonologycovenant_abilitymainpostconditions()
+ demonologytrinketsmainpostconditions() or timeincombat() < first_tyrant_time() and demonologyopenermainpostconditions() or { soulbind(grove_invigoration_soulbind) or soulbind(field_of_blossoms_soulbind) or soulbind(combat_meditation_soulbind) or iscovenant("necrolord") } and demonologycovenant_abilitymainpostconditions() or demonologytyrant_setupmainpostconditions() or demonduration(demonic_tyrant) > 0 and demonologyogcdmainpostconditions() or not iscovenant("venthyr") and demonologycovenant_abilitymainpostconditions() or demonologycovenant_abilitymainpostconditions()
 }
 
 AddFunction demonology_defaultshortcdactions
@@ -2514,49 +2626,55 @@ AddFunction demonology_defaultshortcdactions
  #call_action_list,name=trinkets
  demonologytrinketsshortcdactions()
 
- unless demonologytrinketsshortcdpostconditions() or target.refreshable(doom) and spell(doom)
+ unless demonologytrinketsshortcdpostconditions()
  {
-  #call_action_list,name=covenant_ability,if=soulbind.grove_invigoration|soulbind.field_of_blossoms|soulbind.combat_meditation|covenant.necrolord
-  if soulbind(grove_invigoration_soulbind) or soulbind(field_of_blossoms_soulbind) or soulbind(combat_meditation_soulbind) or iscovenant("necrolord") demonologycovenant_abilityshortcdactions()
+  #call_action_list,name=opener,if=time<variable.first_tyrant_time
+  if timeincombat() < first_tyrant_time() demonologyopenershortcdactions()
 
-  unless { soulbind(grove_invigoration_soulbind) or soulbind(field_of_blossoms_soulbind) or soulbind(combat_meditation_soulbind) or iscovenant("necrolord") } and demonologycovenant_abilityshortcdpostconditions()
+  unless timeincombat() < first_tyrant_time() and demonologyopenershortcdpostconditions() or target.refreshable(doom) and spell(doom)
   {
-   #call_action_list,name=tyrant_setup
-   demonologytyrant_setupshortcdactions()
+   #call_action_list,name=covenant_ability,if=soulbind.grove_invigoration|soulbind.field_of_blossoms|soulbind.combat_meditation|covenant.necrolord
+   if soulbind(grove_invigoration_soulbind) or soulbind(field_of_blossoms_soulbind) or soulbind(combat_meditation_soulbind) or iscovenant("necrolord") demonologycovenant_abilityshortcdactions()
 
-   unless demonologytyrant_setupshortcdpostconditions()
+   unless { soulbind(grove_invigoration_soulbind) or soulbind(field_of_blossoms_soulbind) or soulbind(combat_meditation_soulbind) or iscovenant("necrolord") } and demonologycovenant_abilityshortcdpostconditions()
    {
-    #call_action_list,name=ogcd,if=pet.demonic_tyrant.active
-    if demonduration(demonic_tyrant) > 0 demonologyogcdshortcdactions()
+    #call_action_list,name=tyrant_setup
+    demonologytyrant_setupshortcdactions()
 
-    unless demonduration(demonic_tyrant) > 0 and demonologyogcdshortcdpostconditions()
+    unless demonologytyrant_setupshortcdpostconditions()
     {
-     #demonic_strength,if=(!runeforge.wilfreds_sigil_of_superior_summoning&cooldown.summon_demonic_tyrant.remains_expected>9)|(pet.demonic_tyrant.active&pet.demonic_tyrant.remains<6*gcd.max)
-     if not runeforge(wilfreds_sigil_of_superior_summoning_runeforge) and spellcooldown(summon_demonic_tyrant) > 9 or demonduration(demonic_tyrant) > 0 and demonduration(demonic_tyrant) < 6 * gcd() spell(demonic_strength)
+     #call_action_list,name=ogcd,if=pet.demonic_tyrant.active
+     if demonduration(demonic_tyrant) > 0 demonologyogcdshortcdactions()
 
-     unless spellcooldown(summon_demonic_tyrant) > 20 - 5 * { not runeforge(wilfreds_sigil_of_superior_summoning_runeforge) } and spell(call_dreadstalkers)
+     unless demonduration(demonic_tyrant) > 0 and demonologyogcdshortcdpostconditions()
      {
-      #power_siphon,if=buff.wild_imps.stack>1&buff.demonic_core.stack<3
-      if demons(wild_imp) + demons(wild_imp_inner_demons) > 1 and buffstacks(demonic_core_buff) < 3 spell(power_siphon)
-      #bilescourge_bombers,if=buff.tyrant.down&cooldown.summon_demonic_tyrant.remains_expected>5
-      if demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 spell(bilescourge_bombers)
+      #demonic_strength,if=(!runeforge.wilfreds_sigil_of_superior_summoning&cooldown.summon_demonic_tyrant.remains_expected>9)|(pet.demonic_tyrant.active&pet.demonic_tyrant.remains<6*gcd.max)
+      if not runeforge(wilfreds_sigil_of_superior_summoning_runeforge) and spellcooldown(summon_demonic_tyrant) > 9 or demonduration(demonic_tyrant) > 0 and demonduration(demonic_tyrant) < 6 * gcd() spell(demonic_strength)
 
-      unless enemies() > 1 + 1 * talentpoints(sacrificed_souls_talent) and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and spell(implosion) or enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and not runeforge(implosive_potential_runeforge) and { not hastalent(from_the_shadows_talent) or target.debuffpresent(from_the_shadows_debuff) } and spell(implosion) or enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and buffremaining(implosive_potential_buff) < 2 and runeforge(implosive_potential_runeforge) and spell(implosion) or demons(wild_imp) + demons(wild_imp_inner_demons) >= 12 and hastalent(soul_conduit_talent_demonology) and hastalent(from_the_shadows_talent) and runeforge(implosive_potential_runeforge) and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and spell(implosion)
+      unless spellcooldown(summon_demonic_tyrant) > 20 - 5 * { not runeforge(wilfreds_sigil_of_superior_summoning_runeforge) } and spell(call_dreadstalkers)
       {
-       #summon_vilefiend,if=time_to_die<28
-       if target.timetodie() < 28 spell(summon_vilefiend)
-       #summon_demonic_tyrant,if=time_to_die<15
-       if target.timetodie() < 15 spell(summon_demonic_tyrant)
+       #power_siphon,if=buff.wild_imps.stack>1&buff.demonic_core.stack<3
+       if demons(wild_imp) + demons(wild_imp_inner_demons) > 1 and buffstacks(demonic_core_buff) < 3 spell(power_siphon)
+       #bilescourge_bombers,if=buff.tyrant.down&cooldown.summon_demonic_tyrant.remains_expected>5
+       if demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 spell(bilescourge_bombers)
 
-       unless soulshards() == 5 and spell(hand_of_guldan) or soulshards() >= 3 and { demonduration(dreadstalker) > 0 or demonduration(demonic_tyrant) > 0 } and spell(hand_of_guldan) or soulshards() >= 1 and buffpresent(nether_portal) and spellcooldown(call_dreadstalkers) > 2 * gcd() and spell(hand_of_guldan) or soulshards() >= 1 and spellcooldown(summon_demonic_tyrant) < gcd() and timeincombat() > first_tyrant_time() - gcd() and spell(hand_of_guldan)
+       unless enemies() > 1 + 1 * talentpoints(sacrificed_souls_talent) and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and spell(implosion) or enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and not runeforge(implosive_potential_runeforge) and { not hastalent(from_the_shadows_talent) or target.debuffpresent(from_the_shadows_debuff) } and spell(implosion) or enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and buffremaining(implosive_potential_buff) < 2 and runeforge(implosive_potential_runeforge) and spell(implosion) or demons(wild_imp) + demons(wild_imp_inner_demons) >= 12 and hastalent(soul_conduit_talent_demonology) and hastalent(from_the_shadows_talent) and runeforge(implosive_potential_runeforge) and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and spell(implosion)
        {
-        #call_action_list,name=covenant_ability,if=!covenant.venthyr
-        if not iscovenant("venthyr") demonologycovenant_abilityshortcdactions()
+        #summon_vilefiend,if=time_to_die<28
+        if target.timetodie() < 28 spell(summon_vilefiend)
+        #summon_demonic_tyrant,if=time_to_die<15
+        if target.timetodie() < 15 spell(summon_demonic_tyrant)
 
-        unless not iscovenant("venthyr") and demonologycovenant_abilityshortcdpostconditions() or not hastalent(sacrificed_souls_talent) and spell(soul_strike) or buffpresent(demonic_core_buff) and soulshards() < 4 and spellcooldown(summon_demonic_tyrant) > 20 and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and spellcooldown(summon_demonic_tyrant) < 12 and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and { buffstacks(demonic_core_buff) > 2 or hastalent(sacrificed_souls_talent) } and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and enemies() > 1 and spell(demonbolt) or spell(soul_strike)
+        unless soulshards() == 5 and spell(hand_of_guldan) or soulshards() >= 3 and { demonduration(dreadstalker) > 0 or demonduration(demonic_tyrant) > 0 } and spell(hand_of_guldan) or soulshards() >= 1 and buffpresent(nether_portal) and spellcooldown(call_dreadstalkers) > 2 * gcd() and spell(hand_of_guldan) or soulshards() >= 1 and spellcooldown(summon_demonic_tyrant) < gcd() and timeincombat() > first_tyrant_time() - gcd() and spell(hand_of_guldan)
         {
-         #call_action_list,name=covenant_ability
-         demonologycovenant_abilityshortcdactions()
+         #call_action_list,name=covenant_ability,if=!covenant.venthyr
+         if not iscovenant("venthyr") demonologycovenant_abilityshortcdactions()
+
+         unless not iscovenant("venthyr") and demonologycovenant_abilityshortcdpostconditions() or not hastalent(sacrificed_souls_talent) and spell(soul_strike) or buffpresent(demonic_core_buff) and soulshards() < 4 and spellcooldown(summon_demonic_tyrant) > 20 and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and spellcooldown(summon_demonic_tyrant) < 12 and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and { buffstacks(demonic_core_buff) > 2 or hastalent(sacrificed_souls_talent) } and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and enemies() > 1 and spell(demonbolt) or spell(soul_strike)
+         {
+          #call_action_list,name=covenant_ability
+          demonologycovenant_abilityshortcdactions()
+         }
         }
        }
       }
@@ -2569,7 +2687,7 @@ AddFunction demonology_defaultshortcdactions
 
 AddFunction demonology_defaultshortcdpostconditions
 {
- demonologytrinketsshortcdpostconditions() or target.refreshable(doom) and spell(doom) or { soulbind(grove_invigoration_soulbind) or soulbind(field_of_blossoms_soulbind) or soulbind(combat_meditation_soulbind) or iscovenant("necrolord") } and demonologycovenant_abilityshortcdpostconditions() or demonologytyrant_setupshortcdpostconditions() or demonduration(demonic_tyrant) > 0 and demonologyogcdshortcdpostconditions() or spellcooldown(summon_demonic_tyrant) > 20 - 5 * { not runeforge(wilfreds_sigil_of_superior_summoning_runeforge) } and spell(call_dreadstalkers) or enemies() > 1 + 1 * talentpoints(sacrificed_souls_talent) and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and spell(implosion) or enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and not runeforge(implosive_potential_runeforge) and { not hastalent(from_the_shadows_talent) or target.debuffpresent(from_the_shadows_debuff) } and spell(implosion) or enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and buffremaining(implosive_potential_buff) < 2 and runeforge(implosive_potential_runeforge) and spell(implosion) or demons(wild_imp) + demons(wild_imp_inner_demons) >= 12 and hastalent(soul_conduit_talent_demonology) and hastalent(from_the_shadows_talent) and runeforge(implosive_potential_runeforge) and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and spell(implosion) or soulshards() == 5 and spell(hand_of_guldan) or soulshards() >= 3 and { demonduration(dreadstalker) > 0 or demonduration(demonic_tyrant) > 0 } and spell(hand_of_guldan) or soulshards() >= 1 and buffpresent(nether_portal) and spellcooldown(call_dreadstalkers) > 2 * gcd() and spell(hand_of_guldan) or soulshards() >= 1 and spellcooldown(summon_demonic_tyrant) < gcd() and timeincombat() > first_tyrant_time() - gcd() and spell(hand_of_guldan) or not iscovenant("venthyr") and demonologycovenant_abilityshortcdpostconditions() or not hastalent(sacrificed_souls_talent) and spell(soul_strike) or buffpresent(demonic_core_buff) and soulshards() < 4 and spellcooldown(summon_demonic_tyrant) > 20 and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and spellcooldown(summon_demonic_tyrant) < 12 and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and { buffstacks(demonic_core_buff) > 2 or hastalent(sacrificed_souls_talent) } and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and enemies() > 1 and spell(demonbolt) or spell(soul_strike) or demonologycovenant_abilityshortcdpostconditions() or soulshards() >= 3 and spellcooldown(summon_demonic_tyrant) > 25 and { hastalent(demonic_calling_talent) or spellcooldown(call_dreadstalkers) > { 5 - soulshards() } * executetime(shadow_bolt) + executetime(hand_of_guldan) } and spell(hand_of_guldan) or target.refreshable(doom) and timeincombat() > first_tyrant_time() and spell(doom) or spell(shadow_bolt)
+ demonologytrinketsshortcdpostconditions() or timeincombat() < first_tyrant_time() and demonologyopenershortcdpostconditions() or target.refreshable(doom) and spell(doom) or { soulbind(grove_invigoration_soulbind) or soulbind(field_of_blossoms_soulbind) or soulbind(combat_meditation_soulbind) or iscovenant("necrolord") } and demonologycovenant_abilityshortcdpostconditions() or demonologytyrant_setupshortcdpostconditions() or demonduration(demonic_tyrant) > 0 and demonologyogcdshortcdpostconditions() or spellcooldown(summon_demonic_tyrant) > 20 - 5 * { not runeforge(wilfreds_sigil_of_superior_summoning_runeforge) } and spell(call_dreadstalkers) or enemies() > 1 + 1 * talentpoints(sacrificed_souls_talent) and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and spell(implosion) or enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and not runeforge(implosive_potential_runeforge) and { not hastalent(from_the_shadows_talent) or target.debuffpresent(from_the_shadows_debuff) } and spell(implosion) or enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and buffremaining(implosive_potential_buff) < 2 and runeforge(implosive_potential_runeforge) and spell(implosion) or demons(wild_imp) + demons(wild_imp_inner_demons) >= 12 and hastalent(soul_conduit_talent_demonology) and hastalent(from_the_shadows_talent) and runeforge(implosive_potential_runeforge) and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and spell(implosion) or soulshards() == 5 and spell(hand_of_guldan) or soulshards() >= 3 and { demonduration(dreadstalker) > 0 or demonduration(demonic_tyrant) > 0 } and spell(hand_of_guldan) or soulshards() >= 1 and buffpresent(nether_portal) and spellcooldown(call_dreadstalkers) > 2 * gcd() and spell(hand_of_guldan) or soulshards() >= 1 and spellcooldown(summon_demonic_tyrant) < gcd() and timeincombat() > first_tyrant_time() - gcd() and spell(hand_of_guldan) or not iscovenant("venthyr") and demonologycovenant_abilityshortcdpostconditions() or not hastalent(sacrificed_souls_talent) and spell(soul_strike) or buffpresent(demonic_core_buff) and soulshards() < 4 and spellcooldown(summon_demonic_tyrant) > 20 and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and spellcooldown(summon_demonic_tyrant) < 12 and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and { buffstacks(demonic_core_buff) > 2 or hastalent(sacrificed_souls_talent) } and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and enemies() > 1 and spell(demonbolt) or spell(soul_strike) or demonologycovenant_abilityshortcdpostconditions() or soulshards() >= 3 and spellcooldown(summon_demonic_tyrant) > 25 and { hastalent(demonic_calling_talent) or spellcooldown(call_dreadstalkers) > { 5 - soulshards() } * executetime(shadow_bolt) + executetime(hand_of_guldan) } and spell(hand_of_guldan) or target.refreshable(doom) and timeincombat() > first_tyrant_time() and spell(doom) or spell(shadow_bolt)
 }
 
 AddFunction demonology_defaultcdactions
@@ -2579,40 +2697,46 @@ AddFunction demonology_defaultcdactions
 
  unless demonologytrinketscdpostconditions()
  {
-  #interrupt,if=target.debuff.casting.react
-  if target.isinterruptible() demonologyinterruptactions()
+  #call_action_list,name=opener,if=time<variable.first_tyrant_time
+  if timeincombat() < first_tyrant_time() demonologyopenercdactions()
 
-  unless target.refreshable(doom) and spell(doom)
+  unless timeincombat() < first_tyrant_time() and demonologyopenercdpostconditions()
   {
-   #call_action_list,name=covenant_ability,if=soulbind.grove_invigoration|soulbind.field_of_blossoms|soulbind.combat_meditation|covenant.necrolord
-   if soulbind(grove_invigoration_soulbind) or soulbind(field_of_blossoms_soulbind) or soulbind(combat_meditation_soulbind) or iscovenant("necrolord") demonologycovenant_abilitycdactions()
+   #interrupt,if=target.debuff.casting.react
+   if target.isinterruptible() demonologyinterruptactions()
 
-   unless { soulbind(grove_invigoration_soulbind) or soulbind(field_of_blossoms_soulbind) or soulbind(combat_meditation_soulbind) or iscovenant("necrolord") } and demonologycovenant_abilitycdpostconditions()
+   unless target.refreshable(doom) and spell(doom)
    {
-    #call_action_list,name=tyrant_setup
-    demonologytyrant_setupcdactions()
+    #call_action_list,name=covenant_ability,if=soulbind.grove_invigoration|soulbind.field_of_blossoms|soulbind.combat_meditation|covenant.necrolord
+    if soulbind(grove_invigoration_soulbind) or soulbind(field_of_blossoms_soulbind) or soulbind(combat_meditation_soulbind) or iscovenant("necrolord") demonologycovenant_abilitycdactions()
 
-    unless demonologytyrant_setupcdpostconditions()
+    unless { soulbind(grove_invigoration_soulbind) or soulbind(field_of_blossoms_soulbind) or soulbind(combat_meditation_soulbind) or iscovenant("necrolord") } and demonologycovenant_abilitycdpostconditions()
     {
-     #potion,if=(cooldown.summon_demonic_tyrant.remains_expected<10&time>variable.first_tyrant_time-10|soulbind.refined_palate&cooldown.summon_demonic_tyrant.remains_expected<38)
-     if { spellcooldown(summon_demonic_tyrant) < 10 and timeincombat() > first_tyrant_time() - 10 or soulbind(refined_palate_soulbind) and spellcooldown(summon_demonic_tyrant) < 38 } and { checkboxon(opt_use_consumables) and target.classification(worldboss) } item(potion_of_spectral_intellect_item usable=1)
-     #call_action_list,name=ogcd,if=pet.demonic_tyrant.active
-     if demonduration(demonic_tyrant) > 0 demonologyogcdcdactions()
+     #call_action_list,name=tyrant_setup
+     demonologytyrant_setupcdactions()
 
-     unless demonduration(demonic_tyrant) > 0 and demonologyogcdcdpostconditions() or { not runeforge(wilfreds_sigil_of_superior_summoning_runeforge) and spellcooldown(summon_demonic_tyrant) > 9 or demonduration(demonic_tyrant) > 0 and demonduration(demonic_tyrant) < 6 * gcd() } and spell(demonic_strength) or spellcooldown(summon_demonic_tyrant) > 20 - 5 * { not runeforge(wilfreds_sigil_of_superior_summoning_runeforge) } and spell(call_dreadstalkers) or demons(wild_imp) + demons(wild_imp_inner_demons) > 1 and buffstacks(demonic_core_buff) < 3 and spell(power_siphon) or demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and spell(bilescourge_bombers) or enemies() > 1 + 1 * talentpoints(sacrificed_souls_talent) and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and spell(implosion) or enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and not runeforge(implosive_potential_runeforge) and { not hastalent(from_the_shadows_talent) or target.debuffpresent(from_the_shadows_debuff) } and spell(implosion) or enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and buffremaining(implosive_potential_buff) < 2 and runeforge(implosive_potential_runeforge) and spell(implosion) or demons(wild_imp) + demons(wild_imp_inner_demons) >= 12 and hastalent(soul_conduit_talent_demonology) and hastalent(from_the_shadows_talent) and runeforge(implosive_potential_runeforge) and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and spell(implosion)
+     unless demonologytyrant_setupcdpostconditions()
      {
-      #grimoire_felguard,if=time_to_die<30
-      if target.timetodie() < 30 spell(grimoire_felguard)
+      #potion,if=(cooldown.summon_demonic_tyrant.remains_expected<10&time>variable.first_tyrant_time-10|soulbind.refined_palate&cooldown.summon_demonic_tyrant.remains_expected<38)
+      if { spellcooldown(summon_demonic_tyrant) < 10 and timeincombat() > first_tyrant_time() - 10 or soulbind(refined_palate_soulbind) and spellcooldown(summon_demonic_tyrant) < 38 } and { checkboxon(opt_use_consumables) and target.classification(worldboss) } item(potion_of_spectral_intellect_item usable=1)
+      #call_action_list,name=ogcd,if=pet.demonic_tyrant.active
+      if demonduration(demonic_tyrant) > 0 demonologyogcdcdactions()
 
-      unless target.timetodie() < 28 and spell(summon_vilefiend) or target.timetodie() < 15 and spell(summon_demonic_tyrant) or soulshards() == 5 and spell(hand_of_guldan) or soulshards() >= 3 and { demonduration(dreadstalker) > 0 or demonduration(demonic_tyrant) > 0 } and spell(hand_of_guldan) or soulshards() >= 1 and buffpresent(nether_portal) and spellcooldown(call_dreadstalkers) > 2 * gcd() and spell(hand_of_guldan) or soulshards() >= 1 and spellcooldown(summon_demonic_tyrant) < gcd() and timeincombat() > first_tyrant_time() - gcd() and spell(hand_of_guldan)
+      unless demonduration(demonic_tyrant) > 0 and demonologyogcdcdpostconditions() or { not runeforge(wilfreds_sigil_of_superior_summoning_runeforge) and spellcooldown(summon_demonic_tyrant) > 9 or demonduration(demonic_tyrant) > 0 and demonduration(demonic_tyrant) < 6 * gcd() } and spell(demonic_strength) or spellcooldown(summon_demonic_tyrant) > 20 - 5 * { not runeforge(wilfreds_sigil_of_superior_summoning_runeforge) } and spell(call_dreadstalkers) or demons(wild_imp) + demons(wild_imp_inner_demons) > 1 and buffstacks(demonic_core_buff) < 3 and spell(power_siphon) or demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and spell(bilescourge_bombers) or enemies() > 1 + 1 * talentpoints(sacrificed_souls_talent) and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and spell(implosion) or enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and not runeforge(implosive_potential_runeforge) and { not hastalent(from_the_shadows_talent) or target.debuffpresent(from_the_shadows_debuff) } and spell(implosion) or enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and buffremaining(implosive_potential_buff) < 2 and runeforge(implosive_potential_runeforge) and spell(implosion) or demons(wild_imp) + demons(wild_imp_inner_demons) >= 12 and hastalent(soul_conduit_talent_demonology) and hastalent(from_the_shadows_talent) and runeforge(implosive_potential_runeforge) and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and spell(implosion)
       {
-       #call_action_list,name=covenant_ability,if=!covenant.venthyr
-       if not iscovenant("venthyr") demonologycovenant_abilitycdactions()
+       #grimoire_felguard,if=time_to_die<30
+       if target.timetodie() < 30 spell(grimoire_felguard)
 
-       unless not iscovenant("venthyr") and demonologycovenant_abilitycdpostconditions() or not hastalent(sacrificed_souls_talent) and spell(soul_strike) or buffpresent(demonic_core_buff) and soulshards() < 4 and spellcooldown(summon_demonic_tyrant) > 20 and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and spellcooldown(summon_demonic_tyrant) < 12 and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and { buffstacks(demonic_core_buff) > 2 or hastalent(sacrificed_souls_talent) } and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and enemies() > 1 and spell(demonbolt) or spell(soul_strike)
+       unless target.timetodie() < 28 and spell(summon_vilefiend) or target.timetodie() < 15 and spell(summon_demonic_tyrant) or soulshards() == 5 and spell(hand_of_guldan) or soulshards() >= 3 and { demonduration(dreadstalker) > 0 or demonduration(demonic_tyrant) > 0 } and spell(hand_of_guldan) or soulshards() >= 1 and buffpresent(nether_portal) and spellcooldown(call_dreadstalkers) > 2 * gcd() and spell(hand_of_guldan) or soulshards() >= 1 and spellcooldown(summon_demonic_tyrant) < gcd() and timeincombat() > first_tyrant_time() - gcd() and spell(hand_of_guldan)
        {
-        #call_action_list,name=covenant_ability
-        demonologycovenant_abilitycdactions()
+        #call_action_list,name=covenant_ability,if=!covenant.venthyr
+        if not iscovenant("venthyr") demonologycovenant_abilitycdactions()
+
+        unless not iscovenant("venthyr") and demonologycovenant_abilitycdpostconditions() or not hastalent(sacrificed_souls_talent) and spell(soul_strike) or buffpresent(demonic_core_buff) and soulshards() < 4 and spellcooldown(summon_demonic_tyrant) > 20 and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and spellcooldown(summon_demonic_tyrant) < 12 and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and { buffstacks(demonic_core_buff) > 2 or hastalent(sacrificed_souls_talent) } and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and enemies() > 1 and spell(demonbolt) or spell(soul_strike)
+        {
+         #call_action_list,name=covenant_ability
+         demonologycovenant_abilitycdactions()
+        }
        }
       }
      }
@@ -2624,7 +2748,7 @@ AddFunction demonology_defaultcdactions
 
 AddFunction demonology_defaultcdpostconditions
 {
- demonologytrinketscdpostconditions() or target.refreshable(doom) and spell(doom) or { soulbind(grove_invigoration_soulbind) or soulbind(field_of_blossoms_soulbind) or soulbind(combat_meditation_soulbind) or iscovenant("necrolord") } and demonologycovenant_abilitycdpostconditions() or demonologytyrant_setupcdpostconditions() or demonduration(demonic_tyrant) > 0 and demonologyogcdcdpostconditions() or { not runeforge(wilfreds_sigil_of_superior_summoning_runeforge) and spellcooldown(summon_demonic_tyrant) > 9 or demonduration(demonic_tyrant) > 0 and demonduration(demonic_tyrant) < 6 * gcd() } and spell(demonic_strength) or spellcooldown(summon_demonic_tyrant) > 20 - 5 * { not runeforge(wilfreds_sigil_of_superior_summoning_runeforge) } and spell(call_dreadstalkers) or demons(wild_imp) + demons(wild_imp_inner_demons) > 1 and buffstacks(demonic_core_buff) < 3 and spell(power_siphon) or demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and spell(bilescourge_bombers) or enemies() > 1 + 1 * talentpoints(sacrificed_souls_talent) and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and spell(implosion) or enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and not runeforge(implosive_potential_runeforge) and { not hastalent(from_the_shadows_talent) or target.debuffpresent(from_the_shadows_debuff) } and spell(implosion) or enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and buffremaining(implosive_potential_buff) < 2 and runeforge(implosive_potential_runeforge) and spell(implosion) or demons(wild_imp) + demons(wild_imp_inner_demons) >= 12 and hastalent(soul_conduit_talent_demonology) and hastalent(from_the_shadows_talent) and runeforge(implosive_potential_runeforge) and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and spell(implosion) or target.timetodie() < 28 and spell(summon_vilefiend) or target.timetodie() < 15 and spell(summon_demonic_tyrant) or soulshards() == 5 and spell(hand_of_guldan) or soulshards() >= 3 and { demonduration(dreadstalker) > 0 or demonduration(demonic_tyrant) > 0 } and spell(hand_of_guldan) or soulshards() >= 1 and buffpresent(nether_portal) and spellcooldown(call_dreadstalkers) > 2 * gcd() and spell(hand_of_guldan) or soulshards() >= 1 and spellcooldown(summon_demonic_tyrant) < gcd() and timeincombat() > first_tyrant_time() - gcd() and spell(hand_of_guldan) or not iscovenant("venthyr") and demonologycovenant_abilitycdpostconditions() or not hastalent(sacrificed_souls_talent) and spell(soul_strike) or buffpresent(demonic_core_buff) and soulshards() < 4 and spellcooldown(summon_demonic_tyrant) > 20 and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and spellcooldown(summon_demonic_tyrant) < 12 and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and { buffstacks(demonic_core_buff) > 2 or hastalent(sacrificed_souls_talent) } and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and enemies() > 1 and spell(demonbolt) or spell(soul_strike) or demonologycovenant_abilitycdpostconditions() or soulshards() >= 3 and spellcooldown(summon_demonic_tyrant) > 25 and { hastalent(demonic_calling_talent) or spellcooldown(call_dreadstalkers) > { 5 - soulshards() } * executetime(shadow_bolt) + executetime(hand_of_guldan) } and spell(hand_of_guldan) or target.refreshable(doom) and timeincombat() > first_tyrant_time() and spell(doom) or spell(shadow_bolt)
+ demonologytrinketscdpostconditions() or timeincombat() < first_tyrant_time() and demonologyopenercdpostconditions() or target.refreshable(doom) and spell(doom) or { soulbind(grove_invigoration_soulbind) or soulbind(field_of_blossoms_soulbind) or soulbind(combat_meditation_soulbind) or iscovenant("necrolord") } and demonologycovenant_abilitycdpostconditions() or demonologytyrant_setupcdpostconditions() or demonduration(demonic_tyrant) > 0 and demonologyogcdcdpostconditions() or { not runeforge(wilfreds_sigil_of_superior_summoning_runeforge) and spellcooldown(summon_demonic_tyrant) > 9 or demonduration(demonic_tyrant) > 0 and demonduration(demonic_tyrant) < 6 * gcd() } and spell(demonic_strength) or spellcooldown(summon_demonic_tyrant) > 20 - 5 * { not runeforge(wilfreds_sigil_of_superior_summoning_runeforge) } and spell(call_dreadstalkers) or demons(wild_imp) + demons(wild_imp_inner_demons) > 1 and buffstacks(demonic_core_buff) < 3 and spell(power_siphon) or demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and spell(bilescourge_bombers) or enemies() > 1 + 1 * talentpoints(sacrificed_souls_talent) and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and spell(implosion) or enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and not runeforge(implosive_potential_runeforge) and { not hastalent(from_the_shadows_talent) or target.debuffpresent(from_the_shadows_debuff) } and spell(implosion) or enemies() > 2 and demons(wild_imp) + demons(wild_imp_inner_demons) >= 6 and buffremaining(implosive_potential_buff) < 2 and runeforge(implosive_potential_runeforge) and spell(implosion) or demons(wild_imp) + demons(wild_imp_inner_demons) >= 12 and hastalent(soul_conduit_talent_demonology) and hastalent(from_the_shadows_talent) and runeforge(implosive_potential_runeforge) and demonduration(demonic_tyrant) <= 0 and spellcooldown(summon_demonic_tyrant) > 5 and spell(implosion) or target.timetodie() < 28 and spell(summon_vilefiend) or target.timetodie() < 15 and spell(summon_demonic_tyrant) or soulshards() == 5 and spell(hand_of_guldan) or soulshards() >= 3 and { demonduration(dreadstalker) > 0 or demonduration(demonic_tyrant) > 0 } and spell(hand_of_guldan) or soulshards() >= 1 and buffpresent(nether_portal) and spellcooldown(call_dreadstalkers) > 2 * gcd() and spell(hand_of_guldan) or soulshards() >= 1 and spellcooldown(summon_demonic_tyrant) < gcd() and timeincombat() > first_tyrant_time() - gcd() and spell(hand_of_guldan) or not iscovenant("venthyr") and demonologycovenant_abilitycdpostconditions() or not hastalent(sacrificed_souls_talent) and spell(soul_strike) or buffpresent(demonic_core_buff) and soulshards() < 4 and spellcooldown(summon_demonic_tyrant) > 20 and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and spellcooldown(summon_demonic_tyrant) < 12 and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and { buffstacks(demonic_core_buff) > 2 or hastalent(sacrificed_souls_talent) } and spell(demonbolt) or buffpresent(demonic_core_buff) and soulshards() < 4 and enemies() > 1 and spell(demonbolt) or spell(soul_strike) or demonologycovenant_abilitycdpostconditions() or soulshards() >= 3 and spellcooldown(summon_demonic_tyrant) > 25 and { hastalent(demonic_calling_talent) or spellcooldown(call_dreadstalkers) > { 5 - soulshards() } * executetime(shadow_bolt) + executetime(hand_of_guldan) } and spell(hand_of_guldan) or target.refreshable(doom) and timeincombat() > first_tyrant_time() and spell(doom) or spell(shadow_bolt)
 }
 
 ### actions.5y_per_sec_trinkets
@@ -2826,8 +2950,8 @@ AddFunction destructionprecombatmainactions
  #augmentation
  #summon_pet
  if not pet.present() spell(summon_imp)
- #incinerate,if=!talent.soul_fire.enabled
- if not hastalent(soul_fire_talent) spell(incinerate)
+ #incinerate
+ spell(incinerate)
 }
 
 AddFunction destructionprecombatmainpostconditions
@@ -2847,7 +2971,7 @@ AddFunction destructionprecombatshortcdactions
 
 AddFunction destructionprecombatshortcdpostconditions
 {
- not pet.present() and spell(summon_imp) or not hastalent(soul_fire_talent) and spell(incinerate)
+ not pet.present() and spell(summon_imp) or spell(incinerate)
 }
 
 AddFunction destructionprecombatcdactions
@@ -2864,13 +2988,15 @@ AddFunction destructionprecombatcdactions
    #snapshot_stats
    #fleshcraft
    spell(fleshcraft)
+   #use_item,name=shadowed_orb_of_torment
+   if hastrinket(shadowed_orb_of_torment_item) item(shadowed_orb_of_torment_item usable=1)
   }
  }
 }
 
 AddFunction destructionprecombatcdpostconditions
 {
- not pet.present() and spell(summon_imp) or hastalent(grimoire_of_sacrifice_talent) and pet.present() and spell(grimoire_of_sacrifice) or spell(soul_fire) or not hastalent(soul_fire_talent) and spell(incinerate)
+ not pet.present() and spell(summon_imp) or hastalent(grimoire_of_sacrifice_talent) and pet.present() and spell(grimoire_of_sacrifice) or spell(soul_fire) or spell(incinerate)
 }
 
 ### actions.havoc
@@ -3269,7 +3395,6 @@ AddIcon enabled=(checkboxon(opt_warlock_destruction_aoe) and specialization(dest
 # shadowfury
 # soleahs_secret_technique_item
 # soul_fire
-# soul_fire_talent
 # soul_rot
 # spell_lock
 # summon_imp

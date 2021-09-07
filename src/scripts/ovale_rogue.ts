@@ -1480,8 +1480,8 @@ AddFunction subtletystealth_cdsshortcdactions
   #variable,name=shd_combo_points,value=combo_points.deficit>=2+buff.shadow_blades.up
   #variable,name=shd_combo_points,value=combo_points.deficit>=3,if=covenant.kyrian
   #variable,name=shd_combo_points,value=combo_points.deficit<=1,if=variable.use_priority_rotation&spell_targets.shuriken_storm>=4
-  #shadow_dance,if=variable.shd_combo_points&(variable.shd_threshold|buff.symbols_of_death.remains>=1.2|buff.chaos_bane.up|spell_targets.shuriken_storm>=4&cooldown.symbols_of_death.remains>10)
-  if shd_combo_points() and { shd_threshold() or buffremaining(symbols_of_death) >= 1.2 or buffpresent(chaos_bane_buff) or enemies(tagged=1) >= 4 and spellcooldown(symbols_of_death) > 10 } spell(shadow_dance)
+  #shadow_dance,if=variable.shd_combo_points&(variable.shd_threshold|buff.symbols_of_death.remains>=1.2|buff.chaos_bane.up|spell_targets.shuriken_storm>=4&cooldown.symbols_of_death.remains>10)&(buff.perforated_veins.stack<4|spell_targets.shuriken_storm>1)
+  if shd_combo_points() and { shd_threshold() or buffremaining(symbols_of_death) >= 1.2 or buffpresent(chaos_bane_buff) or enemies(tagged=1) >= 4 and spellcooldown(symbols_of_death) > 10 } and { buffstacks(perforated_veins_buff) < 4 or enemies(tagged=1) > 1 } spell(shadow_dance)
   #shadow_dance,if=variable.shd_combo_points&fight_remains<cooldown.symbols_of_death.remains
   if shd_combo_points() and fightremains() < spellcooldown(symbols_of_death) spell(shadow_dance)
  }
@@ -1506,7 +1506,7 @@ AddFunction subtletystealth_cdscdactions
 
 AddFunction subtletystealth_cdscdpostconditions
 {
- not race(nightelf) and { shd_combo_points() and { shd_threshold() or buffremaining(symbols_of_death) >= 1.2 or buffpresent(chaos_bane_buff) or enemies(tagged=1) >= 4 and spellcooldown(symbols_of_death) > 10 } and spell(shadow_dance) or shd_combo_points() and fightremains() < spellcooldown(symbols_of_death) and spell(shadow_dance) }
+ not race(nightelf) and { shd_combo_points() and { shd_threshold() or buffremaining(symbols_of_death) >= 1.2 or buffpresent(chaos_bane_buff) or enemies(tagged=1) >= 4 and spellcooldown(symbols_of_death) > 10 } and { buffstacks(perforated_veins_buff) < 4 or enemies(tagged=1) > 1 } and spell(shadow_dance) or shd_combo_points() and fightremains() < spellcooldown(symbols_of_death) and spell(shadow_dance) }
 }
 
 ### actions.precombat

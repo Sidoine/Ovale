@@ -259,6 +259,7 @@ export interface Modifiers {
     max_cycle_targets?: ParseNode;
     max_energy?: ParseNode;
     min_frenzy?: ParseNode;
+    mode?: ParseNode;
     moving?: ParseNode;
     name?: ParseNode;
     nonlethal?: ParseNode;
@@ -476,6 +477,7 @@ export const modifierKeywords: TypeCheck<Modifiers> = {
     ["max_cycle_targets"]: true,
     ["max_energy"]: true,
     ["min_frenzy"]: true,
+    ["mode"]: true,
     ["moving"]: true,
     ["name"]: true,
     ["nonlethal"]: true,
