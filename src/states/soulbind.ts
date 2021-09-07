@@ -158,12 +158,7 @@ export class Soulbind {
             const collectionData =
                 C_Soulbinds.GetConduitCollection(conduitType);
             for (const [, data] of ipairs(collectionData)) {
-                const id = data.conduitID;
-                const rank = data.conduitRank;
-                const spellId = C_Soulbinds.GetConduitSpellID(id, rank);
-                this.conduitSpellIdById[id] = spellId;
-                this.conduitId[spellId] = id;
-                this.conduitRank[spellId] = rank;
+                this.updateConduitData(data.conduitID);
             }
         }
     };
@@ -180,18 +175,33 @@ export class Soulbind {
                 //this.tracer.debug(`id=${node.conduitID}, spellId=${node.spellID}, state=${node.state}`);
                 const isSelected =
                     node.state == Enum.SoulbindNodeState.Selected;
-                // spellID is 0 for conduis, conduitID is 0 for traits.
+                // spellID is 0 for conduits; conduitID is 0 for traits
                 const isTrait = node.spellID && node.spellID != 0;
                 const isConduit = node.conduitID && node.conduitID != 0;
-                const isActiveConduit = isConduit && isSelected;
                 if (isTrait) {
                     this.isActiveTrait[node.spellID] = isSelected;
                 }
-                if (isActiveConduit) {
-                    const spellId = this.conduitSpellIdById[node.conduitID];
-                    this.isActiveConduit[spellId] = true;
+                if (isConduit) {
+                    const id = node.conduitID;
+                    this.updateConduitData(id);
+                    if (isSelected) {
+                        const spellId = this.conduitSpellIdById[id];
+                        if (spellId) {
+                            this.isActiveConduit[spellId] = true;
+                        }
+                    }
                 }
             }
+        }
+    };
+
+    private updateConduitData = (id: number) => {
+        const rank = C_Soulbinds.GetConduitRank(id) || 0;
+        const spellId = C_Soulbinds.GetConduitSpellID(id, rank);
+        if (spellId != 0) {
+            this.conduitSpellIdById[id] = spellId;
+            this.conduitId[spellId] = id;
+            this.conduitRank[spellId] = rank;
         }
     };
 

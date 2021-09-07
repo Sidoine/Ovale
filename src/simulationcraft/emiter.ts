@@ -1430,8 +1430,11 @@ export class Emiter {
                 className === "DEMONHUNTER" &&
                 action === "pick_up_fragment"
             ) {
-                bodyCode = "texture(spell_shadow_soulgem text=pickup)";
-                conditionCode = "soulfragments() > 0";
+                bodyCode = "Texture(spell_shadow_soulgem text=pickup)";
+                conditionCode =
+                    "CheckBoxOn(opt_pick_up_soul_fragments) and SoulFragments() > 0";
+                if (!annotation.options) annotation.options = {};
+                annotation.options["opt_pick_up_soul_fragments"] = true;
                 isSpellAction = false;
             } else if (className == "DRUID" && action == "primal_wrath") {
                 conditionCode = "Enemies(tagged=1) > 1";
@@ -1450,28 +1453,6 @@ export class Emiter {
                 conditionCode = "SpellKnown(full_moon)";
             } else if (className == "MAGE" && truthy(find(action, "pet_"))) {
                 conditionCode = "pet.Present()";
-            } else if (
-                className == "MAGE" &&
-                (action == "start_burn_phase" ||
-                    action == "start_pyro_chain" ||
-                    action == "stop_burn_phase" ||
-                    action == "stop_pyro_chain")
-            ) {
-                const [stateAction, stateVariable] = match(
-                    action,
-                    "([^_]+)_(.*)"
-                );
-                const value = (stateAction == "start" && 1) || 0;
-                if (value == 0) {
-                    conditionCode = format("GetState(%s) > 0", stateVariable);
-                } else {
-                    conditionCode = format(
-                        "not GetState(%s) > 0",
-                        stateVariable
-                    );
-                }
-                bodyCode = format("SetState(%s %d)", stateVariable, value);
-                isSpellAction = false;
             } else if (className == "MAGE" && action == "time_warp") {
                 conditionCode =
                     "CheckBoxOn(opt_time_warp) and DebuffExpires(burst_haste_debuff any=1)";
@@ -1644,7 +1625,7 @@ export class Emiter {
                 isSpellAction = false;
             } else if (
                 className == "DEMONHUNTER" &&
-                action == "metamorphosis_havoc"
+                action == "metamorphosis"
             ) {
                 conditionCode =
                     "not CheckBoxOn(opt_meta_only_during_boss) or IsBossFight()";
@@ -1689,17 +1670,6 @@ export class Emiter {
                             annotation
                         );
                         bodyCode = `${functionName}()`;
-                        if (
-                            className == "MAGE" &&
-                            specialization == "arcane" &&
-                            (name == "burn" || name == "init_burn")
-                        ) {
-                            conditionCode =
-                                "CheckBoxOn(opt_arcane_mage_burn_phase)";
-                            if (!annotation.options) annotation.options = {};
-                            annotation.options["opt_arcane_mage_burn_phase"] =
-                                true;
-                        }
                     }
                     isSpellAction = false;
                 }
@@ -3320,10 +3290,6 @@ export class Emiter {
             code = "1";
         } else if (operand == "rtb_buffs") {
             code = "BuffCount(roll_the_bones_buff)";
-        } else if (className == "ROGUE" && operand == "anticipation_charges") {
-            const name = "anticipation_buff";
-            code = format("BuffStacks(%s)", name);
-            this.addSymbol(annotation, name);
         } else if (sub(operand, 1, 22) == "active_enemies_within.") {
             code = "Enemies()";
         } else if (truthy(find(operand, "^incoming_damage_"))) {
