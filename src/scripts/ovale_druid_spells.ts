@@ -635,19 +635,6 @@ Define(starsurge_empowerment_lunar_buff -78675)
 SpellInfo(starsurge_empowerment_lunar_buff)
 SpellRequire(starsurge_empowerment_lunar_buff duration set=(buffexpires(eclipse_lunar_buff)))
 SpellAddbuff(starsurge starsurge_empowerment_lunar_buff add=1 enabled=(buffpresent(eclipse_lunar_buff)))
-
-SpellAddBuff(swipe_cat bt_swipe_buff add=1)
-  SpellInfo(bt_swipe_buff duration=6)
-SpellAddBuff(thrash_cat bt_thrash_buff add=1)
-  SpellInfo(bt_thrash_buff duration=6)
-SpellAddBuff(shred bt_shred_buff add=1)
-  SpellInfo(bt_shred_buff duration=6)
-SpellAddBuff(brutal_slash bt_brutal_slash_buff add=1)
-  SpellInfo(bt_brutal_slash_buff duration=6)
-SpellAddBuff(moonfire_cat bt_moonfire_buff add=1)
-  SpellInfo(bt_moonfire_buff duration=6)
-SpellAddBuff(rake bt_rake_buff add=1)
-  SpellInfo(bt_rake_buff duration=6)
     `;
     scripts.registerScript("DRUID", undefined, name, desc, code, "include");
 }

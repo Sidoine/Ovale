@@ -26,12 +26,6 @@ export function getFixes(spellData: ReturnType<typeof getSpellData>) {
     // Invisible auras
     customIdentifiers.set("garrote_exsanguinated", -703);
     customIdentifiers.set("rupture_exsanguinated", -1943);
-    customIdentifiers.set("bt_swipe_buff", -106785);
-    customIdentifiers.set("bt_thrash_buff", -106830);
-    customIdentifiers.set("bt_rake_buff", -1822);
-    customIdentifiers.set("bt_shred_buff", -5221);
-    customIdentifiers.set("bt_brutal_slash_buff", -202028);
-    customIdentifiers.set("bt_moonfire_buff", -155625);
 
     // Custom spell lists
     function addSpellList(name: string, ...identifiers: string[]) {
@@ -69,15 +63,6 @@ export function getFixes(spellData: ReturnType<typeof getSpellData>) {
         "blessing_of_summer",
         "blessing_of_autumn",
         "blessing_of_winter"
-    );
-    addSpellList(
-        "bt_buffs",
-        "bt_swipe_buff",
-        "bt_thrash_buff",
-        "bt_shred_buff",
-        "bt_brutal_slash_buff",
-        "bt_moonfire_buff",
-        "bt_rake_buff"
     );
     addSpellList(
         "bs_inc_buff",
