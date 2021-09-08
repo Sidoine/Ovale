@@ -1163,9 +1163,9 @@
     webdav "^4.7.0"
 
 "@wowts/wow-mock@^1.0.8", "@wowts/wow-mock@^1.19.0", "@wowts/wow-mock@^1.26.0", "@wowts/wow-mock@^1.32.4", "@wowts/wow-mock@^1.6.0":
-  version "1.32.5"
-  resolved "https://registry.yarnpkg.com/@wowts/wow-mock/-/wow-mock-1.32.5.tgz#075bbb1d4935c087ffc66624332b4303c10267c6"
-  integrity sha512-m4nhfXkS1wGiUWUgjt8Uvd/PR+C26aCJhOEwWq5MlgGmJVq0QksvTm0e8cHHYhA163zk34IfajVFDBcUQ19J0g==
+  version "1.33.1"
+  resolved "https://registry.yarnpkg.com/@wowts/wow-mock/-/wow-mock-1.33.1.tgz#4c088d29ed6c935612354a454b8e670f8dce5bbf"
+  integrity sha512-LnF1XgFquH7GF2YAPAG26MMFfbzrhWOnXMr8PdI/0iulPnP4t3u7RWt70RkpBto/KA8X3gF6rPL9fm0BritiRQ==
   dependencies:
     "@wowts/lua" "^1.6.0"
     "@wowts/table" "^1.0.2"

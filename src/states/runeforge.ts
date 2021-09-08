@@ -30,8 +30,10 @@ export class Runeforge {
                 multiline: 25,
                 width: "full",
                 get: () => {
-                    const powers =
-                        C_LegendaryCrafting.GetRuneforgePowers(undefined);
+                    const [powers] = C_LegendaryCrafting.GetRuneforgePowers(
+                        undefined,
+                        undefined
+                    );
                     const output: LuaArray<string> = {};
                     for (const [, id] of pairs(powers)) {
                         const [spellId, name] = this.getRuneforgePowerInfo(id);
