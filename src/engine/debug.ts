@@ -28,9 +28,12 @@ export class Tracer {
         };
     }
 
+    isDebugging() {
+        return (this.options.db.global.debug[this.name] && true) || false;
+    }
     debug(pattern: string, ...parameters: unknown[]) {
         const name = this.name;
-        if (this.options.db.global.debug[name]) {
+        if (this.isDebugging()) {
             DEFAULT_CHAT_FRAME.AddMessage(
                 format(
                     "|cff33ff99%s|r: %s",
@@ -42,7 +45,7 @@ export class Tracer {
     }
     debugTimestamp(pattern: string, ...parameters: unknown[]) {
         const name = this.name;
-        if (this.options.db.global.debug[name]) {
+        if (this.isDebugging()) {
             const now = GetTime();
             const s = format(
                 "|cffffff00%f|r %s",
