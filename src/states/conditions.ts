@@ -55,6 +55,7 @@ import { OvaleSpellsClass } from "./Spells";
 import { lower, upper, sub } from "@wowts/string";
 import { OvaleAzeriteEssenceClass } from "./AzeriteEssence";
 import { BaseState } from "./BaseState";
+import { Bloodtalons } from "./bloodtalons";
 import { OvaleFutureClass } from "./Future";
 import { OvaleSpellBookClass } from "./SpellBook";
 import { OvaleFrameModuleClass } from "../ui/Frame";
@@ -270,6 +271,51 @@ export class OvaleConditions {
             value = this.auras.getBaseDuration(auraId, undefined, atTime);
         }
         return returnConstant(value);
+    };
+
+    private bloodtalonsTriggerCount = (atTime: number): ConditionResult => {
+        const [active] = this.bloodtalons.getActiveTrigger(atTime);
+        return returnConstant(active);
+    };
+
+    private bloodtalonsTriggerBuffPresent = (
+        atTime: number,
+        name: string
+    ): ConditionResult => {
+        const [active, start, ending] = this.bloodtalons.getActiveTrigger(
+            atTime,
+            name
+        );
+        if (active > 0) {
+            return [start, ending];
+        }
+        return [];
+    };
+
+    private bloodtalonsBrutalSlashPresent = (
+        atTime: number
+    ): ConditionResult => {
+        return this.bloodtalonsTriggerBuffPresent(atTime, "brutal_slash");
+    };
+
+    private bloodtalonsMoonfirePresent = (atTime: number): ConditionResult => {
+        return this.bloodtalonsTriggerBuffPresent(atTime, "moonfire_cat");
+    };
+
+    private bloodtalonsRakePresent = (atTime: number): ConditionResult => {
+        return this.bloodtalonsTriggerBuffPresent(atTime, "rake");
+    };
+
+    private bloodtalonsShredPresent = (atTime: number): ConditionResult => {
+        return this.bloodtalonsTriggerBuffPresent(atTime, "shred");
+    };
+
+    private bloodtalonsSwipePresent = (atTime: number): ConditionResult => {
+        return this.bloodtalonsTriggerBuffPresent(atTime, "swipe_cat");
+    };
+
+    private bloodtalonsThrashPresent = (atTime: number): ConditionResult => {
+        return this.bloodtalonsTriggerBuffPresent(atTime, "thrash_cat");
     };
 
     /** Get the value of a buff as a number.  Not all buffs return an amount.
@@ -5464,6 +5510,7 @@ l    */
         private azeriteEssence: OvaleAzeriteEssenceClass,
         private auras: OvaleAuraClass,
         private baseState: BaseState,
+        private bloodtalons: Bloodtalons,
         private cooldown: OvaleCooldownClass,
         private future: OvaleFutureClass,
         private spellBook: OvaleSpellBookClass,
@@ -5536,6 +5583,41 @@ l    */
             "debuffdurationifapplied",
             false,
             this.baseDuration
+        );
+        ovaleCondition.register(
+            "bloodtalonstriggercount",
+            this.bloodtalonsTriggerCount,
+            { type: "number" }
+        );
+        ovaleCondition.register(
+            "bloodtalonsbrutalslashpresent",
+            this.bloodtalonsBrutalSlashPresent,
+            { type: "none" }
+        );
+        ovaleCondition.register(
+            "bloodtalonsmoonfirepresent",
+            this.bloodtalonsMoonfirePresent,
+            { type: "none" }
+        );
+        ovaleCondition.register(
+            "bloodtalonsrakepresent",
+            this.bloodtalonsRakePresent,
+            { type: "none" }
+        );
+        ovaleCondition.register(
+            "bloodtalonsshredpresent",
+            this.bloodtalonsShredPresent,
+            { type: "none" }
+        );
+        ovaleCondition.register(
+            "bloodtalonsswipepresent",
+            this.bloodtalonsSwipePresent,
+            { type: "none" }
+        );
+        ovaleCondition.register(
+            "bloodtalonsthrashpresent",
+            this.bloodtalonsThrashPresent,
+            { type: "none" }
         );
         ovaleCondition.registerCondition("buffamount", false, this.buffAmount);
         ovaleCondition.registerCondition(

@@ -441,6 +441,7 @@ export class IoC {
             this.azeriteEssence,
             this.aura,
             this.baseState,
+            this.bloodtalons,
             this.cooldown,
             this.future,
             this.spellBook,
