@@ -624,7 +624,7 @@ export interface MiscOperand {
 
 export const miscOperands: LuaObj<MiscOperand> = {
     ["active_enemies"]: { name: "enemies" },
-    ["active_bt_triggers"]: { name: "buffcount", extraSymbol: "bt_buffs" },
+    ["active_bt_triggers"]: { name: "bloodtalonstriggercount" },
     ["animacharged_cp"]: { name: "maxcombopoints" },
     ["arcane_charges"]: { name: "arcanecharges", modifiers: powerModifiers },
     ["astral_power"]: { name: "astralpower", modifiers: powerModifiers },

@@ -3106,6 +3106,13 @@ export class Emiter {
                 } else if (property === "max_stack") {
                     code = "maxarcanecharges()";
                 }
+            } else if (truthy(find(name, "^bt_"))) {
+                const trigger = gsub(sub(name, 4), "_", "");
+                if (property === "up") {
+                    code = `bloodtalons${trigger}present()`;
+                } else if (property === "down") {
+                    code = `not bloodtalons${trigger}present()`;
+                }
             } else if (name === "frozen_pulse") {
                 if (property === "up") code = "runecount() < 3";
             } else {
