@@ -10,6 +10,7 @@ import { OvaleAzeriteArmor } from "./states/AzeriteArmor";
 import { OvaleAzeriteEssenceClass } from "./states/AzeriteEssence";
 import { BaseState } from "./states/BaseState";
 import { OvaleBestActionClass } from "./engine/best-action";
+import { Bloodtalons } from "./states/bloodtalons";
 import { OvaleBossModClass } from "./states/BossMod";
 import { OvaleCompileClass } from "./engine/compile";
 import { OvaleConditionClass } from "./engine/condition";
@@ -69,6 +70,7 @@ export class IoC {
     public azeriteEssence: OvaleAzeriteEssenceClass;
     public baseState: BaseState;
     public bestAction: OvaleBestActionClass;
+    public bloodtalons: Bloodtalons;
     public bossMod: OvaleBossModClass;
     public combatLogEvent: CombatLogEvent;
     public compile: OvaleCompileClass;
@@ -187,6 +189,13 @@ export class IoC {
             this.spellBook,
             this.power,
             this.combatLogEvent
+        );
+        this.bloodtalons = new Bloodtalons(
+            this.ovale,
+            this.debug,
+            this.aura,
+            this.paperDoll,
+            this.spellBook
         );
         this.eclipse = new Eclipse(
             this.ovale,
@@ -459,6 +468,7 @@ export class IoC {
         this.state.registerState(this.cooldown);
         this.state.registerState(this.paperDoll);
         this.state.registerState(this.baseState);
+        this.state.registerState(this.bloodtalons);
         this.state.registerState(this.demonHunterSigils);
         this.state.registerState(this.eclipse);
         this.state.registerState(this.enemies);
