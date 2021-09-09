@@ -3,12 +3,7 @@ import aceTimer, { AceTimer } from "@wowts/ace_timer-3.0";
 import { LuaArray, ipairs, pairs, unpack } from "@wowts/lua";
 import { concat, insert, sort } from "@wowts/table";
 import { AceModule } from "@wowts/tsaddon";
-import {
-    C_Soulbinds,
-    GetSpellInfo,
-    SoulbindConduitType,
-    SoulbindNodeState,
-} from "@wowts/wow-mock";
+import { C_Soulbinds, Enum, GetSpellInfo } from "@wowts/wow-mock";
 import { OvaleClass } from "../Ovale";
 import {
     ConditionFunction,
@@ -168,7 +163,7 @@ export class Soulbind {
         this.tracer.debug(`${event}: Updating conduit collection.`);
         for (
             let conduitType = 0;
-            conduitType <= SoulbindConduitType.Flex;
+            conduitType <= Enum.SoulbindConduitType.Flex;
             conduitType++
         ) {
             const collectionData =
@@ -189,7 +184,8 @@ export class Soulbind {
             const data = C_Soulbinds.GetSoulbindData(soulbindId);
             for (const [, node] of pairs(data.tree.nodes)) {
                 //this.tracer.debug(`id=${node.conduitID}, spellId=${node.spellID}, state=${node.state}`);
-                const isSelected = node.state == SoulbindNodeState.Selected;
+                const isSelected =
+                    node.state == Enum.SoulbindNodeState.Selected;
                 // spellID is 0 for conduits; conduitID is 0 for traits
                 const isTrait = node.spellID && node.spellID != 0;
                 const isConduit = node.conduitID && node.conduitID != 0;
