@@ -140,6 +140,7 @@ export class Eclipse extends States<EclipseData> implements StateModule {
                 "Ovale_TalentsChanged",
                 this.onUpdateEclipseHandlers
             );
+            this.onUpdateEclipseHandlers("onEnable");
         }
     };
 
@@ -393,12 +394,14 @@ export class Eclipse extends States<EclipseData> implements StateModule {
     initializeState() {}
 
     resetState() {
-        const current = this.current;
-        const state = this.next;
-        state.starfire = current.starfire || 0;
-        state.starfireMax = current.starfireMax;
-        state.wrath = current.wrath || 0;
-        state.wrathMax = current.wrathMax;
+        if (this.hasEclipseHandlers) {
+            const current = this.current;
+            const state = this.next;
+            state.starfire = current.starfire || 0;
+            state.starfireMax = current.starfireMax;
+            state.wrath = current.wrath || 0;
+            state.wrathMax = current.wrathMax;
+        }
     }
 
     cleanState() {}
@@ -411,6 +414,7 @@ export class Eclipse extends States<EclipseData> implements StateModule {
         channel: boolean,
         spellcast: SpellCast
     ) => {
+        if (!this.hasEclipseHandlers) return;
         const state = this.next;
         const prevStarfire = state.starfire;
         const prevWrath = state.wrath;
