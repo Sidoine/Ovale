@@ -131,6 +131,7 @@ export class IoC {
         const runner = new Runner(this.debug, this.baseState, this.condition);
         this.data = new OvaleDataClass(runner, this.debug);
         this.combatLogEvent = new CombatLogEvent(this.ovale, this.debug);
+        this.guid = new Guids(this.ovale, this.debug);
         this.equipment = new OvaleEquipmentClass(
             this.ovale,
             this.debug,
@@ -141,7 +142,9 @@ export class IoC {
             this.ovale,
             this.debug
         );
-        this.guid = new Guids(this.ovale, this.debug);
+        const covenant = new Covenant(this.ovale, this.debug);
+        const runeforge = new Runeforge(this.ovale, this.debug, this.equipment);
+        const soulbind = new Soulbind(this.ovale, this.debug);
         this.spellBook = new OvaleSpellBookClass(
             this.ovale,
             this.debug,
@@ -155,10 +158,10 @@ export class IoC {
             this.debug
         );
         this.demonHunterSigils = new OvaleSigilClass(
-            this.paperDoll,
             this.ovale,
-            this.spellBook,
-            this.combatLogEvent
+            this.debug,
+            this.paperDoll,
+            this.spellBook
         );
         const combat = new OvaleCombatClass(
             this.ovale,
@@ -423,9 +426,6 @@ export class IoC {
             controls
         );
         this.recount = new OvaleRecountClass(this.ovale, this.score);
-        const covenant = new Covenant(this.ovale, this.debug);
-        const runeforge = new Runeforge(this.ovale, this.debug, this.equipment);
-        const soulbind = new Soulbind(this.ovale, this.debug);
         this.conditions = new OvaleConditions(
             this.condition,
             this.data,

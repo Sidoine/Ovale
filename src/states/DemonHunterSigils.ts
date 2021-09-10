@@ -1,163 +1,243 @@
+import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
+import { LuaArray, pairs } from "@wowts/lua";
+import { AceModule } from "@wowts/tsaddon";
+import { GetTime, SpellId, TalentId } from "@wowts/wow-mock";
+import { OvaleClass } from "../Ovale";
+import { DebugTools, Tracer } from "../engine/debug";
+import { SpellCastEventHandler, States, StateModule } from "../engine/state";
+import { Queue } from "../tools/Queue";
+import { KeyCheck } from "../tools/tools";
 import { OvalePaperDollClass } from "./PaperDoll";
 import { OvaleSpellBookClass } from "./SpellBook";
-import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
-import { ipairs, LuaObj, LuaArray, tonumber, lualength } from "@wowts/lua";
-import { insert, remove } from "@wowts/table";
-import { GetTime, TalentId } from "@wowts/wow-mock";
-import { OvaleClass } from "../Ovale";
-import { AceModule } from "@wowts/tsaddon";
-import { CombatLogEvent, SpellPayloadHeader } from "../engine/combat-log-event";
-import { StateModule } from "../engine/state";
 
-const updateDelay = 0.5;
-const sigilActivationTime = 2;
-type SigilType = "flame" | "silence" | "misery" | "chains";
-const activatedSigils: LuaObj<LuaArray<number>> = {};
+class SigilData {
+    chains: Queue<number>;
+    flame: Queue<number>;
+    kyrian: Queue<number>;
+    misery: Queue<number>;
+    silence: Queue<number>;
 
-interface Sigil {
+    constructor() {
+        this.chains = new Queue<number>();
+        this.flame = new Queue<number>();
+        this.kyrian = new Queue<number>();
+        this.misery = new Queue<number>();
+        this.silence = new Queue<number>();
+    }
+}
+
+type SigilType = keyof SigilData;
+
+const checkSigilType: KeyCheck<SigilType> = {
+    chains: true,
+    flame: true,
+    kyrian: true,
+    misery: true,
+    silence: true,
+};
+
+interface SigilInfo {
     type: SigilType;
     talent?: number;
 }
 
-const sigilStart: LuaArray<Sigil> = {
-    [204513]: {
-        type: "flame",
+const sigilTrigger: LuaArray<SigilInfo> = {
+    [SpellId.elysian_decree]: {
+        type: "kyrian",
     },
-    [204596]: {
-        type: "flame",
-    },
-    [189110]: {
+    [SpellId.infernal_strike]: {
         type: "flame",
         talent: TalentId.abyssal_strike_talent,
     },
-    [202137]: {
-        type: "silence",
-    },
-    [207684]: {
-        type: "misery",
-    },
-    [202138]: {
+    [SpellId.sigil_of_chains]: {
         type: "chains",
     },
-};
-const sigilEnd: LuaArray<Sigil> = {
-    [204598]: {
+    [SpellId.sigil_of_flame]: {
         type: "flame",
     },
-    [204490]: {
-        type: "silence",
-    },
-    [207685]: {
+    [SpellId.sigil_of_misery]: {
         type: "misery",
     },
-    [204834]: {
-        type: "chains",
+    [SpellId.sigil_of_silence]: {
+        type: "silence",
     },
 };
 
-export class OvaleSigilClass implements StateModule {
+export class OvaleSigilClass extends States<SigilData> implements StateModule {
     private module: AceModule & AceEvent;
+    private tracer: Tracer;
+
+    // number of seconds a sigil charges before activation
+    private chargeDuration = 2;
 
     constructor(
-        private ovalePaperDoll: OvalePaperDollClass,
         private ovale: OvaleClass,
-        private ovaleSpellBook: OvaleSpellBookClass,
-        private combatLogEvent: CombatLogEvent
+        debug: DebugTools,
+        private paperDoll: OvalePaperDollClass,
+        private spellBook: OvaleSpellBookClass
     ) {
+        super(SigilData);
         this.module = ovale.createModule(
             "OvaleSigil",
-            this.handleInitialize,
-            this.handleDisable,
+            this.onEnable,
+            this.onDisable,
             aceEvent
         );
-        activatedSigils["flame"] = {};
-        activatedSigils["silence"] = {};
-        activatedSigils["misery"] = {};
-        activatedSigils["chains"] = {};
+        this.tracer = debug.create(this.module.GetName());
     }
 
-    private handleInitialize = () => {
+    private onEnable = () => {
         if (this.ovale.playerClass == "DEMONHUNTER") {
+            this.module.RegisterMessage(
+                "Ovale_SpecializationChanged",
+                this.onOvaleSpecializationChanged
+            );
             this.module.RegisterEvent(
                 "UNIT_SPELLCAST_SUCCEEDED",
-                this.handleUnitSpellCastSucceeded
+                this.onUnitSpellCastSucceeded
             );
-            this.combatLogEvent.registerEvent(
-                "SPELL_AURA_APPLIED",
-                this,
-                this.handleSpellAuraApplied
+
+            const specialization = this.paperDoll.getSpecialization();
+            this.onOvaleSpecializationChanged(
+                "onEnable",
+                specialization,
+                specialization
             );
         }
     };
-    private handleDisable = () => {
+
+    private onDisable = () => {
         if (this.ovale.playerClass == "DEMONHUNTER") {
+            this.module.UnregisterMessage("Ovale_SpecializationChanged");
+            this.module.UnregisterMessage("Ovale_TalentsChanged");
             this.module.UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED");
-            this.combatLogEvent.unregisterAllEvents(this);
         }
     };
 
-    private handleSpellAuraApplied = (cleuEvent: string) => {
-        if (!this.ovalePaperDoll.isSpecialization("vengeance")) {
-            return;
-        }
-        const cleu = this.combatLogEvent;
-        if (cleu.sourceGUID == this.ovale.playerGUID) {
-            const header = cleu.header as SpellPayloadHeader;
-            const spellId = header.spellId;
-            if (sigilEnd[spellId] != undefined) {
-                const s = sigilEnd[spellId];
-                const t = s.type;
-                remove(activatedSigils[t], 1);
-            }
+    private onOvaleSpecializationChanged = (
+        event: string,
+        newSpecialization: string,
+        oldSpecialization: string
+    ) => {
+        if (newSpecialization === "vengeance") {
+            this.module.RegisterMessage(
+                "Ovale_TalentsChanged",
+                this.onOvaleTalentsChanged
+            );
+            this.onOvaleTalentsChanged(event);
         }
     };
 
-    private handleUnitSpellCastSucceeded = (
+    private onOvaleTalentsChanged = (event: string) => {
+        const talent = TalentId.quickened_sigils_talent;
+        const hasQuickenedSigils = this.spellBook.getTalentPoints(talent) > 0;
+        this.chargeDuration = 2;
+        if (hasQuickenedSigils) {
+            // Quickened Sigils talent reduces activation time by 1 second.
+            this.chargeDuration -= 1;
+        }
+    };
+
+    private onUnitSpellCastSucceeded = (
         event: string,
         unitId: string,
         guid: string,
-        spellId: number,
-        ...parameters: any[]
+        spellId: number
     ) => {
-        if (!this.ovalePaperDoll.isSpecialization("vengeance")) {
-            return;
-        }
-        if (unitId == undefined || unitId != "player") {
-            return;
-        }
-        const id = tonumber(spellId);
-        if (sigilStart[id] != undefined) {
-            const s = sigilStart[id];
-            const t = s.type;
-            const tal = s.talent || undefined;
-            if (
-                tal == undefined ||
-                this.ovaleSpellBook.getTalentPoints(tal) > 0
-            ) {
-                insert(activatedSigils[t], GetTime());
+        if (unitId == "player") {
+            if (sigilTrigger[spellId]) {
+                const info = sigilTrigger[spellId];
+                const sigilType = info.type;
+                const talent = info.talent;
+                if (!talent || this.spellBook.getTalentPoints(talent) > 0) {
+                    const now = GetTime();
+                    const state = this.current;
+                    this.triggerSigil(state, sigilType, now);
+                    const count = state[sigilType].length;
+                    this.tracer.debug(
+                        `"${sigilType}" (${count}) placed at ${now}`
+                    );
+                }
             }
         }
     };
 
-    isSigilCharging(type: SigilType, atTime: number) {
-        if (lualength(activatedSigils[type]) == 0) {
-            return false;
+    private triggerSigil = (
+        state: SigilData,
+        sigilType: SigilType,
+        atTime: number
+    ) => {
+        const queue = state[sigilType];
+        let activationTime = queue.front();
+        while (activationTime && activationTime < atTime) {
+            queue.shift();
+            activationTime = queue.front();
         }
-        let charging = false;
-        for (const [, v] of ipairs(activatedSigils[type])) {
-            let activationTime = sigilActivationTime + updateDelay;
-            if (
-                this.ovaleSpellBook.getTalentPoints(
-                    TalentId.quickened_sigils_talent
-                ) > 0
-            ) {
-                activationTime = activationTime - 1;
-            }
-            charging = charging || atTime < v + activationTime;
-        }
-        return charging;
-    }
-    cleanState(): void {}
+        activationTime = atTime + this.chargeDuration;
+        queue.push(activationTime);
+    };
+
     initializeState(): void {}
-    resetState(): void {}
+
+    resetState() {
+        if (this.ovale.playerClass == "DEMONHUNTER") {
+            for (const [sigilType] of pairs(checkSigilType)) {
+                const current = this.current[sigilType as SigilType];
+                const next = this.next[sigilType as SigilType];
+                {
+                    // TODO replace with next.clear() when available.
+                    next.first = 0;
+                    next.last = 0;
+                    next.length = 0;
+                }
+                for (let i = 1; i <= current.length; i++) {
+                    const activationTime = current.at(i);
+                    if (activationTime) {
+                        next.push(activationTime);
+                    }
+                }
+            }
+        }
+    }
+
+    cleanState(): void {}
+
+    applySpellAfterCast: SpellCastEventHandler = (
+        spellId,
+        targetGUID,
+        startCast,
+        endCast,
+        channel,
+        spellcast
+    ) => {
+        if (this.ovale.playerClass == "DEMONHUNTER") {
+            if (sigilTrigger[spellId]) {
+                const info = sigilTrigger[spellId];
+                const sigilType = info.type;
+                const talent = info.talent;
+                if (!talent || this.spellBook.getTalentPoints(talent) > 0) {
+                    const state = this.next;
+                    this.triggerSigil(state, sigilType, endCast);
+                    const count = state[sigilType].length;
+                    this.tracer.log(
+                        `"${sigilType}" (${count}) placed at ${endCast}`
+                    );
+                }
+            }
+        }
+    };
+
+    isSigilCharging(sigilType: SigilType, atTime: number) {
+        const queue = this.next[sigilType];
+        for (let i = 1; i <= queue.length; i++) {
+            const activationTime = queue.at(i);
+            if (activationTime) {
+                const start = activationTime - this.chargeDuration;
+                if (start <= atTime && atTime < activationTime) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }
