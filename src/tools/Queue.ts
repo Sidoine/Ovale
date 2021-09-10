@@ -89,6 +89,12 @@ export class Deque<T> {
         return (this.length > 0 && this.buffer[this.last]) || undefined;
     }
 
+    clear() {
+        this.first = 0;
+        this.last = 0;
+        this.length = 0;
+    }
+
     indexAfter = (index: number) => {
         return (index < this.capacity && index + 1) || 1;
     };

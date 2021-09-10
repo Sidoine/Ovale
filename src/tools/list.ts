@@ -95,6 +95,11 @@ export class List<T> {
         return (this.head && this.head.prev.value) || undefined;
     }
 
+    clear() {
+        this.head = undefined;
+        this.length = 0;
+    }
+
     backToFrontIterator(): Iterator<T> {
         return new ListBackToFrontIterator<T>(this);
     }

@@ -650,3 +650,10 @@ test("replace with front to back iterator of queue", () => {
     expect(iterator.next()).toBe(false);
     expect(q.asArray()).toEqual({ 1: 10, 2: 40, 3: 30 });
 });
+
+test("cleared queue is empty", () => {
+    const q = new Deque<number>();
+    q.fromArray({ 1: 10, 2: 20, 3: 30 });
+    q.clear();
+    expect(q.isEmpty()).toBe(true);
+});

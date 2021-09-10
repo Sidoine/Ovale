@@ -17,7 +17,7 @@ test("from empty array", () => {
     expect(l.asArray()).toEqual({});
 });
 
-test("nodeOf from empety list", () => {
+test("nodeOf from empty list", () => {
     const l = new List<number>();
     const [node, index] = l.nodeOf(10);
     expect(node).toBe(undefined);
@@ -440,4 +440,11 @@ test("replace with front to back iterator of list", () => {
     expect(iterator.value).toBe(30);
     expect(iterator.next()).toBe(false);
     expect(l.asArray()).toEqual({ 1: 10, 2: 40, 3: 30 });
+});
+
+test("cleared list is empty", () => {
+    const l = new List<number>();
+    l.fromArray({ 1: 10, 2: 20, 3: 30 });
+    l.clear();
+    expect(l.isEmpty()).toBe(true);
 });
