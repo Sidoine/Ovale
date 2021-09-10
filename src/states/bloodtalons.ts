@@ -89,33 +89,40 @@ export class Bloodtalons
 
     private onEnable = () => {
         if (this.ovale.playerClass == "DRUID") {
-            this.module.RegisterEvent(
-                "PLAYER_ENTERING_WORLD",
-                this.onUpdateBloodtalonsHandlers
-            );
             this.module.RegisterMessage(
                 "Ovale_SpecializationChanged",
-                this.onUpdateBloodtalonsHandlers
+                this.onOvaleSpecializationChanged
             );
-            this.module.RegisterMessage(
-                "Ovale_TalentsChanged",
-                this.onUpdateBloodtalonsHandlers
-            );
+            if (this.paperDoll.isSpecialization("feral")) {
+                this.onOvaleSpecializationChanged("onEnable", "feral", "feral");
+            }
         }
     };
 
     private onDisable = () => {
         if (this.ovale.playerClass == "DRUID") {
-            this.module.UnregisterEvent("PLAYER_ENTERING_WORLD");
             this.module.UnregisterMessage("Ovale_SpecializationChanged");
             this.module.UnregisterMessage("Ovale_TalentsChanged");
             this.unregisterBloodtalonsHandlers();
         }
     };
 
-    private onUpdateBloodtalonsHandlers = (event: string) => {
+    private onOvaleSpecializationChanged = (
+        event: string,
+        newSpecialization: string,
+        oldSpecialization: string
+    ) => {
+        if (newSpecialization == "feral") {
+            this.module.RegisterMessage(
+                "Ovale_TalentsChanged",
+                this.onOvaleTalentsChanged
+            );
+            this.onOvaleTalentsChanged(event);
+        }
+    };
+
+    private onOvaleTalentsChanged = (event: string) => {
         const hasBloodtalonsTalent =
-            this.paperDoll.isSpecialization("feral") &&
             this.spellBook.getTalentPoints(TalentId.bloodtalons_talent) > 0;
         if (hasBloodtalonsTalent) {
             this.registerBloodtalonsHandlers();
