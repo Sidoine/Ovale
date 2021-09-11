@@ -2,19 +2,19 @@ import { OvaleClass } from "../Ovale";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { AceModule } from "@wowts/tsaddon";
 import { CovenantChosenEvent, C_Covenants } from "@wowts/wow-mock";
-import { isNumber, AceEventHandler } from "../tools/tools";
+import { isNumber, isString, AceEventHandler } from "../tools/tools";
 import {
     ConditionFunction,
     OvaleConditionClass,
     returnBoolean,
 } from "../engine/condition";
-import { pairs, ipairs, LuaArray, LuaObj, unpack } from "@wowts/lua";
+import { LuaArray, ipairs, pairs, unpack } from "@wowts/lua";
 import { DebugTools } from "../engine/debug";
 import { OptionUiGroup } from "../ui/acegui-helpers";
 import { gsub, lower } from "@wowts/string";
 import { concat, insert } from "@wowts/table";
 
-const covenantIdByName: LuaObj<number> = {};
+const covenantNameById: LuaArray<string> = {};
 
 export class Covenant {
     private module: AceModule & AceEvent;
@@ -30,11 +30,11 @@ export class Covenant {
                 width: "full",
                 get: () => {
                     const output: LuaArray<string> = {};
-                    for (const [k, v] of pairs(covenantIdByName)) {
-                        if (this.covenantId == v) {
-                            insert(output, `${k}: ${v} (active)`);
+                    for (const [id, name] of pairs(covenantNameById)) {
+                        if (this.covenantId === id) {
+                            insert(output, `${id}: ${name} (active)`);
                         } else {
-                            insert(output, `${k}: ${v}`);
+                            insert(output, `${id}: ${name}`);
                         }
                     }
                     return concat(output, "\n");
@@ -46,7 +46,7 @@ export class Covenant {
     constructor(ovale: OvaleClass, debug: DebugTools) {
         this.module = ovale.createModule(
             "Covenant",
-            this.onInitialize,
+            this.onEnable,
             this.onDisable,
             aceEvent
         );
@@ -56,18 +56,17 @@ export class Covenant {
             const covenant = C_Covenants.GetCovenantData(v);
             if (covenant && covenant.name && covenant.ID) {
                 const [name] = gsub(lower(covenant.name), " ", "_");
-                covenantIdByName[name] = covenant.ID;
+                covenantNameById[covenant.ID] = name;
             }
         }
     }
 
-    public registerConditions(condition: OvaleConditionClass) {
-        condition.registerCondition("iscovenant", false, this.isCovenant);
-    }
-
-    private onInitialize = () => {
+    private onEnable = () => {
         this.module.RegisterEvent("COVENANT_CHOSEN", this.onCovenantChosen);
-        this.covenantId = C_Covenants.GetActiveCovenantID();
+        const id = C_Covenants.GetActiveCovenantID();
+        if (id) {
+            this.onCovenantChosen("COVENANT_CHOSEN", id);
+        }
     };
 
     private onDisable = () => {
@@ -75,23 +74,41 @@ export class Covenant {
     };
 
     private onCovenantChosen: AceEventHandler<CovenantChosenEvent> = (
-        _,
+        event,
         covenantId
     ) => {
         this.covenantId = covenantId;
+        const name = this.getCovenant(covenantId);
+        this.module.SendMessage("Ovale_CovenantChosen", name);
     };
 
-    private isCovenant: ConditionFunction = (positionalParameters) => {
-        const [covenant] = unpack(positionalParameters);
-        if (covenant === "none")
-            return returnBoolean(this.covenantId === undefined);
-        if (!covenant) return [];
-        let id: number | undefined;
+    public getCovenant(covenantId?: number) {
+        covenantId = covenantId || this.covenantId;
+        return (covenantId && covenantNameById[covenantId]) || "none";
+    }
+
+    public isCovenant(covenant: number | string) {
         if (isNumber(covenant)) {
-            id = covenant;
+            return this.covenantId === (covenant as number);
         } else {
-            id = covenantIdByName[covenant as string];
+            const name = this.getCovenant();
+            return name === (covenant as string);
         }
-        return returnBoolean(this.covenantId === id);
+    }
+
+    public registerConditions(condition: OvaleConditionClass) {
+        condition.registerCondition(
+            "iscovenant",
+            false,
+            this.isCovenantCondition
+        );
+    }
+
+    private isCovenantCondition: ConditionFunction = (positionalParameters) => {
+        const [covenant] = unpack(positionalParameters);
+        if (isNumber(covenant) || isString(covenant)) {
+            return returnBoolean(this.isCovenant(covenant));
+        }
+        return returnBoolean(false);
     };
 }
