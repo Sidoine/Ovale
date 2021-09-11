@@ -327,10 +327,11 @@ export class IoC {
             this.combatLogEvent
         );
         this.demonHunterSoulFragments = new OvaleDemonHunterSoulFragmentsClass(
-            this.aura,
             this.ovale,
-            this.paperDoll,
-            this.combatLogEvent
+            this.debug,
+            this.aura,
+            this.combatLogEvent,
+            this.paperDoll
         );
         this.runes = new OvaleRunesClass(
             this.ovale,

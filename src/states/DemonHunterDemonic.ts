@@ -52,15 +52,12 @@ export class OvaleDemonHunterDemonicClass implements StateModule {
                 "Ovale_SpecializationChanged",
                 this.onOvaleSpecializationChanged
             );
-            if (this.paperDoll.isSpecialization("havoc")) {
-                this.onOvaleSpecializationChanged("onEnable", "havoc", "havoc");
-            } else if (this.paperDoll.isSpecialization("vengeance")) {
-                this.onOvaleSpecializationChanged(
-                    "onEnable",
-                    "vengeance",
-                    "vengeance"
-                );
-            }
+            const specialization = this.paperDoll.getSpecialization();
+            this.onOvaleSpecializationChanged(
+                "onEnable",
+                specialization,
+                specialization
+            );
         }
     };
 
