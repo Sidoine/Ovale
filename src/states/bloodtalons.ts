@@ -93,9 +93,12 @@ export class Bloodtalons
                 "Ovale_SpecializationChanged",
                 this.onOvaleSpecializationChanged
             );
-            if (this.paperDoll.isSpecialization("feral")) {
-                this.onOvaleSpecializationChanged("onEnable", "feral", "feral");
-            }
+            const specialization = this.paperDoll.getSpecialization();
+            this.onOvaleSpecializationChanged(
+                "onEnable",
+                specialization,
+                specialization
+            );
         }
     };
 
