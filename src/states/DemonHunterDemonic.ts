@@ -94,7 +94,7 @@ export class OvaleDemonHunterDemonicClass implements StateModule {
         if (this.specialization == "havoc") {
             this.hasDemonicTalent =
                 this.spellBook.getTalentPoints(TalentId.demonic_talent) > 0;
-        } else if (this.specialization == "vengenace") {
+        } else if (this.specialization == "vengeance") {
             this.hasDemonicTalent =
                 this.spellBook.getTalentPoints(
                     TalentId.demonic_talent_vengeance
