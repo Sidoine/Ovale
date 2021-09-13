@@ -282,10 +282,10 @@ export class IoC {
         );
         this.stagger = new OvaleStaggerClass(
             this.ovale,
-            combat,
-            this.baseState,
+            this.debug,
             this.aura,
             this.health,
+            this.paperDoll,
             this.combatLogEvent
         );
         this.actionBar = new OvaleActionBarClass(
@@ -477,7 +477,6 @@ export class IoC {
         this.state.registerState(this.health);
         this.state.registerState(this.lossOfControl);
         this.state.registerState(this.power);
-        this.state.registerState(this.stagger);
         this.state.registerState(this.stance);
         this.state.registerState(this.totem);
         this.state.registerState(this.variables);
