@@ -2,6 +2,33 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.1.7](https://github.com/Sidoine/Ovale/compare/9.1.6...9.1.7) (2021-09-18)
+
+### Features
+
+-   add clear() method to list and queue classes ([#1011](https://github.com/Sidoine/Ovale/issues/1011)) ([c95f756](https://github.com/Sidoine/Ovale/commit/c95f75677f5c358afff6d1c1c495b636be9b1cce))
+-   add doubly-linked list implementation ([#970](https://github.com/Sidoine/Ovale/issues/970)) ([e35f10b](https://github.com/Sidoine/Ovale/commit/e35f10b0ee3f2ddf8b2532236096d22ef6506e60))
+-   add indexOf() to find a value in a queue ([#967](https://github.com/Sidoine/Ovale/issues/967)) ([0edc2de](https://github.com/Sidoine/Ovale/commit/0edc2de14fe7df72f9efe10a4eed985feb282efc))
+-   add method to query the current covenant ([#1012](https://github.com/Sidoine/Ovale/issues/1012)) ([0673d46](https://github.com/Sidoine/Ovale/commit/0673d464c5ae7dd2e948d1a9733462216349641f))
+-   add methods to allow in-place replacement of values in queues and lists ([#975](https://github.com/Sidoine/Ovale/issues/975)) ([0597336](https://github.com/Sidoine/Ovale/commit/05973368547fbc841d4ed629fae6a944cab50361))
+-   cache GUIDs without any unit IDs mappings for later removal ([#972](https://github.com/Sidoine/Ovale/issues/972)) ([6b70923](https://github.com/Sidoine/Ovale/commit/6b70923476330f36be2ab8b3806db26df7889d43))
+-   improvements to DBC extraction ([#978](https://github.com/Sidoine/Ovale/issues/978)) ([fcccfe0](https://github.com/Sidoine/Ovale/commit/fcccfe0b6db59ab4f3b95a5ad2f40e1b3b8bc258))
+-   track feral druid Bloodtalons state directly in Ovale ([#1006](https://github.com/Sidoine/Ovale/issues/1006)) ([d230196](https://github.com/Sidoine/Ovale/commit/d23019689c0b8eb2736aa74637ab89a8dd2ff067))
+
+### Bug Fixes
+
+-   audit for-loop usage ([#965](https://github.com/Sidoine/Ovale/issues/965)) ([2e7a5ae](https://github.com/Sidoine/Ovale/commit/2e7a5aec1f3f508cc15be4deefb7b93552d9295f))
+-   be explicit about method return type as a hint to tstolua ([#971](https://github.com/Sidoine/Ovale/issues/971)) ([19c7d5b](https://github.com/Sidoine/Ovale/commit/19c7d5b71905be5acefcda54a61ec8a1a0adba6e))
+-   change usage of UnitName() to GetUnitName() ([#963](https://github.com/Sidoine/Ovale/issues/963)) ([c4c394d](https://github.com/Sidoine/Ovale/commit/c4c394d932953d58d8a28b47ca0892701100e2e5))
+-   cleanup Stagger module ([#1013](https://github.com/Sidoine/Ovale/issues/1013)) ([a0f03fd](https://github.com/Sidoine/Ovale/commit/a0f03fd8908fece7a933edd2b3bb20c267c2fa5a))
+-   fixes to import harness and import latest scripts ([#994](https://github.com/Sidoine/Ovale/issues/994)) ([47a513d](https://github.com/Sidoine/Ovale/commit/47a513dbcbc00908a72e9d6280ec636662214ec2))
+-   multiple icons ([#991](https://github.com/Sidoine/Ovale/issues/991)) ([53664fc](https://github.com/Sidoine/Ovale/commit/53664fcd572ebcb7b5d8b04706acb434ed395cde))
+-   only manage Eclipse state for balance{,-affinity} druids ([#1014](https://github.com/Sidoine/Ovale/issues/1014)) ([63e6477](https://github.com/Sidoine/Ovale/commit/63e6477be796355b9297f68f45532e0edfa3bd76))
+-   rewrite demon hunter modules to correctly handle state ([#1015](https://github.com/Sidoine/Ovale/issues/1015)) ([cc3923d](https://github.com/Sidoine/Ovale/commit/cc3923d60de8eb556893638ddfcb77bfdf4e1bdf))
+-   simplify identifying runeforges by solely using bonus IDs ([#999](https://github.com/Sidoine/Ovale/issues/999)) ([995cf1c](https://github.com/Sidoine/Ovale/commit/995cf1c0be6a710d473771aedf1a78a40bbdf945))
+-   support latest SimC profile grammar and import latest scripts ([#998](https://github.com/Sidoine/Ovale/issues/998)) ([5f9f29b](https://github.com/Sidoine/Ovale/commit/5f9f29bbaa4ac9d9fed5fa8b259853176d8e6bfd))
+-   update conduit data when a higher ranking conduit is learned ([#1000](https://github.com/Sidoine/Ovale/issues/1000)) ([7d086c4](https://github.com/Sidoine/Ovale/commit/7d086c4c19f9cd594c8556fa237f55d572195b9f))
+
 ### [9.1.6](https://github.com/Sidoine/Ovale/compare/9.1.5...9.1.6) (2021-08-08)
 
 ### Features
