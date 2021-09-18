@@ -1,190 +1,154 @@
-import { OvaleAuraClass } from "./Aura";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
-import {
-    GetSpecialization,
-    GetSpecializationInfo,
-    GetTime,
-    GetTalentInfoByID,
-} from "@wowts/wow-mock";
-import { huge } from "@wowts/math";
-import { select } from "@wowts/lua";
-import { OvaleClass } from "../Ovale";
+import { LuaArray, LuaObj } from "@wowts/lua";
+import { SpellId, TalentId } from "@wowts/wow-mock";
 import { AceModule } from "@wowts/tsaddon";
-import { CombatLogEvent, SpellPayloadHeader } from "../engine/combat-log-event";
 import { DebugTools, Tracer } from "../engine/debug";
+import { SpellCastEventHandler, StateModule } from "../engine/state";
+import { OvaleClass } from "../Ovale";
+import { OvaleAuraClass } from "./Aura";
+import { OvalePaperDollClass } from "./PaperDoll";
+import { OvaleSpellBookClass } from "./SpellBook";
 
-const infinity = huge;
-const havocDemonicTalentId = 22547;
-const havocSpecId = 577;
-const havocEyeBeamSpellId = 198013;
-const havocMetaBuffId = 162264;
-const hiddenBuffId = -havocDemonicTalentId;
-const hiddenBuffDuration = infinity;
-const hiddenBuffExtendedByDemonic = "Extended by Demonic";
+const demonicTriggerId: LuaObj<LuaArray<boolean>> = {
+    havoc: {
+        [SpellId.eye_beam]: true,
+    },
+    vengeance: {
+        [SpellId.fel_devastation]: true,
+    },
+};
 
-export class OvaleDemonHunterDemonicClass {
-    playerGUID: string;
-    isDemonHunter = false;
-    isHavoc: boolean;
-    hasDemonic: boolean;
+const metamorphosisId: LuaObj<number> = {
+    havoc: SpellId.metamorphosis,
+    vengeance: SpellId.metamorphosis_vengeance,
+};
 
+export class OvaleDemonHunterDemonicClass implements StateModule {
     private module: AceModule & AceEvent;
-    private debug: Tracer;
+    private tracer: Tracer;
+
+    private specialization = "havoc";
+    private hasDemonicTalent = false;
 
     constructor(
-        private ovaleAura: OvaleAuraClass,
-        private combatLogEvent: CombatLogEvent,
+        private aura: OvaleAuraClass,
+        private paperDoll: OvalePaperDollClass,
+        private spellBook: OvaleSpellBookClass,
         private ovale: OvaleClass,
-        ovaleDebug: DebugTools
+        debug: DebugTools
     ) {
         this.module = ovale.createModule(
             "OvaleDemonHunterDemonic",
-            this.handleInitialize,
-            this.handleDisable,
+            this.onEnable,
+            this.onDisable,
             aceEvent
         );
-        this.debug = ovaleDebug.create(this.module.GetName());
-        this.playerGUID = this.ovale.playerGUID;
-        this.isHavoc = false;
-        this.hasDemonic = false;
+        this.tracer = debug.create(this.module.GetName());
     }
 
-    private handleInitialize = () => {
-        this.isDemonHunter =
-            (this.ovale.playerClass == "DEMONHUNTER" && true) || false;
-        if (this.isDemonHunter) {
-            this.debug.debug("playerGUID: (%s)", this.ovale.playerGUID);
+    private onEnable = () => {
+        if (this.ovale.playerClass == "DEMONHUNTER") {
+            this.module.RegisterMessage(
+                "Ovale_SpecializationChanged",
+                this.onOvaleSpecializationChanged
+            );
+            const specialization = this.paperDoll.getSpecialization();
+            this.onOvaleSpecializationChanged(
+                "onEnable",
+                specialization,
+                specialization
+            );
+        }
+    };
+
+    private onDisable = () => {
+        if (this.ovale.playerClass == "DEMONHUNTER") {
+            this.module.UnregisterMessage("Ovale_SpecializationChanged");
+            this.module.UnregisterMessage("Ovale_TalentsChanged");
+            this.hasDemonicTalent = false;
+        }
+    };
+
+    private onOvaleSpecializationChanged = (
+        event: string,
+        newSpecialization: string,
+        oldSpecialization: string
+    ) => {
+        this.specialization = newSpecialization;
+        if (newSpecialization == "havoc" || newSpecialization == "vengeance") {
+            this.tracer.debug("Installing Demonic event handlers.");
             this.module.RegisterMessage(
                 "Ovale_TalentsChanged",
-                this.handleTalentsChanged
+                this.onOvaleTalentsChanged
             );
-        }
-    };
-    private handleDisable = () => {
-        this.module.UnregisterMessage("Ovale_TalentsChanged");
-    };
-    private handleTalentsChanged = (event: string) => {
-        this.isHavoc =
-            (this.isDemonHunter &&
-                GetSpecializationInfo(GetSpecialization()) == havocSpecId &&
-                true) ||
-            false;
-        this.hasDemonic =
-            (this.isHavoc &&
-                select(
-                    10,
-                    GetTalentInfoByID(havocDemonicTalentId, havocSpecId)
-                ) &&
-                true) ||
-            false;
-        if (this.isHavoc && this.hasDemonic) {
-            this.debug.debug("We are a havoc DH with Demonic.");
-            this.combatLogEvent.registerEvent(
-                "SPELL_CAST_SUCCESS",
-                this,
-                this.handleCombatLogEvent
-            );
-            this.combatLogEvent.registerEvent(
-                "SPELL_AURA_REMOVED",
-                this,
-                this.handleCombatLogEvent
-            );
+            this.onOvaleTalentsChanged(event);
         } else {
-            if (!this.isHavoc) {
-                this.debug.debug("We are not a havoc DH.");
-            } else if (!this.hasDemonic) {
-                this.debug.debug("We don't have the Demonic talent.");
-            }
-            this.dropAura();
-            this.combatLogEvent.unregisterAllEvents(this);
+            this.tracer.debug("Removing Demonic event handlers.");
+            this.module.UnregisterMessage("Ovale_TalentsChanged");
+            this.hasDemonicTalent = false;
         }
     };
-    private handleCombatLogEvent(cleuEvent: string) {
-        const cleu = this.combatLogEvent;
-        if (cleu.sourceGUID == this.playerGUID) {
-            if (cleuEvent == "SPELL_CAST_SUCCESS") {
-                const header = cleu.header as SpellPayloadHeader;
-                const spellId = header.spellId;
-                const spellName = header.spellName;
-                if (havocEyeBeamSpellId == spellId) {
-                    this.debug.debug(
-                        "Spell %d (%s) has successfully been cast. Gaining Aura (only during meta).",
-                        spellId,
-                        spellName
-                    );
-                    this.gainAura();
-                }
-            } else if (cleuEvent == "SPELL_AURA_REMOVED") {
-                const header = cleu.header as SpellPayloadHeader;
-                const spellId = header.spellId;
-                const spellName = header.spellName;
-                if (havocMetaBuffId == spellId) {
-                    this.debug.debug(
-                        "Aura %d (%s) is removed. Dropping Aura.",
-                        spellId,
-                        spellName
-                    );
-                    this.dropAura();
-                }
+
+    private onOvaleTalentsChanged = (event: string) => {
+        const hasDemonicTalent = this.hasDemonicTalent;
+        if (this.specialization == "havoc") {
+            this.hasDemonicTalent =
+                this.spellBook.getTalentPoints(TalentId.demonic_talent) > 0;
+        } else if (this.specialization == "vengeance") {
+            this.hasDemonicTalent =
+                this.spellBook.getTalentPoints(
+                    TalentId.demonic_talent_vengeance
+                ) > 0;
+        } else {
+            this.hasDemonicTalent = false;
+        }
+        if (hasDemonicTalent != this.hasDemonicTalent) {
+            if (this.hasDemonicTalent) {
+                this.tracer.debug("Gained Demonic talent.");
+            } else {
+                this.tracer.debug("Lost Demonic talent.");
             }
         }
-    }
-    gainAura() {
-        const now = GetTime();
-        const auraMeta = this.ovaleAura.getAura(
-            "player",
-            havocMetaBuffId,
-            now,
+    };
+
+    initializeState() {}
+    resetState() {}
+    cleanState() {}
+
+    applySpellAfterCast: SpellCastEventHandler = (
+        spellId,
+        targetGUID,
+        startCast,
+        endCast,
+        channel,
+        spellcast
+    ) => {
+        if (
+            this.hasDemonicTalent &&
+            demonicTriggerId[this.specialization][spellId]
+        ) {
+            /*
+             * Demonic grants 6 seconds of Metamorphosis, plus the
+             * duration of the channeled spell.
+             */
+            const duration = 6 + ((channel && endCast - startCast) || 0);
+            const atTime = (channel && startCast) || endCast;
+            this.triggerMetamorphosis(atTime, duration);
+        }
+    };
+
+    private triggerMetamorphosis = (atTime: number, duration: number) => {
+        const auraId = metamorphosisId[this.specialization];
+        this.tracer.log(`Triggering Demonic Metamorphosis (${auraId}).`);
+        this.aura.addAuraToGUID(
+            this.ovale.playerGUID,
+            auraId,
+            this.ovale.playerGUID,
             "HELPFUL",
-            true
+            undefined,
+            atTime,
+            atTime + duration,
+            atTime
         );
-        if (auraMeta && this.ovaleAura.isActiveAura(auraMeta, now)) {
-            this.debug.debug(
-                "Adding '%s' (%d) buff to player %s.",
-                hiddenBuffExtendedByDemonic,
-                hiddenBuffId,
-                this.playerGUID
-            );
-            const duration = hiddenBuffDuration;
-            const ending = now + hiddenBuffDuration;
-            this.ovaleAura.gainedAuraOnGUID(
-                this.playerGUID,
-                now,
-                hiddenBuffId,
-                this.playerGUID,
-                "HELPFUL",
-                false,
-                undefined,
-                1,
-                undefined,
-                duration,
-                ending,
-                false,
-                hiddenBuffExtendedByDemonic,
-                undefined,
-                undefined,
-                undefined
-            );
-        } else {
-            this.debug.debug(
-                "Aura 'Metamorphosis' (%d) is not present.",
-                havocMetaBuffId
-            );
-        }
-    }
-    dropAura() {
-        const now = GetTime();
-        this.debug.debug(
-            "Removing '%s' (%d) buff on player %s.",
-            hiddenBuffExtendedByDemonic,
-            hiddenBuffId,
-            this.playerGUID
-        );
-        this.ovaleAura.lostAuraOnGUID(
-            this.playerGUID,
-            now,
-            hiddenBuffId,
-            this.playerGUID
-        );
-    }
+    };
 }
