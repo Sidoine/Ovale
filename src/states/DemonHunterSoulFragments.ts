@@ -252,14 +252,23 @@ export class OvaleDemonHunterSoulFragmentsClass
         spellcast
     ) => {
         if (this.hasSoulFragmentsHandlers) {
+            // Spend Soul Fragments first.
+            if (spender[spellId]) {
+                const fragments = spender[spellId];
+                if (fragments < 0) {
+                    const count = this.next.count + fragments;
+                    // invariant: this.next.count >= 0
+                    this.next.count = max(count, 0);
+                }
+            }
+            // Gain Soul Fragments second, to possibly handle refunds.
             if (generator[spellId]) {
                 const fragments = generator[spellId];
-                const count = this.next.count + fragments;
-                this.next.count = (count < 5 && count) || 5;
-            } else if (spender[spellId]) {
-                const fragments = spender[spellId];
-                const count = this.next.count + fragments;
-                this.next.count = (count > 0 && count) || 0;
+                if (fragments > 0) {
+                    const count = this.next.count + fragments;
+                    // invariant: this.next.count <= 5
+                    this.next.count = min(count, 5);
+                }
             }
         }
     };
