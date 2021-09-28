@@ -1,5 +1,6 @@
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
 import { LuaArray, pairs } from "@wowts/lua";
+import { max, min } from "@wowts/math";
 import { AceModule } from "@wowts/tsaddon";
 import { GetTime, SpellId } from "@wowts/wow-mock";
 import { OvaleClass } from "../Ovale";
@@ -32,6 +33,12 @@ class SoulFragmentsData {
     count = 0; // total soul fragments, including pending spawns
 }
 
+/* There is an in-game lag between when a spell that generates Lesser Soul
+ * Fragments is cast and when those Lesser Soul Fragments appear in the
+ * game world before the GCD has finished. Keep track of pending Lesser
+ * Soul Fragments that have not yet appeared so that we know how many
+ * Lesser Soul Fragments will be available when the next spell can be cast.
+ */
 export class OvaleDemonHunterSoulFragmentsClass
     extends States<SoulFragmentsData>
     implements StateModule
@@ -43,7 +50,6 @@ export class OvaleDemonHunterSoulFragmentsClass
     private hasMetamorphosis = false;
     private count = 0; // stack count of Soul Fragment buff
     private pending = 0; // pending soul fragment spawns
-    // invariant: count + pending <= 5
 
     constructor(
         private ovale: OvaleClass,
@@ -185,23 +191,16 @@ export class OvaleDemonHunterSoulFragmentsClass
                     if (aura && this.aura.isActiveAura(aura, atTime)) {
                         const gained = aura.stacks - this.count;
                         if (gained > 0) {
-                            const pending = this.pending - gained;
-                            this.pending = (pending > 0 && pending) || 0;
+                            // invariant: this.pending >= 0
+                            this.pending = max(this.pending - gained, 0);
                         }
-                        this.count = aura.stacks;
-                        const count = this.count + this.pending;
-                        this.current.count = (count < 5 && count) || 5;
-                        this.pending = this.current.count - this.count;
-                        this.tracer.debug(
-                            `${this.current.count} = ${this.count} + ${this.pending}`
-                        );
+                        // invariant: this.count <= 5
+                        this.count = min(aura.stacks, 5);
+                        this.updateCurrentSoulFragments();
                     }
                 } else if (event == "Ovale_AuraRemoved") {
                     this.count = 0;
-                    this.current.count = this.pending;
-                    this.tracer.debug(
-                        `${this.current.count} = ${this.count} + ${this.pending}`
-                    );
+                    this.updateCurrentSoulFragments();
                 }
             }
         }
@@ -212,21 +211,26 @@ export class OvaleDemonHunterSoulFragmentsClass
         if (cleu.sourceGUID == this.ovale.playerGUID) {
             const header = cleu.header as SpellPayloadHeader;
             const spellId = header.spellId;
-            if (generator[spellId]) {
-                let fragments = generator[spellId];
-                if (fragments > 0 && this.hasMetamorphosis) {
-                    // Metamorphosis triggers an extra Lesser Soul Fragment
-                    fragments = fragments + 1;
-                }
+            const fragments = generator[spellId];
+            if (fragments && fragments > 0) {
                 this.pending += fragments;
-                const count = this.count + this.pending;
-                this.current.count = (count < 5 && count) || 5;
-                this.pending = this.current.count - this.count;
-                this.tracer.debug(
-                    `${this.current.count} = ${this.count} + ${this.pending}`
-                );
+                if (this.hasMetamorphosis) {
+                    // Metamorphosis triggers an extra Lesser Soul Fragment
+                    this.pending += 1;
+                }
+                this.updateCurrentSoulFragments();
             }
         }
+    };
+
+    private updateCurrentSoulFragments = () => {
+        // invariant: this.current.count <= 5
+        this.current.count = min(this.count + this.pending, 5);
+        // invariant: this.pending >= 0
+        this.pending = max(this.current.count - this.count, 0);
+        this.tracer.debug(
+            `${this.current.count} = ${this.count} + ${this.pending}`
+        );
     };
 
     initializeState(): void {}
