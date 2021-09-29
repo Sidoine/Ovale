@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.1.8](https://github.com/Sidoine/Ovale/compare/9.1.7...9.1.8) (2021-09-29)
+
+### Bug Fixes
+
+-   ensure that we never have negative values for soul fragment counts ([#1034](https://github.com/Sidoine/Ovale/issues/1034)) ([3afeb18](https://github.com/Sidoine/Ovale/commit/3afeb18706474e9d2c94dce62e69aecc8dd56a8b))
+-   register state for demonic and soul fragment DH modules ([#1033](https://github.com/Sidoine/Ovale/issues/1033)) ([b5c767e](https://github.com/Sidoine/Ovale/commit/b5c767e04897ec2350d4d9b5b8b6a2b0a5093cb9))
+
 ### [9.1.7](https://github.com/Sidoine/Ovale/compare/9.1.6...9.1.7) (2021-09-18)
 
 ### Features
