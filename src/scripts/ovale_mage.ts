@@ -4010,9 +4010,9 @@ AddFunction frostaoemainactions
  if runeforge(disciplinary_command_runeforge) and spellcooldown(disciplinary_command) <= 0 and buffexpires(disciplinary_command_fire_buff) spell(fire_blast)
  #arcane_explosion,if=mana.pct>30&active_enemies>=6&!runeforge.glacial_fragments
  if manapercent() > 30 and enemies() >= 6 and not runeforge(glacial_fragments_runeforge) spell(arcane_explosion)
- #ice_lance,if=runeforge.glacial_fragments&talent.splitting_ice&travel_time<ground_aoe.blizzard.remains
- if runeforge(glacial_fragments_runeforge) and hastalent(splitting_ice_talent) and traveltime(ice_lance) < target.debuffremaining(blizzard_debuff) spell(ice_lance)
- #wait,sec=0.1,if=runeforge.glacial_fragments&talent.splitting_ice
+ #ice_lance,if=runeforge.glacial_fragments&(talent.splitting_ice|active_enemies>=5)&travel_time<ground_aoe.blizzard.remains
+ if runeforge(glacial_fragments_runeforge) and { hastalent(splitting_ice_talent) or enemies() >= 5 } and traveltime(ice_lance) < target.debuffremaining(blizzard_debuff) spell(ice_lance)
+ #wait,sec=0.1,if=runeforge.glacial_fragments&(talent.splitting_ice|active_enemies>=5)
  #frostbolt
  spell(frostbolt)
 }
@@ -4051,7 +4051,7 @@ AddFunction frostaoeshortcdactions
 
 AddFunction frostaoeshortcdpostconditions
 {
- spell(blizzard) or { target.debuffstacks(winters_chill_debuff) == 0 or target.debuffexpires(winters_chill_debuff) } and { previousgcdspell(ebonbolt) or buffpresent(brain_freeze_buff) and buffstacks(fingers_of_frost_buff) == 0 } and spell(flurry) or spell(ice_nova) or { buffpresent(fingers_of_frost_buff) or target.debuffremaining(frozen_debuff) > traveltime(ice_lance) or target.debuffstacks(winters_chill_debuff) and target.debuffremaining(winters_chill_debuff) > traveltime(ice_lance) } and spell(ice_lance) or runeforge(disciplinary_command_runeforge) and spellcooldown(disciplinary_command) <= 0 and buffexpires(disciplinary_command_fire_buff) and spell(fire_blast) or manapercent() > 30 and enemies() >= 6 and not runeforge(glacial_fragments_runeforge) and spell(arcane_explosion) or runeforge(glacial_fragments_runeforge) and hastalent(splitting_ice_talent) and traveltime(ice_lance) < target.debuffremaining(blizzard_debuff) and spell(ice_lance) or spell(frostbolt)
+ spell(blizzard) or { target.debuffstacks(winters_chill_debuff) == 0 or target.debuffexpires(winters_chill_debuff) } and { previousgcdspell(ebonbolt) or buffpresent(brain_freeze_buff) and buffstacks(fingers_of_frost_buff) == 0 } and spell(flurry) or spell(ice_nova) or { buffpresent(fingers_of_frost_buff) or target.debuffremaining(frozen_debuff) > traveltime(ice_lance) or target.debuffstacks(winters_chill_debuff) and target.debuffremaining(winters_chill_debuff) > traveltime(ice_lance) } and spell(ice_lance) or runeforge(disciplinary_command_runeforge) and spellcooldown(disciplinary_command) <= 0 and buffexpires(disciplinary_command_fire_buff) and spell(fire_blast) or manapercent() > 30 and enemies() >= 6 and not runeforge(glacial_fragments_runeforge) and spell(arcane_explosion) or runeforge(glacial_fragments_runeforge) and { hastalent(splitting_ice_talent) or enemies() >= 5 } and traveltime(ice_lance) < target.debuffremaining(blizzard_debuff) and spell(ice_lance) or spell(frostbolt)
 }
 
 AddFunction frostaoecdactions
@@ -4060,7 +4060,7 @@ AddFunction frostaoecdactions
 
 AddFunction frostaoecdpostconditions
 {
- spell(frozen_orb) or spell(blizzard) or { target.debuffstacks(winters_chill_debuff) == 0 or target.debuffexpires(winters_chill_debuff) } and { previousgcdspell(ebonbolt) or buffpresent(brain_freeze_buff) and buffstacks(fingers_of_frost_buff) == 0 } and spell(flurry) or spell(ice_nova) or spell(comet_storm) or { buffpresent(fingers_of_frost_buff) or target.debuffremaining(frozen_debuff) > traveltime(ice_lance) or target.debuffstacks(winters_chill_debuff) and target.debuffremaining(winters_chill_debuff) > traveltime(ice_lance) } and spell(ice_lance) or soulbind(combat_meditation_soulbind) and spell(radiant_spark) or spell(mirrors_of_torment) or spell(shifting_power) or runeforge(disciplinary_command_runeforge) and spellcooldown(disciplinary_command) <= 0 and buffexpires(disciplinary_command_fire_buff) and spell(fire_blast) or manapercent() > 30 and enemies() >= 6 and not runeforge(glacial_fragments_runeforge) and spell(arcane_explosion) or spell(ebonbolt) or runeforge(glacial_fragments_runeforge) and hastalent(splitting_ice_talent) and traveltime(ice_lance) < target.debuffremaining(blizzard_debuff) and spell(ice_lance) or spell(frostbolt)
+ spell(frozen_orb) or spell(blizzard) or { target.debuffstacks(winters_chill_debuff) == 0 or target.debuffexpires(winters_chill_debuff) } and { previousgcdspell(ebonbolt) or buffpresent(brain_freeze_buff) and buffstacks(fingers_of_frost_buff) == 0 } and spell(flurry) or spell(ice_nova) or spell(comet_storm) or { buffpresent(fingers_of_frost_buff) or target.debuffremaining(frozen_debuff) > traveltime(ice_lance) or target.debuffstacks(winters_chill_debuff) and target.debuffremaining(winters_chill_debuff) > traveltime(ice_lance) } and spell(ice_lance) or soulbind(combat_meditation_soulbind) and spell(radiant_spark) or spell(mirrors_of_torment) or spell(shifting_power) or runeforge(disciplinary_command_runeforge) and spellcooldown(disciplinary_command) <= 0 and buffexpires(disciplinary_command_fire_buff) and spell(fire_blast) or manapercent() > 30 and enemies() >= 6 and not runeforge(glacial_fragments_runeforge) and spell(arcane_explosion) or spell(ebonbolt) or runeforge(glacial_fragments_runeforge) and { hastalent(splitting_ice_talent) or enemies() >= 5 } and traveltime(ice_lance) < target.debuffremaining(blizzard_debuff) and spell(ice_lance) or spell(frostbolt)
 }
 
 ### actions.default

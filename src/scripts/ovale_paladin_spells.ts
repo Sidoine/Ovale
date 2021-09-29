@@ -169,6 +169,10 @@ Define(judgment_protection 275779)
 Define(light_of_dawn 85222)
 # Unleashes a wave of holy energy, healing up to s1 injured allies within a ?a337812[a3][a1] yd frontal cone for (105 of Spell Power).
   SpellInfo(light_of_dawn holypower=3)
+Define(lights_hammer 114158)
+# Hurls a Light-infused hammer to the ground, dealing (20.5 of Spell Power) Holy damage to nearby enemies and healing up to 6 nearby allies for (25 of Spell Power), every 114918t1 sec for 15.5 seconds-1.5 sec.
+  SpellInfo(lights_hammer cd=60)
+  SpellRequire(lights_hammer unusable set=1 enabled=(not hastalent(lights_hammer_talent)))
 Define(lights_judgment 255647)
 # Call down a strike of Holy energy, dealing <damage> Holy damage to enemies within A1 yards after 3 sec.
   SpellInfo(lights_judgment cd=150)
@@ -224,6 +228,8 @@ Define(word_of_glory 85673)
 SpellList(blessing_of_the_seasons blessing_of_spring blessing_of_summer blessing_of_autumn blessing_of_winter)
 Define(avenging_crusader_talent 22190)
 # You become the ultimate crusader of light, increasing your Crusader Strike, Judgment, and auto-attack damage by s1.rnrnCrusader Strike and Judgment cool down s2 faster and heal up to s6 injured allies for s5 of the damage they deal. Lasts 20 seconds.
+Define(awakening_talent 22484)
+# Word of Glory and Light of Dawn have a s1 chance to grant you Avenging Wrath for s2 sec.
 Define(blade_of_wrath_talent 22592)
 # Art of War resets the cooldown of Blade of Justice s1 more often and increases its damage by 281178s1.
 Define(blessed_hammer_talent 23469)
@@ -242,6 +248,8 @@ Define(holy_avenger_talent 17599)
 # Your Holy Power generation is tripled for 20 seconds.
 Define(holy_prism_talent 17577)
 # Fires a beam of light that scatters to strike a clump of targets. rnrnIf the beam is aimed at an enemy target, it deals (75 of Spell Power) Holy damage and radiates (70 of Spell Power) healing to 5 allies within 114852A2 yards.rnrnIf the beam is aimed at a friendly target, it heals for (140 of Spell Power) and radiates (45 of Spell Power) Holy damage to 5 enemies within 114871A2 yards.
+Define(lights_hammer_talent 17569)
+# Hurls a Light-infused hammer to the ground, dealing (20.5 of Spell Power) Holy damage to nearby enemies and healing up to 6 nearby allies for (25 of Spell Power), every 114918t1 sec for 15.5 seconds-1.5 sec.
 Define(moment_of_glory_talent 23468)
 # Reset the cooldown of Avenger's Shield. Your next n Avenger's Shields have no cooldown and deal s2 additional damage.
 Define(righteous_verdict_talent 22557)
@@ -252,6 +260,8 @@ Define(sanctified_wrath_talent_protection 23457)
 # Avenging Wrath lasts s1 longer and causes Judgment to generate s2 additional Holy Power.
 Define(seraphim_talent 17601)
 # The Light magnifies your power for 15 seconds, granting s1 Haste, Critical Strike, and Versatility, and ?c1[s4*183997bc1]?c2[s4*76671bc1][s4*267316bc1] Mastery.
+Define(potion_of_spectral_intellect_item 171273)
+    ItemInfo(potion_of_spectral_intellect_item cd=1 shared_cd="item_cd_4" proc=307162)
 Define(potion_of_phantom_fire_item 171349)
     ItemInfo(potion_of_phantom_fire_item cd=300 shared_cd="item_cd_4" rppm=12 proc=307495)
 Define(darkmoon_deck_voracity_item 173087)
