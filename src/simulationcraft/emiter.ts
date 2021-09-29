@@ -1885,15 +1885,13 @@ export class Emiter {
                         actionTarget = "other";
                     }
                     if (actionTarget != "1") {
-                        bodyCode = format(
-                            "%s(%s text=%s)",
-                            type,
-                            action,
-                            actionTarget
-                        );
+                        bodyCode = `${type}(${action} text=${actionTarget})`;
                     }
+                } else if (modifiers.cycle_targets) {
+                    bodyCode = `${type}(${action} text=cycle)`;
+                } else {
+                    bodyCode = `${type}(${action})`;
                 }
-                bodyCode = bodyCode || `${type}(${action})`;
             }
             if (!bodyNode && bodyCode) {
                 [bodyNode] = this.ovaleAst.parseCode(
