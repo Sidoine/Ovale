@@ -472,7 +472,9 @@ export class IoC {
         this.state.registerState(this.paperDoll);
         this.state.registerState(this.baseState);
         this.state.registerState(this.bloodtalons);
+        this.state.registerState(this.demonHunterDemonic);
         this.state.registerState(this.demonHunterSigils);
+        this.state.registerState(this.demonHunterSoulFragments);
         this.state.registerState(this.eclipse);
         this.state.registerState(this.enemies);
         this.state.registerState(this.future);
