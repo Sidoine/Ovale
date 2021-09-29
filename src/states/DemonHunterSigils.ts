@@ -184,12 +184,7 @@ export class OvaleSigilClass extends States<SigilData> implements StateModule {
             for (const [sigilType] of pairs(checkSigilType)) {
                 const current = this.current[sigilType as SigilType];
                 const next = this.next[sigilType as SigilType];
-                {
-                    // TODO replace with next.clear() when available.
-                    next.first = 0;
-                    next.last = 0;
-                    next.length = 0;
-                }
+                next.clear();
                 for (let i = 1; i <= current.length; i++) {
                     const activationTime = current.at(i);
                     if (activationTime) {

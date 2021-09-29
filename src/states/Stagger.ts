@@ -71,7 +71,7 @@ export class OvaleStaggerClass {
             this.module.UnregisterMessage("Ovale_SpecializationChanged");
             this.module.UnregisterMessage("Ovale_AuraRemoved");
             this.combatLogEvent.unregisterAllEvents(this);
-            this.emptyTickQueue();
+            this.staggerTicks.clear();
         }
     };
 
@@ -95,7 +95,7 @@ export class OvaleStaggerClass {
             this.tracer.debug("Removing stagger event handlers.");
             this.module.UnregisterMessage("Ovale_AuraRemoved");
             this.combatLogEvent.unregisterAllEvents(this);
-            this.emptyTickQueue();
+            this.staggerTicks.clear();
         }
     };
 
@@ -110,7 +110,7 @@ export class OvaleStaggerClass {
             const stagger = UnitStagger("player");
             if (stagger === 0) {
                 this.tracer.debug("Empty stagger pool; clearing ticks.");
-                this.emptyTickQueue();
+                this.staggerTicks.clear();
             }
         }
     };
@@ -128,14 +128,6 @@ export class OvaleStaggerClass {
                 this.staggerTicks.push(amount);
             }
         }
-    };
-
-    private emptyTickQueue = () => {
-        const queue = this.staggerTicks;
-        // TODO replace with queue.clear() when available
-        queue.first = 0;
-        queue.last = 0;
-        queue.length = 0;
     };
 
     private getAnyStaggerAura(atTime: number) {
