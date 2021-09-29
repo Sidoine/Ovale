@@ -62,11 +62,11 @@
     },
     "devDependencies": {
         "@commitlint/cli": "^13.1.0",
-        "@commitlint/config-conventional": "^13.1.0",
+        "@commitlint/config-conventional": "^13.2.0",
         "@typescript-eslint/eslint-plugin": "^4.31.1",
         "@typescript-eslint/parser": "^4.31.1",
         "@wowts/tstolua": "^1.13.7",
-        "commitlint": "^13.1.0",
+        "commitlint": "^13.2.0",
         "csv-parse": "^4.16.3",
         "eslint": "^7.32.0",
         "husky": "^7.0.2",
