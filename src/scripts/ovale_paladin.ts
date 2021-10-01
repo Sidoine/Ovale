@@ -34,24 +34,40 @@ AddFunction holygetinmeleerange
 
 AddFunction holyprioritymainactions
 {
- #shield_of_the_righteous
- spell(shield_of_the_righteous)
+ #shield_of_the_righteous,if=buff.avenging_wrath.up|buff.holy_avenger.up|!talent.awakening.enabled
+ if buffpresent(avenging_wrath) or buffpresent(holy_avenger) or not hastalent(awakening_talent) spell(shield_of_the_righteous)
+ #hammer_of_wrath,if=holy_power<5&spell_targets.consecration=2
+ if holypower() < 5 and enemies(tagged=1) == 2 spell(hammer_of_wrath)
+ #lights_hammer,if=spell_targets.lights_hammer>=2
+ if enemies(tagged=1) >= 2 spell(lights_hammer)
+ #consecration,if=spell_targets.consecration>=2&!consecration.up
+ if enemies(tagged=1) >= 2 and not buffpresent(consecration) spell(consecration)
+ #light_of_dawn,if=talent.awakening.enabled&spell_targets.consecration<=5&(holy_power>=5|(buff.holy_avenger.up&holy_power>=3))
+ if hastalent(awakening_talent) and enemies(tagged=1) <= 5 and { holypower() >= 5 or buffpresent(holy_avenger) and holypower() >= 3 } spell(light_of_dawn)
+ #shield_of_the_righteous,if=spell_targets.consecration>5
+ if enemies(tagged=1) > 5 spell(shield_of_the_righteous)
  #hammer_of_wrath
  spell(hammer_of_wrath)
- #holy_shock,damage=1
- spell(holy_shock)
  #judgment
  spell(judgment_holy)
- #crusader_strike
- spell(crusader_strike)
+ #lights_hammer
+ spell(lights_hammer)
+ #consecration,if=!consecration.up
+ if not buffpresent(consecration) spell(consecration)
+ #holy_shock,damage=1
+ spell(holy_shock)
+ #crusader_strike,if=cooldown.crusader_strike.charges=2
+ if spellcharges(crusader_strike) == 2 spell(crusader_strike)
  #holy_prism,target=self,if=active_enemies>=2
  if enemies() >= 2 spell(holy_prism text=self)
  #holy_prism
  spell(holy_prism)
+ #light_of_dawn,if=talent.awakening.enabled&spell_targets.consecration<=5
+ if hastalent(awakening_talent) and enemies(tagged=1) <= 5 spell(light_of_dawn)
+ #crusader_strike
+ spell(crusader_strike)
  #consecration
  spell(consecration)
- #light_of_dawn
- spell(light_of_dawn)
 }
 
 AddFunction holyprioritymainpostconditions
@@ -64,16 +80,21 @@ AddFunction holypriorityshortcdactions
 
 AddFunction holypriorityshortcdpostconditions
 {
- spell(shield_of_the_righteous) or spell(hammer_of_wrath) or spell(holy_shock) or spell(judgment_holy) or spell(crusader_strike) or enemies() >= 2 and spell(holy_prism text=self) or spell(holy_prism) or spell(consecration) or spell(light_of_dawn)
+ { buffpresent(avenging_wrath) or buffpresent(holy_avenger) or not hastalent(awakening_talent) } and spell(shield_of_the_righteous) or holypower() < 5 and enemies(tagged=1) == 2 and spell(hammer_of_wrath) or enemies(tagged=1) >= 2 and spell(lights_hammer) or enemies(tagged=1) >= 2 and not buffpresent(consecration) and spell(consecration) or hastalent(awakening_talent) and enemies(tagged=1) <= 5 and { holypower() >= 5 or buffpresent(holy_avenger) and holypower() >= 3 } and spell(light_of_dawn) or enemies(tagged=1) > 5 and spell(shield_of_the_righteous) or spell(hammer_of_wrath) or spell(judgment_holy) or spell(lights_hammer) or not buffpresent(consecration) and spell(consecration) or spell(holy_shock) or spellcharges(crusader_strike) == 2 and spell(crusader_strike) or enemies() >= 2 and spell(holy_prism text=self) or spell(holy_prism) or hastalent(awakening_talent) and enemies(tagged=1) <= 5 and spell(light_of_dawn) or spell(crusader_strike) or spell(consecration)
 }
 
 AddFunction holyprioritycdactions
 {
+ unless { buffpresent(avenging_wrath) or buffpresent(holy_avenger) or not hastalent(awakening_talent) } and spell(shield_of_the_righteous) or holypower() < 5 and enemies(tagged=1) == 2 and spell(hammer_of_wrath) or enemies(tagged=1) >= 2 and spell(lights_hammer) or enemies(tagged=1) >= 2 and not buffpresent(consecration) and spell(consecration) or hastalent(awakening_talent) and enemies(tagged=1) <= 5 and { holypower() >= 5 or buffpresent(holy_avenger) and holypower() >= 3 } and spell(light_of_dawn) or enemies(tagged=1) > 5 and spell(shield_of_the_righteous) or spell(hammer_of_wrath) or spell(judgment_holy) or spell(lights_hammer) or not buffpresent(consecration) and spell(consecration) or spell(holy_shock) or spellcharges(crusader_strike) == 2 and spell(crusader_strike) or enemies() >= 2 and spell(holy_prism text=self) or spell(holy_prism)
+ {
+  #arcane_torrent
+  spell(arcane_torrent)
+ }
 }
 
 AddFunction holyprioritycdpostconditions
 {
- spell(shield_of_the_righteous) or spell(hammer_of_wrath) or spell(holy_shock) or spell(judgment_holy) or spell(crusader_strike) or enemies() >= 2 and spell(holy_prism text=self) or spell(holy_prism) or spell(consecration) or spell(light_of_dawn)
+ { buffpresent(avenging_wrath) or buffpresent(holy_avenger) or not hastalent(awakening_talent) } and spell(shield_of_the_righteous) or holypower() < 5 and enemies(tagged=1) == 2 and spell(hammer_of_wrath) or enemies(tagged=1) >= 2 and spell(lights_hammer) or enemies(tagged=1) >= 2 and not buffpresent(consecration) and spell(consecration) or hastalent(awakening_talent) and enemies(tagged=1) <= 5 and { holypower() >= 5 or buffpresent(holy_avenger) and holypower() >= 3 } and spell(light_of_dawn) or enemies(tagged=1) > 5 and spell(shield_of_the_righteous) or spell(hammer_of_wrath) or spell(judgment_holy) or spell(lights_hammer) or not buffpresent(consecration) and spell(consecration) or spell(holy_shock) or spellcharges(crusader_strike) == 2 and spell(crusader_strike) or enemies() >= 2 and spell(holy_prism text=self) or spell(holy_prism) or hastalent(awakening_talent) and enemies(tagged=1) <= 5 and spell(light_of_dawn) or spell(crusader_strike) or spell(consecration)
 }
 
 ### actions.precombat
@@ -101,7 +122,7 @@ AddFunction holyprecombatcdactions
  #augmentation
  #snapshot_stats
  #potion
- if checkboxon(opt_use_consumables) and target.classification(worldboss) item(potion_of_phantom_fire_item usable=1)
+ if checkboxon(opt_use_consumables) and target.classification(worldboss) item(potion_of_spectral_intellect_item usable=1)
 }
 
 AddFunction holyprecombatcdpostconditions
@@ -140,15 +161,15 @@ AddFunction holycooldownsshortcdpostconditions
 
 AddFunction holycooldownscdactions
 {
- #avenging_wrath
- spell(avenging_wrath)
  #ashen_hallow
  spell(ashen_hallow)
+ #avenging_wrath
+ spell(avenging_wrath)
 
  unless spell(blessing_of_the_seasons) or spell(vanquishers_hammer) or spell(divine_toll)
  {
   #potion,if=(buff.avenging_wrath.up)
-  if buffpresent(avenging_wrath) and { checkboxon(opt_use_consumables) and target.classification(worldboss) } item(potion_of_phantom_fire_item usable=1)
+  if buffpresent(avenging_wrath) and { checkboxon(opt_use_consumables) and target.classification(worldboss) } item(potion_of_spectral_intellect_item usable=1)
   #blood_fury,if=(buff.avenging_wrath.up)
   if buffpresent(avenging_wrath) spell(blood_fury_ap_int)
   #berserking,if=(buff.avenging_wrath.up)
@@ -261,8 +282,10 @@ AddIcon enabled=(checkboxon(opt_paladin_holy_aoe) and specialization(holy)) help
 }
 
 ### Required symbols
+# arcane_torrent
 # ashen_hallow
 # avenging_wrath
+# awakening_talent
 # berserking
 # blessing_of_the_seasons
 # blood_fury_ap_int
@@ -275,7 +298,8 @@ AddIcon enabled=(checkboxon(opt_paladin_holy_aoe) and specialization(holy)) help
 # holy_shock
 # judgment_holy
 # light_of_dawn
-# potion_of_phantom_fire_item
+# lights_hammer
+# potion_of_spectral_intellect_item
 # rebuke
 # seraphim
 # shield_of_the_righteous
