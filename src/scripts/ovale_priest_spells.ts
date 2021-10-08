@@ -48,6 +48,11 @@ Define(dark_thought_buff 341207)
   SpellInfo(dark_thought_buff duration=10 max_stacks=1 gcd=0 offgcd=1)
   # Maximum number of charges of Mind Blast increased by w1.rnrnMind Blast no longer has a  cooldown, can be cast instantly, and while channelling Mind Flay or Mind Sear.
   SpellAddBuff(dark_thought_buff dark_thought_buff add=1)
+Define(desperate_prayer 19236)
+# Increases maximum health by s1 for 10 seconds, and instantly heals you for that amount.
+  SpellInfo(desperate_prayer cd=90 duration=10 gcd=0 offgcd=1 tick=1)
+  # Maximum health increased by w1.
+  SpellAddBuff(desperate_prayer desperate_prayer add=1)
 Define(devouring_plague 335467)
 # Afflicts the target with a disease that instantly causes (49.036 of Spell Power) Shadow damage plus an additional o2 Shadow damage over 6 seconds. Heals you for e2*100 of damage dealt.rnrnIf this effect is reapplied, any remaining damage will be added to the new Devouring Plague.
   SpellInfo(devouring_plague insanity=50 duration=6 tick=3)
