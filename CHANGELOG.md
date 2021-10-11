@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.1.10](https://github.com/Sidoine/Ovale/compare/9.1.9...9.1.10) (2021-10-11)
+
+### Bug Fixes
+
+-   import latest scripts from SimulationCraft ([#1042](https://github.com/Sidoine/Ovale/issues/1042)) ([5afb9ee](https://github.com/Sidoine/Ovale/commit/5afb9ee76ee30f8bc58395eeb0690b84b78d92d1))
+
 ### [9.1.9](https://github.com/Sidoine/Ovale/compare/9.1.8...9.1.9) (2021-10-01)
 
 ### Bug Fixes
