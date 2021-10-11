@@ -38,8 +38,6 @@ AddFunction holyprioritymainactions
  if buffpresent(avenging_wrath) or buffpresent(holy_avenger) or not hastalent(awakening_talent) spell(shield_of_the_righteous)
  #hammer_of_wrath,if=holy_power<5&spell_targets.consecration=2
  if holypower() < 5 and enemies(tagged=1) == 2 spell(hammer_of_wrath)
- #lights_hammer,if=spell_targets.lights_hammer>=2
- if enemies(tagged=1) >= 2 spell(lights_hammer)
  #consecration,if=spell_targets.consecration>=2&!consecration.up
  if enemies(tagged=1) >= 2 and not buffpresent(consecration) spell(consecration)
  #light_of_dawn,if=talent.awakening.enabled&spell_targets.consecration<=5&(holy_power>=5|(buff.holy_avenger.up&holy_power>=3))
@@ -50,8 +48,6 @@ AddFunction holyprioritymainactions
  spell(hammer_of_wrath)
  #judgment
  spell(judgment_holy)
- #lights_hammer
- spell(lights_hammer)
  #consecration,if=!consecration.up
  if not buffpresent(consecration) spell(consecration)
  #holy_shock,damage=1
@@ -76,11 +72,22 @@ AddFunction holyprioritymainpostconditions
 
 AddFunction holypriorityshortcdactions
 {
+ unless { buffpresent(avenging_wrath) or buffpresent(holy_avenger) or not hastalent(awakening_talent) } and spell(shield_of_the_righteous) or holypower() < 5 and enemies(tagged=1) == 2 and spell(hammer_of_wrath)
+ {
+  #lights_hammer,if=spell_targets.lights_hammer>=2
+  if enemies(tagged=1) >= 2 spell(lights_hammer)
+
+  unless enemies(tagged=1) >= 2 and not buffpresent(consecration) and spell(consecration) or hastalent(awakening_talent) and enemies(tagged=1) <= 5 and { holypower() >= 5 or buffpresent(holy_avenger) and holypower() >= 3 } and spell(light_of_dawn) or enemies(tagged=1) > 5 and spell(shield_of_the_righteous) or spell(hammer_of_wrath) or spell(judgment_holy)
+  {
+   #lights_hammer
+   spell(lights_hammer)
+  }
+ }
 }
 
 AddFunction holypriorityshortcdpostconditions
 {
- { buffpresent(avenging_wrath) or buffpresent(holy_avenger) or not hastalent(awakening_talent) } and spell(shield_of_the_righteous) or holypower() < 5 and enemies(tagged=1) == 2 and spell(hammer_of_wrath) or enemies(tagged=1) >= 2 and spell(lights_hammer) or enemies(tagged=1) >= 2 and not buffpresent(consecration) and spell(consecration) or hastalent(awakening_talent) and enemies(tagged=1) <= 5 and { holypower() >= 5 or buffpresent(holy_avenger) and holypower() >= 3 } and spell(light_of_dawn) or enemies(tagged=1) > 5 and spell(shield_of_the_righteous) or spell(hammer_of_wrath) or spell(judgment_holy) or spell(lights_hammer) or not buffpresent(consecration) and spell(consecration) or spell(holy_shock) or spellcharges(crusader_strike) == 2 and spell(crusader_strike) or enemies() >= 2 and spell(holy_prism text=self) or spell(holy_prism) or hastalent(awakening_talent) and enemies(tagged=1) <= 5 and spell(light_of_dawn) or spell(crusader_strike) or spell(consecration)
+ { buffpresent(avenging_wrath) or buffpresent(holy_avenger) or not hastalent(awakening_talent) } and spell(shield_of_the_righteous) or holypower() < 5 and enemies(tagged=1) == 2 and spell(hammer_of_wrath) or enemies(tagged=1) >= 2 and not buffpresent(consecration) and spell(consecration) or hastalent(awakening_talent) and enemies(tagged=1) <= 5 and { holypower() >= 5 or buffpresent(holy_avenger) and holypower() >= 3 } and spell(light_of_dawn) or enemies(tagged=1) > 5 and spell(shield_of_the_righteous) or spell(hammer_of_wrath) or spell(judgment_holy) or not buffpresent(consecration) and spell(consecration) or spell(holy_shock) or spellcharges(crusader_strike) == 2 and spell(crusader_strike) or enemies() >= 2 and spell(holy_prism text=self) or spell(holy_prism) or hastalent(awakening_talent) and enemies(tagged=1) <= 5 and spell(light_of_dawn) or spell(crusader_strike) or spell(consecration)
 }
 
 AddFunction holyprioritycdactions

@@ -826,7 +826,13 @@ export const miscOperands: LuaObj<MiscOperand> = {
     ["focus"]: { name: "focus", modifiers: powerModifiers },
     ["fury"]: { name: "fury", modifiers: powerModifiers },
     ["health"]: {
-        modifiers: { max: { type: MiscOperandModifierType.Prefix } },
+        modifiers: {
+            max: { type: MiscOperandModifierType.Prefix },
+            pct: {
+                name: "percent",
+                type: MiscOperandModifierType.Suffix,
+            },
+        },
     },
     ["holy_power"]: { name: "holypower", modifiers: powerModifiers },
     ["incoming_imps"]: { name: "impsspawnedduring" },

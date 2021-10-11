@@ -437,8 +437,8 @@ AddFunction shadowtrinketscdactions
  if { buffpresent(power_infusion) or not checkboxon("self_power_infusion") or hasequippeditem(shadowed_orb_of_torment_item) } and hastrinket(soulletting_ruby_item) item(soulletting_ruby_item usable=1)
  #use_item,name=sinful_gladiators_badge_of_ferocity,if=cooldown.void_eruption.remains>=10
  if spellcooldown(void_eruption) >= 10 and hastrinket(sinful_gladiators_badge_of_ferocity_item) item(sinful_gladiators_badge_of_ferocity_item usable=1)
- #use_item,name=shadowed_orb_of_torment,if=!buff.voidform.up|(prev_gcd.1.void_bolt)
- if { not buffpresent(voidform_buff) or previousgcdspell(void_bolt) } and hastrinket(shadowed_orb_of_torment_item) item(shadowed_orb_of_torment_item usable=1)
+ #use_item,name=shadowed_orb_of_torment,if=cooldown.power_infusion.remains<=10&cooldown.void_eruption.remains<=10&(covenant.necrolord|covenant.kyrian)|(covenant.venthyr|covenant.night_fae)&(!buff.voidform.up|prev_gcd.1.void_bolt)|fight_remains<=40
+ if { spellcooldown(power_infusion) <= 10 and spellcooldown(void_eruption) <= 10 and { iscovenant("necrolord") or iscovenant("kyrian") } or { iscovenant("venthyr") or iscovenant("night_fae") } and { not buffpresent(voidform_buff) or previousgcdspell(void_bolt) } or fightremains() <= 40 } and hastrinket(shadowed_orb_of_torment_item) item(shadowed_orb_of_torment_item usable=1)
  #call_action_list,name=dmg_trinkets,if=(!talent.hungering_void.enabled|debuff.hungering_void.up)&(buff.voidform.up|cooldown.void_eruption.remains>10)
  if { not hastalent(hungering_void_talent) or target.debuffpresent(hungering_void_debuff) } and { buffpresent(voidform_buff) or spellcooldown(void_eruption) > 10 } shadowdmg_trinketscdactions()
 
@@ -721,6 +721,12 @@ AddFunction shadowcdsshortcdactions
  if not hastalent(hungering_void_talent) and dots_up() or target.debuffpresent(hungering_void_debuff) and buffpresent(voidform_buff) or { spellcooldown(void_eruption) > 10 or not pool_for_cds() } and not buffpresent(voidform_buff) spell(unholy_nova)
  #call_action_list,name=trinkets
  shadowtrinketsshortcdactions()
+
+ unless shadowtrinketsshortcdpostconditions()
+ {
+  #desperate_prayer,if=health.pct<=75
+  if healthpercent() <= 75 spell(desperate_prayer)
+ }
 }
 
 AddFunction shadowcdsshortcdpostconditions
@@ -746,7 +752,7 @@ AddFunction shadowcdscdactions
 
 AddFunction shadowcdscdpostconditions
 {
- { not buffpresent(voidform_buff) and { not { not spellcooldown(void_torrent) > 0 } or not hastalent(void_torrent_talent) } and { dots_up() and enemies(tagged=1) == 1 or debuffcountonany(vampiric_touch) == enemies(tagged=1) and enemies(tagged=1) > 1 } or buffpresent(voidform_buff) and { enabledsoulbind(grove_invigoration_soulbind) or enabledsoulbind(field_of_blossoms_soulbind) } } and spell(fae_guardians) or insanity() < 90 and { all_dots_up() and { not { not spellcooldown(void_eruption) > 0 } or not hastalent(hungering_void_talent) } or buffpresent(voidform_buff) } and { not hastalent(hungering_void_talent) or target.debuffremaining(hungering_void_debuff) > casttime(mindgames) or not buffpresent(voidform_buff) } and { not hastalent(searing_nightmare_talent) or enemies(tagged=1) < 5 } and spell(mindgames) or { not hastalent(hungering_void_talent) and dots_up() or target.debuffpresent(hungering_void_debuff) and buffpresent(voidform_buff) or { spellcooldown(void_eruption) > 10 or not pool_for_cds() } and not buffpresent(voidform_buff) } and spell(unholy_nova) or shadowtrinketscdpostconditions()
+ { not buffpresent(voidform_buff) and { not { not spellcooldown(void_torrent) > 0 } or not hastalent(void_torrent_talent) } and { dots_up() and enemies(tagged=1) == 1 or debuffcountonany(vampiric_touch) == enemies(tagged=1) and enemies(tagged=1) > 1 } or buffpresent(voidform_buff) and { enabledsoulbind(grove_invigoration_soulbind) or enabledsoulbind(field_of_blossoms_soulbind) } } and spell(fae_guardians) or insanity() < 90 and { all_dots_up() and { not { not spellcooldown(void_eruption) > 0 } or not hastalent(hungering_void_talent) } or buffpresent(voidform_buff) } and { not hastalent(hungering_void_talent) or target.debuffremaining(hungering_void_debuff) > casttime(mindgames) or not buffpresent(voidform_buff) } and { not hastalent(searing_nightmare_talent) or enemies(tagged=1) < 5 } and spell(mindgames) or { not hastalent(hungering_void_talent) and dots_up() or target.debuffpresent(hungering_void_debuff) and buffpresent(voidform_buff) or { spellcooldown(void_eruption) > 10 or not pool_for_cds() } and not buffpresent(voidform_buff) } and spell(unholy_nova) or shadowtrinketscdpostconditions() or healthpercent() <= 75 and spell(desperate_prayer)
 }
 
 ### actions.boon
@@ -899,6 +905,7 @@ AddIcon enabled=(checkboxon(opt_priest_shadow_aoe) and specialization(shadow)) h
 # damnation
 # dark_thought_buff
 # darkmoon_deck_putrescence_item
+# desperate_prayer
 # devouring_plague
 # dissonant_echoes_conduit
 # dreadfire_vessel_item
@@ -1056,8 +1063,8 @@ AddFunction shadowtrinketscdactions
  if { buffpresent(power_infusion) or not checkboxon("self_power_infusion") or hasequippeditem(shadowed_orb_of_torment_item) } and hastrinket(soulletting_ruby_item) item(soulletting_ruby_item usable=1)
  #use_item,name=sinful_gladiators_badge_of_ferocity,if=cooldown.void_eruption.remains>=10
  if spellcooldown(void_eruption) >= 10 and hastrinket(sinful_gladiators_badge_of_ferocity_item) item(sinful_gladiators_badge_of_ferocity_item usable=1)
- #use_item,name=shadowed_orb_of_torment,if=!buff.voidform.up|(prev_gcd.1.void_bolt)
- if { not buffpresent(voidform_buff) or previousgcdspell(void_bolt) } and hastrinket(shadowed_orb_of_torment_item) item(shadowed_orb_of_torment_item usable=1)
+ #use_item,name=shadowed_orb_of_torment,if=cooldown.power_infusion.remains<=10&cooldown.void_eruption.remains<=10&(covenant.necrolord|covenant.kyrian)|(covenant.venthyr|covenant.night_fae)&(!buff.voidform.up|prev_gcd.1.void_bolt)|fight_remains<=40
+ if { spellcooldown(power_infusion) <= 10 and spellcooldown(void_eruption) <= 10 and { iscovenant("necrolord") or iscovenant("kyrian") } or { iscovenant("venthyr") or iscovenant("night_fae") } and { not buffpresent(voidform_buff) or previousgcdspell(void_bolt) } or fightremains() <= 40 } and hastrinket(shadowed_orb_of_torment_item) item(shadowed_orb_of_torment_item usable=1)
  #call_action_list,name=dmg_trinkets,if=(!talent.hungering_void.enabled|debuff.hungering_void.up)&(buff.voidform.up|cooldown.void_eruption.remains>10)
  if { not hastalent(hungering_void_talent) or target.debuffpresent(hungering_void_debuff) } and { buffpresent(voidform_buff) or spellcooldown(void_eruption) > 10 } shadowdmg_trinketscdactions()
 
@@ -1340,6 +1347,12 @@ AddFunction shadowcdsshortcdactions
  if not hastalent(hungering_void_talent) and dots_up() or target.debuffpresent(hungering_void_debuff) and buffpresent(voidform_buff) or { spellcooldown(void_eruption) > 10 or not pool_for_cds() } and not buffpresent(voidform_buff) spell(unholy_nova)
  #call_action_list,name=trinkets
  shadowtrinketsshortcdactions()
+
+ unless shadowtrinketsshortcdpostconditions()
+ {
+  #desperate_prayer,if=health.pct<=75
+  if healthpercent() <= 75 spell(desperate_prayer)
+ }
 }
 
 AddFunction shadowcdsshortcdpostconditions
@@ -1365,7 +1378,7 @@ AddFunction shadowcdscdactions
 
 AddFunction shadowcdscdpostconditions
 {
- { not buffpresent(voidform_buff) and { not { not spellcooldown(void_torrent) > 0 } or not hastalent(void_torrent_talent) } and { dots_up() and enemies(tagged=1) == 1 or debuffcountonany(vampiric_touch) == enemies(tagged=1) and enemies(tagged=1) > 1 } or buffpresent(voidform_buff) and { enabledsoulbind(grove_invigoration_soulbind) or enabledsoulbind(field_of_blossoms_soulbind) } } and spell(fae_guardians) or insanity() < 90 and { all_dots_up() and { not { not spellcooldown(void_eruption) > 0 } or not hastalent(hungering_void_talent) } or buffpresent(voidform_buff) } and { not hastalent(hungering_void_talent) or target.debuffremaining(hungering_void_debuff) > casttime(mindgames) or not buffpresent(voidform_buff) } and { not hastalent(searing_nightmare_talent) or enemies(tagged=1) < 5 } and spell(mindgames) or { not hastalent(hungering_void_talent) and dots_up() or target.debuffpresent(hungering_void_debuff) and buffpresent(voidform_buff) or { spellcooldown(void_eruption) > 10 or not pool_for_cds() } and not buffpresent(voidform_buff) } and spell(unholy_nova) or shadowtrinketscdpostconditions()
+ { not buffpresent(voidform_buff) and { not { not spellcooldown(void_torrent) > 0 } or not hastalent(void_torrent_talent) } and { dots_up() and enemies(tagged=1) == 1 or debuffcountonany(vampiric_touch) == enemies(tagged=1) and enemies(tagged=1) > 1 } or buffpresent(voidform_buff) and { enabledsoulbind(grove_invigoration_soulbind) or enabledsoulbind(field_of_blossoms_soulbind) } } and spell(fae_guardians) or insanity() < 90 and { all_dots_up() and { not { not spellcooldown(void_eruption) > 0 } or not hastalent(hungering_void_talent) } or buffpresent(voidform_buff) } and { not hastalent(hungering_void_talent) or target.debuffremaining(hungering_void_debuff) > casttime(mindgames) or not buffpresent(voidform_buff) } and { not hastalent(searing_nightmare_talent) or enemies(tagged=1) < 5 } and spell(mindgames) or { not hastalent(hungering_void_talent) and dots_up() or target.debuffpresent(hungering_void_debuff) and buffpresent(voidform_buff) or { spellcooldown(void_eruption) > 10 or not pool_for_cds() } and not buffpresent(voidform_buff) } and spell(unholy_nova) or shadowtrinketscdpostconditions() or healthpercent() <= 75 and spell(desperate_prayer)
 }
 
 ### actions.boon
@@ -1518,6 +1531,7 @@ AddIcon enabled=(checkboxon(opt_priest_shadow_aoe) and specialization(shadow)) h
 # damnation
 # dark_thought_buff
 # darkmoon_deck_putrescence_item
+# desperate_prayer
 # devouring_plague
 # dissonant_echoes_conduit
 # dreadfire_vessel_item
@@ -1675,8 +1689,8 @@ AddFunction shadowtrinketscdactions
  if { buffpresent(power_infusion) or not checkboxon("self_power_infusion") or hasequippeditem(shadowed_orb_of_torment_item) } and hastrinket(soulletting_ruby_item) item(soulletting_ruby_item usable=1)
  #use_item,name=sinful_gladiators_badge_of_ferocity,if=cooldown.void_eruption.remains>=10
  if spellcooldown(void_eruption) >= 10 and hastrinket(sinful_gladiators_badge_of_ferocity_item) item(sinful_gladiators_badge_of_ferocity_item usable=1)
- #use_item,name=shadowed_orb_of_torment,if=!buff.voidform.up|(prev_gcd.1.void_bolt)
- if { not buffpresent(voidform_buff) or previousgcdspell(void_bolt) } and hastrinket(shadowed_orb_of_torment_item) item(shadowed_orb_of_torment_item usable=1)
+ #use_item,name=shadowed_orb_of_torment,if=cooldown.power_infusion.remains<=10&cooldown.void_eruption.remains<=10&(covenant.necrolord|covenant.kyrian)|(covenant.venthyr|covenant.night_fae)&(!buff.voidform.up|prev_gcd.1.void_bolt)|fight_remains<=40
+ if { spellcooldown(power_infusion) <= 10 and spellcooldown(void_eruption) <= 10 and { iscovenant("necrolord") or iscovenant("kyrian") } or { iscovenant("venthyr") or iscovenant("night_fae") } and { not buffpresent(voidform_buff) or previousgcdspell(void_bolt) } or fightremains() <= 40 } and hastrinket(shadowed_orb_of_torment_item) item(shadowed_orb_of_torment_item usable=1)
  #call_action_list,name=dmg_trinkets,if=(!talent.hungering_void.enabled|debuff.hungering_void.up)&(buff.voidform.up|cooldown.void_eruption.remains>10)
  if { not hastalent(hungering_void_talent) or target.debuffpresent(hungering_void_debuff) } and { buffpresent(voidform_buff) or spellcooldown(void_eruption) > 10 } shadowdmg_trinketscdactions()
 
@@ -1959,6 +1973,12 @@ AddFunction shadowcdsshortcdactions
  if not hastalent(hungering_void_talent) and dots_up() or target.debuffpresent(hungering_void_debuff) and buffpresent(voidform_buff) or { spellcooldown(void_eruption) > 10 or not pool_for_cds() } and not buffpresent(voidform_buff) spell(unholy_nova)
  #call_action_list,name=trinkets
  shadowtrinketsshortcdactions()
+
+ unless shadowtrinketsshortcdpostconditions()
+ {
+  #desperate_prayer,if=health.pct<=75
+  if healthpercent() <= 75 spell(desperate_prayer)
+ }
 }
 
 AddFunction shadowcdsshortcdpostconditions
@@ -1984,7 +2004,7 @@ AddFunction shadowcdscdactions
 
 AddFunction shadowcdscdpostconditions
 {
- { not buffpresent(voidform_buff) and { not { not spellcooldown(void_torrent) > 0 } or not hastalent(void_torrent_talent) } and { dots_up() and enemies(tagged=1) == 1 or debuffcountonany(vampiric_touch) == enemies(tagged=1) and enemies(tagged=1) > 1 } or buffpresent(voidform_buff) and { enabledsoulbind(grove_invigoration_soulbind) or enabledsoulbind(field_of_blossoms_soulbind) } } and spell(fae_guardians) or insanity() < 90 and { all_dots_up() and { not { not spellcooldown(void_eruption) > 0 } or not hastalent(hungering_void_talent) } or buffpresent(voidform_buff) } and { not hastalent(hungering_void_talent) or target.debuffremaining(hungering_void_debuff) > casttime(mindgames) or not buffpresent(voidform_buff) } and { not hastalent(searing_nightmare_talent) or enemies(tagged=1) < 5 } and spell(mindgames) or { not hastalent(hungering_void_talent) and dots_up() or target.debuffpresent(hungering_void_debuff) and buffpresent(voidform_buff) or { spellcooldown(void_eruption) > 10 or not pool_for_cds() } and not buffpresent(voidform_buff) } and spell(unholy_nova) or shadowtrinketscdpostconditions()
+ { not buffpresent(voidform_buff) and { not { not spellcooldown(void_torrent) > 0 } or not hastalent(void_torrent_talent) } and { dots_up() and enemies(tagged=1) == 1 or debuffcountonany(vampiric_touch) == enemies(tagged=1) and enemies(tagged=1) > 1 } or buffpresent(voidform_buff) and { enabledsoulbind(grove_invigoration_soulbind) or enabledsoulbind(field_of_blossoms_soulbind) } } and spell(fae_guardians) or insanity() < 90 and { all_dots_up() and { not { not spellcooldown(void_eruption) > 0 } or not hastalent(hungering_void_talent) } or buffpresent(voidform_buff) } and { not hastalent(hungering_void_talent) or target.debuffremaining(hungering_void_debuff) > casttime(mindgames) or not buffpresent(voidform_buff) } and { not hastalent(searing_nightmare_talent) or enemies(tagged=1) < 5 } and spell(mindgames) or { not hastalent(hungering_void_talent) and dots_up() or target.debuffpresent(hungering_void_debuff) and buffpresent(voidform_buff) or { spellcooldown(void_eruption) > 10 or not pool_for_cds() } and not buffpresent(voidform_buff) } and spell(unholy_nova) or shadowtrinketscdpostconditions() or healthpercent() <= 75 and spell(desperate_prayer)
 }
 
 ### actions.boon
@@ -2137,6 +2157,7 @@ AddIcon enabled=(checkboxon(opt_priest_shadow_aoe) and specialization(shadow)) h
 # damnation
 # dark_thought_buff
 # darkmoon_deck_putrescence_item
+# desperate_prayer
 # devouring_plague
 # dissonant_echoes_conduit
 # dreadfire_vessel_item
@@ -2294,8 +2315,8 @@ AddFunction shadowtrinketscdactions
  if { buffpresent(power_infusion) or not checkboxon("self_power_infusion") or hasequippeditem(shadowed_orb_of_torment_item) } and hastrinket(soulletting_ruby_item) item(soulletting_ruby_item usable=1)
  #use_item,name=sinful_gladiators_badge_of_ferocity,if=cooldown.void_eruption.remains>=10
  if spellcooldown(void_eruption) >= 10 and hastrinket(sinful_gladiators_badge_of_ferocity_item) item(sinful_gladiators_badge_of_ferocity_item usable=1)
- #use_item,name=shadowed_orb_of_torment,if=!buff.voidform.up|(prev_gcd.1.void_bolt)
- if { not buffpresent(voidform_buff) or previousgcdspell(void_bolt) } and hastrinket(shadowed_orb_of_torment_item) item(shadowed_orb_of_torment_item usable=1)
+ #use_item,name=shadowed_orb_of_torment,if=cooldown.power_infusion.remains<=10&cooldown.void_eruption.remains<=10&(covenant.necrolord|covenant.kyrian)|(covenant.venthyr|covenant.night_fae)&(!buff.voidform.up|prev_gcd.1.void_bolt)|fight_remains<=40
+ if { spellcooldown(power_infusion) <= 10 and spellcooldown(void_eruption) <= 10 and { iscovenant("necrolord") or iscovenant("kyrian") } or { iscovenant("venthyr") or iscovenant("night_fae") } and { not buffpresent(voidform_buff) or previousgcdspell(void_bolt) } or fightremains() <= 40 } and hastrinket(shadowed_orb_of_torment_item) item(shadowed_orb_of_torment_item usable=1)
  #call_action_list,name=dmg_trinkets,if=(!talent.hungering_void.enabled|debuff.hungering_void.up)&(buff.voidform.up|cooldown.void_eruption.remains>10)
  if { not hastalent(hungering_void_talent) or target.debuffpresent(hungering_void_debuff) } and { buffpresent(voidform_buff) or spellcooldown(void_eruption) > 10 } shadowdmg_trinketscdactions()
 
@@ -2578,6 +2599,12 @@ AddFunction shadowcdsshortcdactions
  if not hastalent(hungering_void_talent) and dots_up() or target.debuffpresent(hungering_void_debuff) and buffpresent(voidform_buff) or { spellcooldown(void_eruption) > 10 or not pool_for_cds() } and not buffpresent(voidform_buff) spell(unholy_nova)
  #call_action_list,name=trinkets
  shadowtrinketsshortcdactions()
+
+ unless shadowtrinketsshortcdpostconditions()
+ {
+  #desperate_prayer,if=health.pct<=75
+  if healthpercent() <= 75 spell(desperate_prayer)
+ }
 }
 
 AddFunction shadowcdsshortcdpostconditions
@@ -2603,7 +2630,7 @@ AddFunction shadowcdscdactions
 
 AddFunction shadowcdscdpostconditions
 {
- { not buffpresent(voidform_buff) and { not { not spellcooldown(void_torrent) > 0 } or not hastalent(void_torrent_talent) } and { dots_up() and enemies(tagged=1) == 1 or debuffcountonany(vampiric_touch) == enemies(tagged=1) and enemies(tagged=1) > 1 } or buffpresent(voidform_buff) and { enabledsoulbind(grove_invigoration_soulbind) or enabledsoulbind(field_of_blossoms_soulbind) } } and spell(fae_guardians) or insanity() < 90 and { all_dots_up() and { not { not spellcooldown(void_eruption) > 0 } or not hastalent(hungering_void_talent) } or buffpresent(voidform_buff) } and { not hastalent(hungering_void_talent) or target.debuffremaining(hungering_void_debuff) > casttime(mindgames) or not buffpresent(voidform_buff) } and { not hastalent(searing_nightmare_talent) or enemies(tagged=1) < 5 } and spell(mindgames) or { not hastalent(hungering_void_talent) and dots_up() or target.debuffpresent(hungering_void_debuff) and buffpresent(voidform_buff) or { spellcooldown(void_eruption) > 10 or not pool_for_cds() } and not buffpresent(voidform_buff) } and spell(unholy_nova) or shadowtrinketscdpostconditions()
+ { not buffpresent(voidform_buff) and { not { not spellcooldown(void_torrent) > 0 } or not hastalent(void_torrent_talent) } and { dots_up() and enemies(tagged=1) == 1 or debuffcountonany(vampiric_touch) == enemies(tagged=1) and enemies(tagged=1) > 1 } or buffpresent(voidform_buff) and { enabledsoulbind(grove_invigoration_soulbind) or enabledsoulbind(field_of_blossoms_soulbind) } } and spell(fae_guardians) or insanity() < 90 and { all_dots_up() and { not { not spellcooldown(void_eruption) > 0 } or not hastalent(hungering_void_talent) } or buffpresent(voidform_buff) } and { not hastalent(hungering_void_talent) or target.debuffremaining(hungering_void_debuff) > casttime(mindgames) or not buffpresent(voidform_buff) } and { not hastalent(searing_nightmare_talent) or enemies(tagged=1) < 5 } and spell(mindgames) or { not hastalent(hungering_void_talent) and dots_up() or target.debuffpresent(hungering_void_debuff) and buffpresent(voidform_buff) or { spellcooldown(void_eruption) > 10 or not pool_for_cds() } and not buffpresent(voidform_buff) } and spell(unholy_nova) or shadowtrinketscdpostconditions() or healthpercent() <= 75 and spell(desperate_prayer)
 }
 
 ### actions.boon
@@ -2756,6 +2783,7 @@ AddIcon enabled=(checkboxon(opt_priest_shadow_aoe) and specialization(shadow)) h
 # damnation
 # dark_thought_buff
 # darkmoon_deck_putrescence_item
+# desperate_prayer
 # devouring_plague
 # dissonant_echoes_conduit
 # dreadfire_vessel_item
