@@ -206,6 +206,11 @@ Define(frostscythe 207230)
 Define(frostwyrms_fury 279302)
 # Summons a frostwyrm who breathes on all enemies within s1 yd in front of you, dealing 279303s1 Frost damage and slowing movement speed by (25 of Spell Power) for 10 seconds.
   SpellInfo(frostwyrms_fury cd=180 duration=10)
+Define(gathering_storm_buff 211805)
+# Each Rune spent during Remorseless Winter increases its damage by 211805s1, and extends its duration by m1/10.1 sec.
+  SpellInfo(gathering_storm_buff duration=8 max_stacks=10 gcd=0 offgcd=1)
+  # Remorseless Winter damage increased by s1.
+  SpellAddBuff(gathering_storm_buff gathering_storm_buff add=1)
 Define(glacial_advance 194913)
 # Summon glacial spikes from the ground that advance forward, each dealing 195975s1*<CAP>/AP Frost damage and applying Razorice to enemies near their eruption point.
   SpellInfo(glacial_advance runicpower=30 cd=6)
@@ -422,6 +427,8 @@ Define(hypothermic_presence_talent 22533)
 # Embrace the ice in your veins, reducing the Runic Power cost of your abilities by s1 for 8 seconds. Does not trigger the global cooldown.
 Define(icecap_talent 22023)
 # Your Frost Strike?s207230[, Frostscythe,][] and Obliterate critical strikes reduce the remaining cooldown of Pillar of Frost by <cd> sec.
+Define(icy_talons_talent 22017)
+# Your Runic Power spending abilities increase your melee attack speed by 194879s1 for 6 seconds, stacking up to 194879u times.
 Define(obliteration_talent 22109)
 # While Pillar of Frost is active, Frost Strike?s194913[, Glacial Advance,][] and Howling Blast always grant Killing Machine and have a s2 chance to generate a Rune.
 Define(rapid_decomposition_talent 19218)

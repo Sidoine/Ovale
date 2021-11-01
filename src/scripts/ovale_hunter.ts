@@ -1451,42 +1451,49 @@ AddFunction survivalcleavemainactions
  if hastalent(hydras_bite_talent) and buffpresent(vipers_venom_buff) and buffremaining(vipers_venom_buff) < gcd() spell(serpent_sting)
  #wildfire_bomb,if=full_recharge_time<gcd
  if spellfullrecharge(wildfire_bomb) < gcd() spell(wildfire_bomb)
- #chakrams
- spell(chakrams)
- #butchery,if=dot.shrapnel_bomb.ticking&(dot.internal_bleeding.stack<2|dot.shrapnel_bomb.remains<gcd)
- if target.debuffpresent(shrapnel_bomb_debuff) and { target.debuffstacks(internal_bleeding_hunter_debuff) < 2 or target.debuffremaining(shrapnel_bomb_debuff) < gcd() } spell(butchery)
- #carve,if=dot.shrapnel_bomb.ticking
- if target.debuffpresent(shrapnel_bomb_debuff) spell(carve)
- #butchery,if=charges_fractional>2.5&cooldown.wildfire_bomb.full_recharge_time>spell_targets%2
- if charges(butchery count=0) > 2.5 and spellcooldown(wildfire_bomb) > enemies(tagged=1) / 2 spell(butchery)
- #carve,if=cooldown.wildfire_bomb.full_recharge_time>spell_targets%2&talent.alpha_predator.enabled
- if spellcooldown(wildfire_bomb) > enemies(tagged=1) / 2 and hastalent(alpha_predator_talent) spell(carve)
- #kill_command,target_if=min:bloodseeker.remains,if=focus+cast_regen<focus.max&full_recharge_time<gcd&(runeforge.nessingwarys_trapping_apparatus.equipped&cooldown.freezing_trap.remains&cooldown.tar_trap.remains|!runeforge.nessingwarys_trapping_apparatus.equipped)
- if focus() + focuscastingregen(kill_command_survival) < maxfocus() and spellfullrecharge(kill_command_survival) < gcd() and { equippedruneforge(nessingwarys_trapping_apparatus_runeforge) and spellcooldown(freezing_trap) > 0 and spellcooldown(tar_trap) > 0 or not equippedruneforge(nessingwarys_trapping_apparatus_runeforge) } spell(kill_command_survival)
- #wildfire_bomb,if=!dot.wildfire_bomb.ticking
- if not target.debuffpresent(wildfire_bomb_debuff) spell(wildfire_bomb)
- #butchery,if=(!next_wi_bomb.shrapnel|!talent.wildfire_infusion.enabled)&cooldown.wildfire_bomb.full_recharge_time>spell_targets%2
- if { not spellusable(shrapnel_bomb) or not hastalent(wildfire_infusion_talent) } and spellcooldown(wildfire_bomb) > enemies(tagged=1) / 2 spell(butchery)
- #carve,if=cooldown.wildfire_bomb.full_recharge_time>spell_targets%2
- if spellcooldown(wildfire_bomb) > enemies(tagged=1) / 2 spell(carve)
- #kill_shot
- spell(kill_shot_survival)
- #serpent_sting,target_if=min:remains,if=refreshable&talent.hydras_bite.enabled&target.time_to_die>8
- if target.refreshable(serpent_sting) and hastalent(hydras_bite_talent) and target.timetodie() > 8 spell(serpent_sting)
- #carve
- spell(carve)
- #kill_command,target_if=focus+cast_regen<focus.max&(runeforge.nessingwarys_trapping_apparatus.equipped&cooldown.freezing_trap.remains&cooldown.tar_trap.remains|!runeforge.nessingwarys_trapping_apparatus.equipped)
- if focus() + focuscastingregen(kill_command_survival) < maxfocus() and { equippedruneforge(nessingwarys_trapping_apparatus_runeforge) and spellcooldown(freezing_trap) > 0 and spellcooldown(tar_trap) > 0 or not equippedruneforge(nessingwarys_trapping_apparatus_runeforge) } spell(kill_command_survival)
- #serpent_sting,target_if=min:remains,if=refreshable
- if target.refreshable(serpent_sting) spell(serpent_sting)
- #mongoose_bite,target_if=max:debuff.latent_poison_injection.stack
- spell(mongoose_bite)
- #raptor_strike,target_if=max:debuff.latent_poison_injection.stack
- spell(raptor_strike)
+ #call_action_list,name=nta,if=runeforge.nessingwarys_trapping_apparatus.equipped&focus<variable.mb_rs_cost
+ if equippedruneforge(nessingwarys_trapping_apparatus_runeforge) and focus() < mb_rs_cost() survivalntamainactions()
+
+ unless equippedruneforge(nessingwarys_trapping_apparatus_runeforge) and focus() < mb_rs_cost() and survivalntamainpostconditions()
+ {
+  #chakrams
+  spell(chakrams)
+  #butchery,if=dot.shrapnel_bomb.ticking&(dot.internal_bleeding.stack<2|dot.shrapnel_bomb.remains<gcd)
+  if target.debuffpresent(shrapnel_bomb_debuff) and { target.debuffstacks(internal_bleeding_hunter_debuff) < 2 or target.debuffremaining(shrapnel_bomb_debuff) < gcd() } spell(butchery)
+  #carve,if=dot.shrapnel_bomb.ticking
+  if target.debuffpresent(shrapnel_bomb_debuff) spell(carve)
+  #butchery,if=charges_fractional>2.5&cooldown.wildfire_bomb.full_recharge_time>spell_targets%2
+  if charges(butchery count=0) > 2.5 and spellcooldown(wildfire_bomb) > enemies(tagged=1) / 2 spell(butchery)
+  #carve,if=cooldown.wildfire_bomb.full_recharge_time>spell_targets%2&talent.alpha_predator.enabled
+  if spellcooldown(wildfire_bomb) > enemies(tagged=1) / 2 and hastalent(alpha_predator_talent) spell(carve)
+  #kill_command,target_if=min:bloodseeker.remains,if=focus+cast_regen<focus.max&full_recharge_time<gcd&(runeforge.nessingwarys_trapping_apparatus.equipped&cooldown.freezing_trap.remains&cooldown.tar_trap.remains|!runeforge.nessingwarys_trapping_apparatus.equipped)
+  if focus() + focuscastingregen(kill_command_survival) < maxfocus() and spellfullrecharge(kill_command_survival) < gcd() and { equippedruneforge(nessingwarys_trapping_apparatus_runeforge) and spellcooldown(freezing_trap) > 0 and spellcooldown(tar_trap) > 0 or not equippedruneforge(nessingwarys_trapping_apparatus_runeforge) } spell(kill_command_survival)
+  #wildfire_bomb,if=!dot.wildfire_bomb.ticking
+  if not target.debuffpresent(wildfire_bomb_debuff) spell(wildfire_bomb)
+  #butchery,if=(!next_wi_bomb.shrapnel|!talent.wildfire_infusion.enabled)&cooldown.wildfire_bomb.full_recharge_time>spell_targets%2
+  if { not spellusable(shrapnel_bomb) or not hastalent(wildfire_infusion_talent) } and spellcooldown(wildfire_bomb) > enemies(tagged=1) / 2 spell(butchery)
+  #carve,if=cooldown.wildfire_bomb.full_recharge_time>spell_targets%2
+  if spellcooldown(wildfire_bomb) > enemies(tagged=1) / 2 spell(carve)
+  #kill_shot
+  spell(kill_shot_survival)
+  #serpent_sting,target_if=min:remains,if=refreshable&talent.hydras_bite.enabled&target.time_to_die>8
+  if target.refreshable(serpent_sting) and hastalent(hydras_bite_talent) and target.timetodie() > 8 spell(serpent_sting)
+  #carve
+  spell(carve)
+  #kill_command,target_if=focus+cast_regen<focus.max&(runeforge.nessingwarys_trapping_apparatus.equipped&cooldown.freezing_trap.remains&cooldown.tar_trap.remains|!runeforge.nessingwarys_trapping_apparatus.equipped)
+  if focus() + focuscastingregen(kill_command_survival) < maxfocus() and { equippedruneforge(nessingwarys_trapping_apparatus_runeforge) and spellcooldown(freezing_trap) > 0 and spellcooldown(tar_trap) > 0 or not equippedruneforge(nessingwarys_trapping_apparatus_runeforge) } spell(kill_command_survival)
+  #serpent_sting,target_if=min:remains,if=refreshable
+  if target.refreshable(serpent_sting) spell(serpent_sting)
+  #mongoose_bite,target_if=max:debuff.latent_poison_injection.stack
+  spell(mongoose_bite)
+  #raptor_strike,target_if=max:debuff.latent_poison_injection.stack
+  spell(raptor_strike)
+ }
 }
 
 AddFunction survivalcleavemainpostconditions
 {
+ equippedruneforge(nessingwarys_trapping_apparatus_runeforge) and focus() < mb_rs_cost() and survivalntamainpostconditions()
 }
 
 AddFunction survivalcleaveshortcdactions
@@ -1496,24 +1503,30 @@ AddFunction survivalcleaveshortcdactions
   #resonating_arrow
   spell(resonating_arrow)
 
-  unless spellfullrecharge(wildfire_bomb) < gcd() and spell(wildfire_bomb) or spell(chakrams) or target.debuffpresent(shrapnel_bomb_debuff) and { target.debuffstacks(internal_bleeding_hunter_debuff) < 2 or target.debuffremaining(shrapnel_bomb_debuff) < gcd() } and spell(butchery) or target.debuffpresent(shrapnel_bomb_debuff) and spell(carve)
+  unless spellfullrecharge(wildfire_bomb) < gcd() and spell(wildfire_bomb)
   {
-   #death_chakram,if=focus+cast_regen<focus.max
-   if focus() + focuscastingregen(death_chakram) < maxfocus() spell(death_chakram)
+   #call_action_list,name=nta,if=runeforge.nessingwarys_trapping_apparatus.equipped&focus<variable.mb_rs_cost
+   if equippedruneforge(nessingwarys_trapping_apparatus_runeforge) and focus() < mb_rs_cost() survivalntashortcdactions()
 
-   unless charges(butchery count=0) > 2.5 and spellcooldown(wildfire_bomb) > enemies(tagged=1) / 2 and spell(butchery)
+   unless equippedruneforge(nessingwarys_trapping_apparatus_runeforge) and focus() < mb_rs_cost() and survivalntashortcdpostconditions() or spell(chakrams) or target.debuffpresent(shrapnel_bomb_debuff) and { target.debuffstacks(internal_bleeding_hunter_debuff) < 2 or target.debuffremaining(shrapnel_bomb_debuff) < gcd() } and spell(butchery) or target.debuffpresent(shrapnel_bomb_debuff) and spell(carve)
    {
-    #flanking_strike,if=focus+cast_regen<focus.max
-    if focus() + focuscastingregen(flanking_strike) < maxfocus() spell(flanking_strike)
+    #death_chakram,if=focus+cast_regen<focus.max
+    if focus() + focuscastingregen(death_chakram) < maxfocus() spell(death_chakram)
 
-    unless spellcooldown(wildfire_bomb) > enemies(tagged=1) / 2 and hastalent(alpha_predator_talent) and spell(carve) or focus() + focuscastingregen(kill_command_survival) < maxfocus() and spellfullrecharge(kill_command_survival) < gcd() and { equippedruneforge(nessingwarys_trapping_apparatus_runeforge) and spellcooldown(freezing_trap) > 0 and spellcooldown(tar_trap) > 0 or not equippedruneforge(nessingwarys_trapping_apparatus_runeforge) } and spell(kill_command_survival) or not target.debuffpresent(wildfire_bomb_debuff) and spell(wildfire_bomb) or { not spellusable(shrapnel_bomb) or not hastalent(wildfire_infusion_talent) } and spellcooldown(wildfire_bomb) > enemies(tagged=1) / 2 and spell(butchery) or spellcooldown(wildfire_bomb) > enemies(tagged=1) / 2 and spell(carve) or spell(kill_shot_survival)
+    unless charges(butchery count=0) > 2.5 and spellcooldown(wildfire_bomb) > enemies(tagged=1) / 2 and spell(butchery)
     {
-     #flayed_shot
-     spell(flayed_shot)
-     #a_murder_of_crows
-     spell(a_murder_of_crows)
-     #steel_trap
-     spell(steel_trap)
+     #flanking_strike,if=focus+cast_regen<focus.max
+     if focus() + focuscastingregen(flanking_strike) < maxfocus() spell(flanking_strike)
+
+     unless spellcooldown(wildfire_bomb) > enemies(tagged=1) / 2 and hastalent(alpha_predator_talent) and spell(carve) or focus() + focuscastingregen(kill_command_survival) < maxfocus() and spellfullrecharge(kill_command_survival) < gcd() and { equippedruneforge(nessingwarys_trapping_apparatus_runeforge) and spellcooldown(freezing_trap) > 0 and spellcooldown(tar_trap) > 0 or not equippedruneforge(nessingwarys_trapping_apparatus_runeforge) } and spell(kill_command_survival) or not target.debuffpresent(wildfire_bomb_debuff) and spell(wildfire_bomb) or { not spellusable(shrapnel_bomb) or not hastalent(wildfire_infusion_talent) } and spellcooldown(wildfire_bomb) > enemies(tagged=1) / 2 and spell(butchery) or spellcooldown(wildfire_bomb) > enemies(tagged=1) / 2 and spell(carve) or spell(kill_shot_survival)
+     {
+      #flayed_shot
+      spell(flayed_shot)
+      #a_murder_of_crows
+      spell(a_murder_of_crows)
+      #steel_trap,if=focus+cast_regen<focus.max
+      if focus() + focuscastingregen(steel_trap) < maxfocus() spell(steel_trap)
+     }
     }
    }
   }
@@ -1522,7 +1535,7 @@ AddFunction survivalcleaveshortcdactions
 
 AddFunction survivalcleaveshortcdpostconditions
 {
- hastalent(hydras_bite_talent) and buffpresent(vipers_venom_buff) and buffremaining(vipers_venom_buff) < gcd() and spell(serpent_sting) or spellfullrecharge(wildfire_bomb) < gcd() and spell(wildfire_bomb) or spell(chakrams) or target.debuffpresent(shrapnel_bomb_debuff) and { target.debuffstacks(internal_bleeding_hunter_debuff) < 2 or target.debuffremaining(shrapnel_bomb_debuff) < gcd() } and spell(butchery) or target.debuffpresent(shrapnel_bomb_debuff) and spell(carve) or charges(butchery count=0) > 2.5 and spellcooldown(wildfire_bomb) > enemies(tagged=1) / 2 and spell(butchery) or spellcooldown(wildfire_bomb) > enemies(tagged=1) / 2 and hastalent(alpha_predator_talent) and spell(carve) or focus() + focuscastingregen(kill_command_survival) < maxfocus() and spellfullrecharge(kill_command_survival) < gcd() and { equippedruneforge(nessingwarys_trapping_apparatus_runeforge) and spellcooldown(freezing_trap) > 0 and spellcooldown(tar_trap) > 0 or not equippedruneforge(nessingwarys_trapping_apparatus_runeforge) } and spell(kill_command_survival) or not target.debuffpresent(wildfire_bomb_debuff) and spell(wildfire_bomb) or { not spellusable(shrapnel_bomb) or not hastalent(wildfire_infusion_talent) } and spellcooldown(wildfire_bomb) > enemies(tagged=1) / 2 and spell(butchery) or spellcooldown(wildfire_bomb) > enemies(tagged=1) / 2 and spell(carve) or spell(kill_shot_survival) or target.refreshable(serpent_sting) and hastalent(hydras_bite_talent) and target.timetodie() > 8 and spell(serpent_sting) or spell(carve) or focus() + focuscastingregen(kill_command_survival) < maxfocus() and { equippedruneforge(nessingwarys_trapping_apparatus_runeforge) and spellcooldown(freezing_trap) > 0 and spellcooldown(tar_trap) > 0 or not equippedruneforge(nessingwarys_trapping_apparatus_runeforge) } and spell(kill_command_survival) or target.refreshable(serpent_sting) and spell(serpent_sting) or spell(mongoose_bite) or spell(raptor_strike)
+ hastalent(hydras_bite_talent) and buffpresent(vipers_venom_buff) and buffremaining(vipers_venom_buff) < gcd() and spell(serpent_sting) or spellfullrecharge(wildfire_bomb) < gcd() and spell(wildfire_bomb) or equippedruneforge(nessingwarys_trapping_apparatus_runeforge) and focus() < mb_rs_cost() and survivalntashortcdpostconditions() or spell(chakrams) or target.debuffpresent(shrapnel_bomb_debuff) and { target.debuffstacks(internal_bleeding_hunter_debuff) < 2 or target.debuffremaining(shrapnel_bomb_debuff) < gcd() } and spell(butchery) or target.debuffpresent(shrapnel_bomb_debuff) and spell(carve) or charges(butchery count=0) > 2.5 and spellcooldown(wildfire_bomb) > enemies(tagged=1) / 2 and spell(butchery) or spellcooldown(wildfire_bomb) > enemies(tagged=1) / 2 and hastalent(alpha_predator_talent) and spell(carve) or focus() + focuscastingregen(kill_command_survival) < maxfocus() and spellfullrecharge(kill_command_survival) < gcd() and { equippedruneforge(nessingwarys_trapping_apparatus_runeforge) and spellcooldown(freezing_trap) > 0 and spellcooldown(tar_trap) > 0 or not equippedruneforge(nessingwarys_trapping_apparatus_runeforge) } and spell(kill_command_survival) or not target.debuffpresent(wildfire_bomb_debuff) and spell(wildfire_bomb) or { not spellusable(shrapnel_bomb) or not hastalent(wildfire_infusion_talent) } and spellcooldown(wildfire_bomb) > enemies(tagged=1) / 2 and spell(butchery) or spellcooldown(wildfire_bomb) > enemies(tagged=1) / 2 and spell(carve) or spell(kill_shot_survival) or target.refreshable(serpent_sting) and hastalent(hydras_bite_talent) and target.timetodie() > 8 and spell(serpent_sting) or spell(carve) or focus() + focuscastingregen(kill_command_survival) < maxfocus() and { equippedruneforge(nessingwarys_trapping_apparatus_runeforge) and spellcooldown(freezing_trap) > 0 and spellcooldown(tar_trap) > 0 or not equippedruneforge(nessingwarys_trapping_apparatus_runeforge) } and spell(kill_command_survival) or target.refreshable(serpent_sting) and spell(serpent_sting) or spell(mongoose_bite) or spell(raptor_strike)
 }
 
 AddFunction survivalcleavecdactions
@@ -1536,13 +1549,19 @@ AddFunction survivalcleavecdactions
   {
    #coordinated_assault
    spell(coordinated_assault)
+
+   unless spellfullrecharge(wildfire_bomb) < gcd() and spell(wildfire_bomb)
+   {
+    #call_action_list,name=nta,if=runeforge.nessingwarys_trapping_apparatus.equipped&focus<variable.mb_rs_cost
+    if equippedruneforge(nessingwarys_trapping_apparatus_runeforge) and focus() < mb_rs_cost() survivalntacdactions()
+   }
   }
  }
 }
 
 AddFunction survivalcleavecdpostconditions
 {
- hastalent(hydras_bite_talent) and buffpresent(vipers_venom_buff) and buffremaining(vipers_venom_buff) < gcd() and spell(serpent_sting) or spell(resonating_arrow) or spellfullrecharge(wildfire_bomb) < gcd() and spell(wildfire_bomb) or spell(chakrams) or target.debuffpresent(shrapnel_bomb_debuff) and { target.debuffstacks(internal_bleeding_hunter_debuff) < 2 or target.debuffremaining(shrapnel_bomb_debuff) < gcd() } and spell(butchery) or target.debuffpresent(shrapnel_bomb_debuff) and spell(carve) or focus() + focuscastingregen(death_chakram) < maxfocus() and spell(death_chakram) or charges(butchery count=0) > 2.5 and spellcooldown(wildfire_bomb) > enemies(tagged=1) / 2 and spell(butchery) or focus() + focuscastingregen(flanking_strike) < maxfocus() and spell(flanking_strike) or spellcooldown(wildfire_bomb) > enemies(tagged=1) / 2 and hastalent(alpha_predator_talent) and spell(carve) or focus() + focuscastingregen(kill_command_survival) < maxfocus() and spellfullrecharge(kill_command_survival) < gcd() and { equippedruneforge(nessingwarys_trapping_apparatus_runeforge) and spellcooldown(freezing_trap) > 0 and spellcooldown(tar_trap) > 0 or not equippedruneforge(nessingwarys_trapping_apparatus_runeforge) } and spell(kill_command_survival) or not target.debuffpresent(wildfire_bomb_debuff) and spell(wildfire_bomb) or { not spellusable(shrapnel_bomb) or not hastalent(wildfire_infusion_talent) } and spellcooldown(wildfire_bomb) > enemies(tagged=1) / 2 and spell(butchery) or spellcooldown(wildfire_bomb) > enemies(tagged=1) / 2 and spell(carve) or spell(kill_shot_survival) or spell(flayed_shot) or spell(a_murder_of_crows) or spell(steel_trap) or target.refreshable(serpent_sting) and hastalent(hydras_bite_talent) and target.timetodie() > 8 and spell(serpent_sting) or spell(carve) or focus() + focuscastingregen(kill_command_survival) < maxfocus() and { equippedruneforge(nessingwarys_trapping_apparatus_runeforge) and spellcooldown(freezing_trap) > 0 and spellcooldown(tar_trap) > 0 or not equippedruneforge(nessingwarys_trapping_apparatus_runeforge) } and spell(kill_command_survival) or target.refreshable(serpent_sting) and spell(serpent_sting) or spell(mongoose_bite) or spell(raptor_strike)
+ hastalent(hydras_bite_talent) and buffpresent(vipers_venom_buff) and buffremaining(vipers_venom_buff) < gcd() and spell(serpent_sting) or spell(resonating_arrow) or spellfullrecharge(wildfire_bomb) < gcd() and spell(wildfire_bomb) or equippedruneforge(nessingwarys_trapping_apparatus_runeforge) and focus() < mb_rs_cost() and survivalntacdpostconditions() or spell(chakrams) or target.debuffpresent(shrapnel_bomb_debuff) and { target.debuffstacks(internal_bleeding_hunter_debuff) < 2 or target.debuffremaining(shrapnel_bomb_debuff) < gcd() } and spell(butchery) or target.debuffpresent(shrapnel_bomb_debuff) and spell(carve) or focus() + focuscastingregen(death_chakram) < maxfocus() and spell(death_chakram) or charges(butchery count=0) > 2.5 and spellcooldown(wildfire_bomb) > enemies(tagged=1) / 2 and spell(butchery) or focus() + focuscastingregen(flanking_strike) < maxfocus() and spell(flanking_strike) or spellcooldown(wildfire_bomb) > enemies(tagged=1) / 2 and hastalent(alpha_predator_talent) and spell(carve) or focus() + focuscastingregen(kill_command_survival) < maxfocus() and spellfullrecharge(kill_command_survival) < gcd() and { equippedruneforge(nessingwarys_trapping_apparatus_runeforge) and spellcooldown(freezing_trap) > 0 and spellcooldown(tar_trap) > 0 or not equippedruneforge(nessingwarys_trapping_apparatus_runeforge) } and spell(kill_command_survival) or not target.debuffpresent(wildfire_bomb_debuff) and spell(wildfire_bomb) or { not spellusable(shrapnel_bomb) or not hastalent(wildfire_infusion_talent) } and spellcooldown(wildfire_bomb) > enemies(tagged=1) / 2 and spell(butchery) or spellcooldown(wildfire_bomb) > enemies(tagged=1) / 2 and spell(carve) or spell(kill_shot_survival) or spell(flayed_shot) or spell(a_murder_of_crows) or focus() + focuscastingregen(steel_trap) < maxfocus() and spell(steel_trap) or target.refreshable(serpent_sting) and hastalent(hydras_bite_talent) and target.timetodie() > 8 and spell(serpent_sting) or spell(carve) or focus() + focuscastingregen(kill_command_survival) < maxfocus() and { equippedruneforge(nessingwarys_trapping_apparatus_runeforge) and spellcooldown(freezing_trap) > 0 and spellcooldown(tar_trap) > 0 or not equippedruneforge(nessingwarys_trapping_apparatus_runeforge) } and spell(kill_command_survival) or target.refreshable(serpent_sting) and spell(serpent_sting) or spell(mongoose_bite) or spell(raptor_strike)
 }
 
 ### actions.cds
