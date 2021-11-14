@@ -390,6 +390,7 @@ export interface Item {
     unk_1: number;
     unk_3: unknown;
     unk_4: number;
+    unk_5: number;
 }
 
 export interface ItemSparse {
