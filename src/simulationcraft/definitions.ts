@@ -873,6 +873,16 @@ export const miscOperands: LuaObj<MiscOperand> = {
         },
         symbol: "runeforge",
     },
+    ["rune_word"]: {
+        /* TODO implement rune_word.* (unique_gear_shadowlands.cpp)
+         * rune_word.<shard_type>.<property>
+         *    <shard_type> is blood, blood_link
+         *                    frost, winds_of_winter
+         *                    unholy, chaos_bane
+         *    <property> is enabled, disabled, rank
+         */
+        code: "always(rune_word)",
+    },
     ["runic_power"]: { name: "runicpower", modifiers: powerModifiers },
     ["searing_touch"]: {
         modifiers: {
