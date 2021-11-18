@@ -56,7 +56,7 @@ Define(blessing_of_summer 328620)
   # Attacks have a h chance to deal w1 additional damage as Holy.
   SpellAddBuff(blessing_of_summer blessing_of_summer add=1)
 Define(blessing_of_winter 328281)
-# Bless an ally for 30 seconds. Their attacks deal <points>*s5 Frost damage and reduce enemies' movement speed by 328506s4 and attack speed by 328506s3, stacking 328506u times.rnrn|cFFFFFFFFBlessing of the Seasons:|r Turns to Spring after use.
+# Bless an ally for 30 seconds. Their spells and abilities deal <points>*s5 Frost damage and reduce enemies' movement speed by 328506s4 and attack speed by 328506s3, stacking 328506u times.rnrn|cFFFFFFFFBlessing of the Seasons:|r Turns to Spring after use.
   SpellInfo(blessing_of_winter cd=45 duration=30)
   # Attack speed reduced by w3.rnMovement speed reduced by w4.
   SpellAddBuff(blessing_of_winter blessing_of_winter_unused_0 add=1)
@@ -65,7 +65,7 @@ Define(blessing_of_winter 328281)
   # Attacks deal <points>*w5 Frost damage and reduce enemies' movement speed by 328506s4 and attack speed by 328506s3, stacking 328506u times.
   SpellAddTargetDebuff(blessing_of_winter blessing_of_winter add=1)
 Define(blessing_of_winter_unused_0 328506)
-# Bless an ally for 30 seconds. Their attacks deal <points>*s5 Frost damage and reduce enemies' movement speed by 328506s4 and attack speed by 328506s3, stacking 328506u times.rnrn|cFFFFFFFFBlessing of the Seasons:|r Turns to Spring after use.
+# Bless an ally for 30 seconds. Their spells and abilities deal <points>*s5 Frost damage and reduce enemies' movement speed by 328506s4 and attack speed by 328506s3, stacking 328506u times.rnrn|cFFFFFFFFBlessing of the Seasons:|r Turns to Spring after use.
   SpellInfo(blessing_of_winter_unused_0 duration=6 max_stacks=10 gcd=0 offgcd=1)
 Define(blinding_light 115750)
 # Emits dazzling light in all directions, blinding enemies within 105421A1 yards, causing them to wander disoriented for 105421d. Non-Holy damage will break the disorient effect.
@@ -102,7 +102,7 @@ Define(divine_purpose_buff 223819)
   # Your next Holy Power ability is free and deals s2 increased damage and healing.
   SpellAddBuff(divine_purpose_buff divine_purpose_buff add=1)
 Define(divine_storm 53385)
-# Unleashes a whirl of divine energy, dealing s1 Holy damage to up to s2 nearby enemies.
+# Unleashes a whirl of divine energy, dealing s1 Holy damage to all nearby enemies. Deals reduced damage beyond s2 targets.
   SpellInfo(divine_storm holypower=3)
 Define(divine_toll 304971)
 # Instantly cast Holy Shock, Avenger's Shield, or Judgment on up to s1 targets within A2 yds (based on your current specialization).?c3[rnrnDivine Toll's Judgment deals 326011s1 increased damage.][]
@@ -208,9 +208,9 @@ Define(templars_verdict 85256)
 # Unleashes a powerful weapon strike that deals 224266s1 Holy damage to an enemy target.
   SpellInfo(templars_verdict holypower=3)
 Define(vanquishers_hammer 328204)
-# Throws a hammer at your target dealing (136 of Spell Power) Shadow damage, and empowering your next ?c3[Templar's Verdict to automatically trigger Divine Storm]?c1[Word of Glory to automatically trigger Light of Dawn][Word of Glory to automatically trigger Shield of the Righteous].rnrn|cFFFFFFFFGenerates s3 Holy Power.
+# Throws a hammer at your target dealing (136 of Spell Power) Shadow damage, and empowering your next ?c3[Templar's Verdict to automatically trigger Divine Storm]?c1[Word of Glory to automatically trigger Light of Dawn][Word of Glory to automatically trigger Shield of the Righteous] with s2 increased effectiveness.rnrn|cFFFFFFFFGenerates s3 Holy Power.
   SpellInfo(vanquishers_hammer cd=30 duration=20 holypower=-1)
-  # Your next ?c3[Templar's Verdict automatically triggers Divine Storm]?c1[Word of Glory automatically triggers Light of Dawn][Word of Glory automatically triggers Shield of the Righteous].
+  # Your next ?c3[Templar's Verdict automatically triggers Divine Storm]?c1[Word of Glory automatically triggers Light of Dawn][Word of Glory automatically triggers Shield of the Righteous] with s2 increased effectiveness.
   SpellAddBuff(vanquishers_hammer vanquishers_hammer add=1)
 Define(wake_of_ashes 255937)
 # Lash out at your enemies, dealing s1 Radiant damage to all enemies within a1 yd in front of you and reducing their movement speed by s2 for 5 seconds. Damage reduced on secondary targets.rnrnDemon and Undead enemies are also stunned for 5 seconds.rnrn|cFFFFFFFFGenerates s3 Holy Power.

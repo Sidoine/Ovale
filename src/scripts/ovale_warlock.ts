@@ -1636,6 +1636,8 @@ AddFunction demonologyopenercdactions
 {
  unless soulbind(grove_invigoration_soulbind) and spell(soul_rot)
  {
+  #nether_portal
+  spell(nether_portal)
   #grimoire_felguard
   spell(grimoire_felguard)
  }
@@ -2408,6 +2410,8 @@ AddFunction demonologyopenercdactions
 {
  unless soulbind(grove_invigoration_soulbind) and spell(soul_rot)
  {
+  #nether_portal
+  spell(nether_portal)
   #grimoire_felguard
   spell(grimoire_felguard)
  }

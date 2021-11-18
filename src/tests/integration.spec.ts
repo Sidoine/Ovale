@@ -132,6 +132,8 @@ test("sc_t27_monk_windwalker_necrolord", () =>
     integrationTest("sc_t27_monk_windwalker_necrolord"));
 test("sc_t27_monk_windwalker_night_fae", () =>
     integrationTest("sc_t27_monk_windwalker_night_fae"));
+test("sc_t27_monk_windwalker_venthyr", () =>
+    integrationTest("sc_t27_monk_windwalker_venthyr"));
 test("sc_t27_paladin_holy", () => integrationTest("sc_t27_paladin_holy"));
 test("sc_t27_paladin_protection", () =>
     integrationTest("sc_t27_paladin_protection"));

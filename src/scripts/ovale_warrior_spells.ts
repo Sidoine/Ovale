@@ -36,13 +36,13 @@ Define(berserking 26297)
   # Haste increased by s1.
   SpellAddBuff(berserking berserking add=1)
 Define(bladestorm 46924)
-# Become an unstoppable storm of destructive force, striking up to s1 nearby targets for <dmg> Physical damage over 4 seconds.rnrnYou are immune to movement impairing and loss of control effects, but can use defensive abilities and avoid attacks.rnrn|cFFFFFFFFGenerates o4/10 Rage over the duration.|r
+# Become an unstoppable storm of destructive force, striking all nearby enemies for <dmg> Physical damage over 4 seconds. Deals reduced damage beyond s1 targets.rnrnYou are immune to movement impairing and loss of control effects, but can use defensive abilities and avoid attacks.rnrn|cFFFFFFFFGenerates o4/10 Rage over the duration.|r
   SpellInfo(bladestorm cd=60 duration=4 tick=1)
   SpellRequire(bladestorm unusable set=1 enabled=(not hastalent(bladestorm_talent)))
   # Dealing damage to all nearby enemies every t1 sec.rnImmune to crowd control.
   SpellAddBuff(bladestorm bladestorm add=1)
 Define(bladestorm_arms 227847)
-# Become an unstoppable storm of destructive force, striking up to s1 nearby targets for (1+6 seconds)*50622s1 Physical damage over 6 seconds.rnrnYou are immune to movement impairing and loss of control effects, but can use defensive abilities and can avoid attacks.
+# Become an unstoppable storm of destructive force, striking all nearby enemies for (1+6 seconds)*50622s1 Physical damage over 6 seconds. Deals reduced damage beyond s1 targets.rnrnYou are immune to movement impairing and loss of control effects, but can use defensive abilities and can avoid attacks.
   SpellInfo(bladestorm_arms cd=90 duration=6 tick=1)
   SpellRequire(bladestorm_arms replaced_by set=ravager enabled=(hastalent(ravager_talent)))
   # Dealing damage to all nearby enemies every t1 sec.rnImmune to crowd control.
@@ -67,7 +67,7 @@ Define(charge 100)
 # Charge to an enemy, dealing 126664s2 Physical damage, rooting it for 1 second?s103828[, and stunning it for 7922d][].rnrn|cFFFFFFFFGenerates /10;s2 Rage.|r
   SpellInfo(charge cd=20 gcd=0 offgcd=1 rage=-10)
 Define(cleave 845)
-# Strikes up to s2 enemies in front of you for s1 Physical damage, inflicting Deep Wounds. Cleave will consume your Overpower effect to deal increased damage.
+# Strikes all enemies in front of you for s1 Physical damage, inflicting Deep Wounds. Cleave will consume your Overpower effect to deal increased damage. Deals reduced damage beyond s2 targets.
   SpellInfo(cleave rage=20 cd=6)
   SpellRequire(cleave unusable set=1 enabled=(not hastalent(cleave_talent)))
 Define(colossus_smash 167105)
@@ -197,13 +197,13 @@ Define(rampage 184367)
 # ?s316412[Enrages you and unleashes][Unleashes] a series of s1 brutal strikes for a total of <damage> Physical damage.
   SpellInfo(rampage rage=80)
 Define(ravager 152277)
-# Throws a whirling weapon at the target location that chases nearby enemies, inflicting <damage> Physical damage and applying Deep Wounds to up to 156287s2 enemies over 12 seconds.rnrn|cFFFFFFFFGenerates 248439s1/10 Rage each time it deals damage.|r
+# Throws a whirling weapon at the target location that chases nearby enemies, inflicting <damage> Physical damage and applying Deep Wounds to all enemies over 12 seconds. Deals reduced damage beyond 156287s2 targets.rnrn|cFFFFFFFFGenerates 248439s1/10 Rage each time it deals damage.|r
   SpellInfo(ravager cd=45 duration=12 tick=2)
   SpellRequire(ravager unusable set=1 enabled=(not hastalent(ravager_talent)))
   # Ravager is currently active.
   SpellAddBuff(ravager ravager add=1)
 Define(ravager_protection 228920)
-# Throws a whirling weapon at the target location that chases nearby enemies, inflicting <damage> Physical damage to up to 156287s2 enemies over 12 seconds.rnrn|cFFFFFFFFGenerates 334934s1/10 Rage each time it deals damage.|r
+# Throws a whirling weapon at the target location that chases nearby enemies, inflicting <damage> Physical damage to all enemies over 12 seconds. Deals reduced damage beyond 156287s2 targets.rnrn|cFFFFFFFFGenerates 334934s1/10 Rage each time it deals damage.|r
   SpellInfo(ravager_protection cd=45 duration=12 tick=2)
   SpellRequire(ravager_protection unusable set=1 enabled=(not hastalent(ravager_talent_protection)))
   # Ravager is currently active.
@@ -292,7 +292,7 @@ Define(warbreaker 262161)
   SpellInfo(warbreaker cd=45)
   SpellRequire(warbreaker unusable set=1 enabled=(not hastalent(warbreaker_talent)))
 Define(whirlwind 1680)
-# Unleashes a whirlwind of steel, ?s202316[hitting your primary target with Slam and ][]striking up to s1 nearby targets for <baseDmg> Physical damage.
+# Unleashes a whirlwind of steel, ?s202316[hitting your primary target with Slam and ][]striking all nearby targets for <baseDmg> Physical damage. Deals reduced damage beyond s1 targets.
   SpellInfo(whirlwind rage=30)
   SpellRequire(whirlwind replaced_by set=whirlwind_fury enabled=(specialization("fury")))
 Define(whirlwind_buff 85739)
@@ -301,7 +301,7 @@ Define(whirlwind_buff 85739)
   # Your next single-target attack strikes up to w1 additional targets for w3 damage.
   SpellAddBuff(whirlwind_buff whirlwind_buff add=1)
 Define(whirlwind_fury 190411)
-# Unleashes a whirlwind of steel, striking up to s3 nearby enemies for <damage> Physical damage.?s12950[rnrnCauses your next 85739u single-target melee lattack:attacks; to strike up to 85739s1 additional targets for 85739s3 damage.][]?s316435[rnrn|cFFFFFFFFGenerates s1 Rage, plus an additional s2 per target hit.|r][]
+# Unleashes a whirlwind of steel, striking all nearby enemies for <damage> Physical damage. Deals reduced damage beyond s3 targets.?s12950[rnrnCauses your next 85739u single-target melee lattack:attacks; to strike up to 85739s1 additional targets for 85739s3 damage.][]?s316435[rnrn|cFFFFFFFFGenerates s1 Rage, plus an additional s2 per target hit.|r][]
   SpellInfo(whirlwind_fury rage=30)
 Define(will_of_the_berserker_buff 335597)
 # When Recklessness expires, your Critical Strike is increased by 335597s1 for 12 seconds. Your Raging Blow will refresh the duration of this effect.
@@ -313,11 +313,11 @@ Define(anger_management_talent_fury 22405)
 Define(avatar_talent 22397)
 # Transform into a colossus for 20 seconds, causing you to deal s1 increased damage and removing all roots and snares.rnrn|cFFFFFFFFGenerates s5/10 Rage.|r
 Define(bladestorm_talent 22400)
-# Become an unstoppable storm of destructive force, striking up to s1 nearby targets for <dmg> Physical damage over 4 seconds.rnrnYou are immune to movement impairing and loss of control effects, but can use defensive abilities and avoid attacks.rnrn|cFFFFFFFFGenerates o4/10 Rage over the duration.|r
+# Become an unstoppable storm of destructive force, striking all nearby enemies for <dmg> Physical damage over 4 seconds. Deals reduced damage beyond s1 targets.rnrnYou are immune to movement impairing and loss of control effects, but can use defensive abilities and avoid attacks.rnrn|cFFFFFFFFGenerates o4/10 Rage over the duration.|r
 Define(booming_voice_talent 22626)
 # Demoralizing Shout also generates m1/10 Rage, and increases damage you deal to affected targets by s2.
 Define(cleave_talent 22362)
-# Strikes up to s2 enemies in front of you for s1 Physical damage, inflicting Deep Wounds. Cleave will consume your Overpower effect to deal increased damage.
+# Strikes all enemies in front of you for s1 Physical damage, inflicting Deep Wounds. Cleave will consume your Overpower effect to deal increased damage. Deals reduced damage beyond s2 targets.
 Define(cruelty_talent 19140)
 # While Enraged, Raging Blow deals s1 more damage and has a s2 chance to instantly reset its own cooldown.
 Define(deadly_calm_talent 22399)
@@ -329,7 +329,7 @@ Define(dragon_roar_talent_protection 23260)
 Define(dragon_roar_talent 22398)
 # Roar explosively, dealing s1 Physical damage to enemies within A1 yds. Deals reduced damage to secondary targets. Dragon Roar critically strikes for <critMult> times normal damage.rnrn|cFFFFFFFFGenerates s2/10 Rage.|r
 Define(dreadnaught_talent 22407)
-# Overpower has 1+s1 charges and causes a seismic wave, dealing 315961s1 damage to up to 315961s2 enemies in a 315961A1 yd line.
+# Overpower has 1+s1 charges and causes a seismic wave, dealing 315961s1 damage to all enemies in a 315961A1 yd line. Deals reduced damage beyond 315961s2 targets.
 Define(fervor_of_battle_talent 22489)
 # Whirlwind also Slams your primary target.
 Define(massacre_talent 22379)
@@ -339,9 +339,9 @@ Define(massacre_talent_arms 22380)
 Define(onslaught_talent 23372)
 # Brutally attack an enemy for s1 Physical damage. Requires Enrage.rnrn|cFFFFFFFFGenerates m2/10 Rage.|r
 Define(ravager_talent_protection 22401)
-# Throws a whirling weapon at the target location that chases nearby enemies, inflicting <damage> Physical damage to up to 156287s2 enemies over 12 seconds.rnrn|cFFFFFFFFGenerates 334934s1/10 Rage each time it deals damage.|r
+# Throws a whirling weapon at the target location that chases nearby enemies, inflicting <damage> Physical damage to all enemies over 12 seconds. Deals reduced damage beyond 156287s2 targets.rnrn|cFFFFFFFFGenerates 334934s1/10 Rage each time it deals damage.|r
 Define(ravager_talent 21667)
-# Throws a whirling weapon at the target location that chases nearby enemies, inflicting <damage> Physical damage and applying Deep Wounds to up to 156287s2 enemies over 12 seconds.rnrn|cFFFFFFFFGenerates 248439s1/10 Rage each time it deals damage.|r
+# Throws a whirling weapon at the target location that chases nearby enemies, inflicting <damage> Physical damage and applying Deep Wounds to all enemies over 12 seconds. Deals reduced damage beyond 156287s2 targets.rnrn|cFFFFFFFFGenerates 248439s1/10 Rage each time it deals damage.|r
 Define(reckless_abandon_talent 22402)
 # Recklessness generates s1/10 Rage and greatly empowers Bloodthirst and Raging Blow.
 Define(rend_talent 19138)

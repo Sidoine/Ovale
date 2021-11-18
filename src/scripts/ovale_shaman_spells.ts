@@ -93,12 +93,12 @@ Define(elemental_equilibrium_buff 347348)
   # Damage dealt increased by s1.
   SpellAddBuff(elemental_equilibrium_buff elemental_equilibrium_buff add=1)
 Define(fae_transfusion 328923)
-# Transfer the life force of up to 328928I enemies in the targeted area, dealing (117.5 of Spell Power)*3 seconds/t2 Nature damage evenly split to each enemy target over 3 seconds. ?a137041[rnrnFully channeling Fae Transfusion generates s4 Lstack:stacks; of Maelstrom Weapon.][]rnrnPressing Fae Transfusion again within 20 seconds will release s1 of all damage from Fae Transfusion, healing up to 328930s2 allies within 328930A1 yds.
+# Transfer the life force of up to 328928I enemies in the targeted area, dealing ((117.5 of Spell Power)*3 seconds/t2) + (117.5 of Spell Power) Nature damage evenly split to each enemy target over 3 seconds. ?a137041[rnrnFully channeling Fae Transfusion generates s4 Lstack:stacks; of Maelstrom Weapon.][]rnrnPressing Fae Transfusion again within 20 seconds will release s1 of all damage from Fae Transfusion, healing up to 328930s2 allies within 328930A1 yds.
   SpellInfo(fae_transfusion cd=120 duration=3 channel=3 tick=0.5)
   # Fae Transfusion will heal up to 328930s2 nearby allies for w1.
   SpellAddBuff(fae_transfusion fae_transfusion_buff add=1)
 Define(fae_transfusion_buff 328933)
-# Transfer the life force of up to 328928I enemies in the targeted area, dealing (117.5 of Spell Power)*3 seconds/t2 Nature damage evenly split to each enemy target over 3 seconds. ?a137041[rnrnFully channeling Fae Transfusion generates s4 Lstack:stacks; of Maelstrom Weapon.][]rnrnPressing Fae Transfusion again within 20 seconds will release s1 of all damage from Fae Transfusion, healing up to 328930s2 allies within 328930A1 yds.
+# Transfer the life force of up to 328928I enemies in the targeted area, dealing ((117.5 of Spell Power)*3 seconds/t2) + (117.5 of Spell Power) Nature damage evenly split to each enemy target over 3 seconds. ?a137041[rnrnFully channeling Fae Transfusion generates s4 Lstack:stacks; of Maelstrom Weapon.][]rnrnPressing Fae Transfusion again within 20 seconds will release s1 of all damage from Fae Transfusion, healing up to 328930s2 allies within 328930A1 yds.
   SpellInfo(fae_transfusion_buff duration=20 gcd=0 offgcd=1 tick=0.5)
 Define(feral_lunge 196884)
 # Lunge at your enemy as a ghostly wolf, biting them to deal 215802s1 Physical damage.
