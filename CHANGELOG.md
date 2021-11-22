@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.1.13](https://github.com/Sidoine/Ovale/compare/9.1.12...9.1.13) (2021-11-22)
+
+### Bug Fixes
+
+-   hide unused icons ([bc83368](https://github.com/Sidoine/Ovale/commit/bc833684342d567961e3550120510737b69fff43))
+-   import latest scripts from SimulationCraft 2021-11-17 ([#1063](https://github.com/Sidoine/Ovale/issues/1063)) ([4158b4b](https://github.com/Sidoine/Ovale/commit/4158b4b6fb5f6ff69e38dfeb37fd8b5194c4b264))
+
 ### [9.1.12](https://github.com/Sidoine/Ovale/compare/9.1.11...9.1.12) (2021-11-02)
 
 ### [9.1.11](https://github.com/Sidoine/Ovale/compare/9.1.10...9.1.11) (2021-11-02)
