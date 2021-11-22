@@ -807,7 +807,7 @@ export class OvaleAuraClass
         return returnConstant(duration / tick);
     };
 
-    isActiveAura(aura: Aura, atTime: number): aura is Aura {
+    isActiveAura(aura: Aura, atTime: number) {
         let boolean = false;
         if (aura.state) {
             if (
