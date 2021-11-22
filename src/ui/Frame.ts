@@ -11,7 +11,16 @@ import { IconParent, OvaleIcon } from "./Icon";
 import { OvaleEnemiesClass } from "../states/Enemies";
 import { Controls } from "../engine/controls";
 import aceEvent, { AceEvent } from "@wowts/ace_event-3.0";
-import { LuaArray, ipairs, next, pairs, wipe, type, LuaObj } from "@wowts/lua";
+import {
+    LuaArray,
+    ipairs,
+    next,
+    pairs,
+    wipe,
+    type,
+    LuaObj,
+    lualength,
+} from "@wowts/lua";
 import { match } from "@wowts/string";
 import {
     CreateFrame,
@@ -669,6 +678,14 @@ class OvaleFrame extends WidgetContainer<UIFrame> implements IconParent {
                     this.skinGroup.AddButton(icon.frame);
                 }
                 icon.Show();
+            }
+
+            for (
+                let i = profile.apparence.numberOfIcons + 1;
+                i <= lualength(action.icons);
+                i++
+            ) {
+                action.icons[i].Hide();
             }
         }
 
