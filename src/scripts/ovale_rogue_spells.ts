@@ -45,7 +45,7 @@ Define(between_the_eyes 315341)
   # s2 increased chance to be critically struck by @auracaster.
   SpellAddTargetDebuff(between_the_eyes between_the_eyes add=1)
 Define(black_powder 319175)
-# Finishing move that launches explosive Black Powder at up to s4 nearby targets dealing Physical damage.?s319178[ All nearby targets with your Find Weakness suffer an additional 319178s1 damage as Shadow.][]rnrn   1 point  : m1*1 damagern   2 points: m1*2 damagern   3 points: m1*3 damagern   4 points: m1*4 damagern   5 points: m1*5 damage?s193531[rn   6 points: m1*6 damage][]rn
+# Finishing move that launches explosive Black Powder at all nearby enemies dealing Physical damage. Deals reduced damage beyond s4 targets.?s319178[ All nearby targets with your Find Weakness suffer an additional 319178s1 damage as Shadow.][]rnrn   1 point  : m1*1 damagern   2 points: m1*2 damagern   3 points: m1*3 damagern   4 points: m1*4 damagern   5 points: m1*5 damage?s193531[rn   6 points: m1*6 damage][]rn
   SpellInfo(black_powder energy=35 combopoints=1 max_combopoints=4 gcd=1)
 Define(blade_flurry 13877)
 # ?s331851[Strikes up to nearby 331850i targets for 331850s1 Physical damage, and causes][Causes] your single target attacks to also strike up to s3 nearby enemies for s2 of normal damage for 12 seconds.
@@ -92,7 +92,7 @@ Define(concealed_blunderbuss_buff 340587)
   # Your next Pistol Shot fires 340088s2 additional times.
   SpellAddBuff(concealed_blunderbuss_buff concealed_blunderbuss_buff add=1)
 Define(crimson_tempest 121411)
-# Finishing move that slashes at up to s3 enemies within A1 yards, dealing instant damage and causing victims to bleed for additional damage. Lasts longer per combo point.rnrn   1 point  : s2*2 plus o1*2 over 4 secrn   2 points: s2*3 plus o1*3 over 6 secrn   3 points: s2*4 plus o1*4 over 8 secrn   4 points: s2*5 plus o1*5 over 10 secrn   5 points: s2*6 plus o1*6 over 12 sec?s193531[rn   6 points: s2*7 plus o1*7 over 14 sec][]
+# Finishing move that slashes all enemies within A1 yards, dealing instant damage and causing victims to bleed for additional damage. Deals reduced damage beyond s3 targets. Lasts longer per combo point.rnrn   1 point  : s2*2 plus o1*2 over 4 secrn   2 points: s2*3 plus o1*3 over 6 secrn   3 points: s2*4 plus o1*4 over 8 secrn   4 points: s2*5 plus o1*5 over 10 secrn   5 points: s2*6 plus o1*6 over 12 sec?s193531[rn   6 points: s2*7 plus o1*7 over 14 sec][]
   SpellInfo(crimson_tempest energy=35 combopoints=1 max_combopoints=4 duration=2 gcd=1 tick=2)
   SpellRequire(crimson_tempest unusable set=1 enabled=(not hastalent(crimson_tempest_talent)))
   # Bleeding for w1 damage every t1 sec.
@@ -114,14 +114,29 @@ Define(dispatch 2098)
 # Finishing move that dispatches the enemy, dealing damage per combo point:rn   1 point  : m1*1 damagern   2 points: m1*2 damagern   3 points: m1*3 damagern   4 points: m1*4 damagern   5 points: m1*5 damage?s193531[rn   6 points: m1*6 damage][]
   SpellInfo(dispatch energy=35 combopoints=1 max_combopoints=4 gcd=1)
 Define(dreadblades 343142)
-# Strike at an enemy, dealing s1 Physical damage and empowering your weapons for 10 seconds, causing your Sinister Strike,?s196937[ Ghostly Strike,][]?s328305[ Sepsis,][]?s323547[ Echoing Reprimand,][]?s328547[ Serrated Bone Spike,][] Ambush, and Pistol Shot to fill your combo points, but your finishing moves consume 343145s1 of your current health.
-  SpellInfo(dreadblades energy=30 cd=90 duration=10 gcd=1)
+# Strike at an enemy, dealing s1 Physical damage, filling your combo points, and empowering your weapons for 10 seconds, causing your Sinister Strike,?s196937[ Ghostly Strike,][]?s328305[ Sepsis,][]?s323547[ Echoing Reprimand,][]?s328547[ Serrated Bone Spike,][] Ambush, and Pistol Shot to fill your combo points, but your finishing moves consume 343145s1 of your current health.
+  SpellInfo(dreadblades energy=30 cd=90 duration=10 gcd=1 combopoints=-10)
   SpellRequire(dreadblades unusable set=1 enabled=(not hastalent(dreadblades_talent)))
   # Sinister Strike, ?s196937[Ghostly Strike, ][]Ambush, and Pistol Shot will refill all of your combo points when used.
   SpellAddBuff(dreadblades dreadblades add=1)
 Define(echoing_reprimand 323547)
 # Deal s1 Arcane damage to an enemy, extracting their anima to Animacharge a combo point for 45 seconds.rnrnDamaging finishing moves that consume the same number of combo points as your Animacharge function as if they consumed s2 combo points.rnrn|cFFFFFFFFAwards s3 combo lpoint:points;.|rrn
   SpellInfo(echoing_reprimand energy=0 cd=45 gcd=1 combopoints=-2)
+Define(echoing_reprimand_3_buff 323559)
+# Deal s1 Arcane damage to an enemy, extracting their anima to Animacharge a combo point for 45 seconds.rnrnDamaging finishing moves that consume the same number of combo points as your Animacharge function as if they consumed s2 combo points.rnrn|cFFFFFFFFAwards s3 combo lpoint:points;.|rrn
+  SpellInfo(echoing_reprimand_3_buff duration=45 max_stacks=3 gcd=0 offgcd=1)
+  # Rogue's third combo point is Animacharged. rnrnDamaging finishing moves using exactly 3 combo points deal damage as if 7 combo points are consumed.
+  SpellAddBuff(echoing_reprimand_3_buff echoing_reprimand_3_buff add=1)
+Define(echoing_reprimand_4_buff 323560)
+# Deal s1 Arcane damage to an enemy, extracting their anima to Animacharge a combo point for 45 seconds.rnrnDamaging finishing moves that consume the same number of combo points as your Animacharge function as if they consumed s2 combo points.rnrn|cFFFFFFFFAwards s3 combo lpoint:points;.|rrn
+  SpellInfo(echoing_reprimand_4_buff duration=45 max_stacks=4 gcd=0 offgcd=1)
+  # Rogue's fourth combo point is Animacharged. rnrnDamaging finishing moves using exactly 4 combo points deal damage as if 7 combo points are consumed.
+  SpellAddBuff(echoing_reprimand_4_buff echoing_reprimand_4_buff add=1)
+Define(echoing_reprimand_5_buff 354838)
+# Deal s1 Arcane damage to an enemy, extracting their anima to Animacharge a combo point for 45 seconds.rnrnDamaging finishing moves that consume the same number of combo points as your Animacharge function as if they consumed s2 combo points.rnrn|cFFFFFFFFAwards s3 combo lpoint:points;.|rrn
+  SpellInfo(echoing_reprimand_5_buff duration=45 max_stacks=5 gcd=0 offgcd=1)
+  # Rogue's fifth combo point is Animacharged. rnrnDamaging finishing moves using exactly 5 combo points deal damage as if 7 combo points are consumed.
+  SpellAddBuff(echoing_reprimand_5_buff echoing_reprimand_5_buff add=1)
 Define(envenom 32645)
 # Finishing move that drives your poisoned blades in deep, dealing instant Nature damage and increasing your poison application chance by s2. Damage and duration increased per combo point.rnrn   1 point  : m1*1 damage, 2 secrn   2 points: m1*2 damage, 3 secrn   3 points: m1*3 damage, 4 secrn   4 points: m1*4 damage, 5 secrn   5 points: m1*5 damage, 6 sec?s193531[rn   6 points: m1*6 damage, 7 sec][]
   SpellInfo(envenom energy=35 combopoints=1 max_combopoints=4 duration=1 gcd=1 tick=5)
@@ -137,7 +152,7 @@ Define(exsanguinate 200806)
   SpellInfo(exsanguinate energy=25 cd=45 gcd=1)
   SpellRequire(exsanguinate unusable set=1 enabled=(not hastalent(exsanguinate_talent)))
 Define(fan_of_knives 51723)
-# Sprays knives at up to s3 targets within A1 yards, dealing s1 Physical damage and applying your active poisons at their normal rate.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
+# Sprays knives at all enemies within A1 yards, dealing s1 Physical damage and applying your active poisons at their normal rate. Deals reduced damage beyond s3 targets.rnrn|cFFFFFFFFAwards s2 combo lpoint:points;.|r
   SpellInfo(fan_of_knives energy=35 gcd=1)
 Define(find_weakness_debuff 316220)
 # Your Shadowstrike and Cheap Shot reveal a flaw in your target's defenses, causing all your attacks to bypass 91021s1 of that enemy's armor for 10 seconds.
@@ -282,7 +297,7 @@ Define(rupture 1943)
   # Bleeding for w1 damage every t1 sec.
   SpellAddTargetDebuff(rupture rupture add=1)
 Define(secret_technique 280719)
-# Finishing move that creates shadow clones of yourself. You and your shadow clones each perform a piercing attack on up to s6 enemies near your target, dealing Physical damage to the primary target and reduced damage to other targets.rn   1 point  : 280720m1*1*<mult> total damagern   2 points: 280720m1*2*<mult> total damagern   3 points: 280720m1*3*<mult> total damagern   4 points: 280720m1*4*<mult> total damagern   5 points: 280720m1*5*<mult> total damage?s193531[rn   6 points: 280720m1*6*<mult> total damage][]rnrnCooldown is reduced by s5 sec for every combo point you spend.
+# Finishing move that creates shadow clones of yourself. You and your shadow clones each perform a piercing attack on all enemies near your target, dealing Physical damage to the primary target and reduced damage to other targets.rn   1 point  : 280720m1*1*<mult> total damagern   2 points: 280720m1*2*<mult> total damagern   3 points: 280720m1*3*<mult> total damagern   4 points: 280720m1*4*<mult> total damagern   5 points: 280720m1*5*<mult> total damage?s193531[rn   6 points: 280720m1*6*<mult> total damage][]rnrnCooldown is reduced by s5 sec for every combo point you spend.
   SpellInfo(secret_technique energy=30 combopoints=1 max_combopoints=4 cd=45 gcd=1)
   SpellRequire(secret_technique unusable set=1 enabled=(not hastalent(secret_technique_talent)))
 Define(sepsis 328305)
@@ -338,7 +353,7 @@ Define(shot_in_the_dark_buff 257506)
   # Your next Cheap Shot is free.
   SpellAddBuff(shot_in_the_dark_buff shot_in_the_dark_buff add=1)
 Define(shuriken_storm 197835)
-# Sprays shurikens at up to s4 targets within A1 yards, dealing s1*<CAP>/AP Physical damage.?s319951[rnrnCritical strikes with Shuriken Storm apply Find Weakness for 319949s1 sec.][]rnrn|cFFFFFFFFAwards s2 combo lpoint:points; per target hit?a121471[ plus an additional 121471s2][].|r
+# Sprays shurikens at all enemies within A1 yards, dealing s1*<CAP>/AP Physical damage. Deals reduced damage beyond s4 targets.?s319951[rnrnCritical strikes with Shuriken Storm apply Find Weakness for 319949s1 sec.][]rnrn|cFFFFFFFFAwards s2 combo lpoint:points; per target hit?a121471[ plus an additional 121471s2][].|r
   SpellInfo(shuriken_storm energy=35 gcd=1)
 Define(shuriken_tornado 277925)
 # Focus intently, then release a Shuriken Storm every sec for the next 4 seconds. 
@@ -409,7 +424,7 @@ Define(alacrity_talent 19249)
 Define(blade_rush_talent 23075)
 # Charge to your target with your blades out, dealing 271881sw1*271881s2/100 Physical damage to the target and 271881sw1 to all other nearby enemies.rnrnWhile Blade Flurry is active, damage to non-primary targets is increased by s1.rnrn|cFFFFFFFFGenerates 271896s1*5 seconds/271896t1 Energy over 5 seconds.
 Define(crimson_tempest_talent 23174)
-# Finishing move that slashes at up to s3 enemies within A1 yards, dealing instant damage and causing victims to bleed for additional damage. Lasts longer per combo point.rnrn   1 point  : s2*2 plus o1*2 over 4 secrn   2 points: s2*3 plus o1*3 over 6 secrn   3 points: s2*4 plus o1*4 over 8 secrn   4 points: s2*5 plus o1*5 over 10 secrn   5 points: s2*6 plus o1*6 over 12 sec?s193531[rn   6 points: s2*7 plus o1*7 over 14 sec][]
+# Finishing move that slashes all enemies within A1 yards, dealing instant damage and causing victims to bleed for additional damage. Deals reduced damage beyond s3 targets. Lasts longer per combo point.rnrn   1 point  : s2*2 plus o1*2 over 4 secrn   2 points: s2*3 plus o1*3 over 6 secrn   3 points: s2*4 plus o1*4 over 8 secrn   4 points: s2*5 plus o1*5 over 10 secrn   5 points: s2*6 plus o1*6 over 12 sec?s193531[rn   6 points: s2*7 plus o1*7 over 14 sec][]
 Define(dark_shadow_talent 22335)
 # Shadow Dance now increases damage by s1+15.
 Define(deeper_stratagem_talent 19240)
@@ -417,7 +432,7 @@ Define(deeper_stratagem_talent 19240)
 Define(dirty_tricks_talent 23077)
 # Cheap Shot, Gouge, ?s207777[Sap, and Dismantle][and Sap] no longer cost Energy.
 Define(dreadblades_talent 19250)
-# Strike at an enemy, dealing s1 Physical damage and empowering your weapons for 10 seconds, causing your Sinister Strike,?s196937[ Ghostly Strike,][]?s328305[ Sepsis,][]?s323547[ Echoing Reprimand,][]?s328547[ Serrated Bone Spike,][] Ambush, and Pistol Shot to fill your combo points, but your finishing moves consume 343145s1 of your current health.
+# Strike at an enemy, dealing s1 Physical damage, filling your combo points, and empowering your weapons for 10 seconds, causing your Sinister Strike,?s196937[ Ghostly Strike,][]?s328305[ Sepsis,][]?s323547[ Echoing Reprimand,][]?s328547[ Serrated Bone Spike,][] Ambush, and Pistol Shot to fill your combo points, but your finishing moves consume 343145s1 of your current health.
 Define(enveloping_shadows_talent 22336)
 # Deepening Shadows reduces the remaining cooldown of Shadow Dance by an additional @switch<s3>[s1/10][s1/10.1] sec per combo point spent.rnrnShadow Dance gains s2 additional charge.
 Define(exsanguinate_talent 22344)
@@ -441,7 +456,7 @@ Define(premeditation_talent 19234)
 Define(quick_draw_talent 22119)
 # Half-cost uses of Pistol Shot granted by Sinister Strike now generate (25 of Spell Power) additional combo point, and deal s1 additional damage.
 Define(secret_technique_talent 23183)
-# Finishing move that creates shadow clones of yourself. You and your shadow clones each perform a piercing attack on up to s6 enemies near your target, dealing Physical damage to the primary target and reduced damage to other targets.rn   1 point  : 280720m1*1*<mult> total damagern   2 points: 280720m1*2*<mult> total damagern   3 points: 280720m1*3*<mult> total damagern   4 points: 280720m1*4*<mult> total damagern   5 points: 280720m1*5*<mult> total damage?s193531[rn   6 points: 280720m1*6*<mult> total damage][]rnrnCooldown is reduced by s5 sec for every combo point you spend.
+# Finishing move that creates shadow clones of yourself. You and your shadow clones each perform a piercing attack on all enemies near your target, dealing Physical damage to the primary target and reduced damage to other targets.rn   1 point  : 280720m1*1*<mult> total damagern   2 points: 280720m1*2*<mult> total damagern   3 points: 280720m1*3*<mult> total damagern   4 points: 280720m1*4*<mult> total damagern   5 points: 280720m1*5*<mult> total damage?s193531[rn   6 points: 280720m1*6*<mult> total damage][]rnrnCooldown is reduced by s5 sec for every combo point you spend.
 Define(shadow_focus_talent 22333)
 # ?c3[Abilities cost 112942m1 less Energy while Stealth or Shadow Dance is active.][Abilities cost 112942s1 less Energy while Stealth is active.]
 Define(shuriken_tornado_talent 21188)

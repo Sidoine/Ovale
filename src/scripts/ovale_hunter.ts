@@ -633,11 +633,6 @@ Include(ovale_common)
 Include(ovale_hunter_spells)
 
 
-AddFunction etf_precast
-{
- 0
-}
-
 AddFunction sync_remains
 {
  if iscovenant("kyrian") spellcooldown(resonating_arrow) >? spellcooldown(trueshot)
@@ -939,10 +934,10 @@ AddFunction marksmanshipstcdpostconditions
 
 AddFunction marksmanshipprecombatmainactions
 {
- #aimed_shot,if=active_enemies<3&(!covenant.kyrian&!talent.volley|active_enemies<2)&!variable.etf_precast
- if enemies() < 3 and { not iscovenant("kyrian") and not hastalent(volley_talent) or enemies() < 2 } and not etf_precast() spell(aimed_shot)
- #steady_shot,if=active_enemies>2|(covenant.kyrian|talent.volley)&active_enemies=2|variable.etf_precast
- if enemies() > 2 or { iscovenant("kyrian") or hastalent(volley_talent) } and enemies() == 2 or etf_precast() spell(steady_shot)
+ #aimed_shot,if=active_enemies<3&(!covenant.kyrian&!talent.volley|active_enemies<2)
+ if enemies() < 3 and { not iscovenant("kyrian") and not hastalent(volley_talent) or enemies() < 2 } spell(aimed_shot)
+ #steady_shot,if=active_enemies>2|(covenant.kyrian|talent.volley)&active_enemies=2
+ if enemies() > 2 or { iscovenant("kyrian") or hastalent(volley_talent) } and enemies() == 2 spell(steady_shot)
 }
 
 AddFunction marksmanshipprecombatmainpostconditions
@@ -953,14 +948,13 @@ AddFunction marksmanshipprecombatshortcdactions
 {
  #tar_trap,if=runeforge.soulforge_embers
  if runeforge(soulforge_embers_runeforge) spell(tar_trap)
- #variable,name=etf_precast,value=0
- #double_tap,precast_time=10,if=active_enemies>1|!covenant.kyrian&!talent.volley|variable.etf_precast
- if enemies() > 1 or not iscovenant("kyrian") and not hastalent(volley_talent) or etf_precast() spell(double_tap)
+ #double_tap,precast_time=10,if=active_enemies>1|!covenant.kyrian&!talent.volley
+ if enemies() > 1 or not iscovenant("kyrian") and not hastalent(volley_talent) spell(double_tap)
 }
 
 AddFunction marksmanshipprecombatshortcdpostconditions
 {
- enemies() < 3 and { not iscovenant("kyrian") and not hastalent(volley_talent) or enemies() < 2 } and not etf_precast() and spell(aimed_shot) or { enemies() > 2 or { iscovenant("kyrian") or hastalent(volley_talent) } and enemies() == 2 or etf_precast() } and spell(steady_shot)
+ enemies() < 3 and { not iscovenant("kyrian") and not hastalent(volley_talent) or enemies() < 2 } and spell(aimed_shot) or { enemies() > 2 or { iscovenant("kyrian") or hastalent(volley_talent) } and enemies() == 2 } and spell(steady_shot)
 }
 
 AddFunction marksmanshipprecombatcdactions
@@ -971,17 +965,11 @@ AddFunction marksmanshipprecombatcdactions
  #snapshot_stats
  #fleshcraft
  spell(fleshcraft)
-
- unless runeforge(soulforge_embers_runeforge) and spell(tar_trap) or { enemies() > 1 or not iscovenant("kyrian") and not hastalent(volley_talent) or etf_precast() } and spell(double_tap)
- {
-  #trueshot,precast_etf_equip=1,precast_time=2,if=variable.etf_precast
-  if equippedruneforge(eagletalons_true_focus_runeforge) and etf_precast() spell(trueshot)
- }
 }
 
 AddFunction marksmanshipprecombatcdpostconditions
 {
- runeforge(soulforge_embers_runeforge) and spell(tar_trap) or { enemies() > 1 or not iscovenant("kyrian") and not hastalent(volley_talent) or etf_precast() } and spell(double_tap) or enemies() < 3 and { not iscovenant("kyrian") and not hastalent(volley_talent) or enemies() < 2 } and not etf_precast() and spell(aimed_shot) or { enemies() > 2 or { iscovenant("kyrian") or hastalent(volley_talent) } and enemies() == 2 or etf_precast() } and spell(steady_shot)
+ runeforge(soulforge_embers_runeforge) and spell(tar_trap) or { enemies() > 1 or not iscovenant("kyrian") and not hastalent(volley_talent) } and spell(double_tap) or enemies() < 3 and { not iscovenant("kyrian") and not hastalent(volley_talent) or enemies() < 2 } and spell(aimed_shot) or { enemies() > 2 or { iscovenant("kyrian") or hastalent(volley_talent) } and enemies() == 2 } and spell(steady_shot)
 }
 
 ### actions.cds
@@ -1175,7 +1163,6 @@ AddIcon enabled=(checkboxon(opt_hunter_marksmanship_aoe) and specialization(mark
 # double_tap
 # double_tap_talent
 # eagletalons_true_focus_buff
-# eagletalons_true_focus_runeforge
 # effusive_anima_accelerator_soulbind
 # explosive_shot
 # explosive_shot_talent

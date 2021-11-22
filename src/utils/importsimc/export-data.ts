@@ -21,6 +21,9 @@ interface ConduitData {
         lines.push(`},`);
     }
     lines.push("};\n");
+    lines.push("/* runeforgeBonusId[<runeforge spell ID>] = <item bonus ID>");
+    lines.push(" * used by src/states/runeforge.ts");
+    lines.push(" */");
     lines.push("export const runeforgeBonusId: LuaArray<number> = {");
     for (const [id, runeforge] of dbc.runeforgeById.entries()) {
         lines.push(`[${runeforge.spell_id}]: ${id},`);

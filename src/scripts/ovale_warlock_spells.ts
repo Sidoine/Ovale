@@ -202,7 +202,7 @@ Define(malefic_wrath_buff 337125)
   SpellInfo(malefic_wrath_buff duration=10 max_stacks=3 gcd=0 offgcd=1)
 Define(nether_portal 267217)
 # Tear open a portal to the Twisting Nether for 15 seconds. Every time you spend Soul Shards, you will also command demons from the Nether to come out and fight for you.
-  SpellInfo(nether_portal soulshards=1 cd=180 duration=15)
+  SpellInfo(nether_portal soulshards=1 cd=150 duration=15)
   SpellRequire(nether_portal unusable set=1 enabled=(not hastalent(nether_portal_talent)))
 Define(phantom_singularity 205179)
 # Places a phantom singularity above the target, which consumes the life of all enemies within 205246A2 yards, dealing 8*(22.5 of Spell Power) damage over 16 seconds, healing you for 205246e2*100 of the damage done.
@@ -220,7 +220,7 @@ Define(rain_of_fire 5740)
   # 42223s1 Fire damage every 5740t2 sec.
   SpellAddBuff(rain_of_fire rain_of_fire add=1)
 Define(scouring_tithe 312321)
-# Deal (54 of Spell Power) Arcane damage instantly, and o2 over 18 seconds. If the enemy dies while affected by Scouring Tithe, you generate ?a137043[s3/10]?a137044[s4/10][s5/10] Soul LShard:Shards;. If they survive, Scouring Tithe's cooldown is refreshed.
+# Deal (65 of Spell Power) Arcane damage instantly, and o2 over 18 seconds. If the enemy dies while affected by Scouring Tithe, you generate ?a137043[s3/10]?a137044[s4/10][s5/10] Soul LShard:Shards;. If they survive, Scouring Tithe's cooldown is refreshed.
   SpellInfo(scouring_tithe cd=40 duration=18 tick=3)
   # Suffering w2 Arcane damage every t2 sec.
   SpellAddTargetDebuff(scouring_tithe scouring_tithe add=1)
@@ -302,7 +302,7 @@ Define(ultimate_form_buff 323524)
 # While channeling Fleshcraft, you are immune to crowd control and you regenerate 323524s17 health every 323524t17 sec. rnrnIf you finish the full channel, you gain 3 seconds of crowd control immunity, during which you regenerate 323524s17 health every 323524t17 sec.
   SpellInfo(ultimate_form_buff duration=3 gcd=0 offgcd=1 tick=1)
 Define(unstable_affliction 316099)
-# Afflicts one target with o2 Shadow damage over 16 seconds. rnrnIf dispelled, deals m2*s1/100 damage to the dispeller and silences them for 4 seconds.rnrn|cFFFFFFFFGenerates 231791m1 Soul LShard:Shards; if the target dies while afflicted.|r
+# Afflicts one target with o2 Shadow damage over 16 seconds. rnrnIf dispelled, deals m2*s1/100 damage to the dispeller and silences them for 4 seconds.?s231791[rnrn|cFFFFFFFFGenerates 231791m1 Soul LShard:Shards; if the target dies while afflicted.|r][]
   SpellInfo(unstable_affliction duration=16 max_stacks=1 tick=2)
   # Suffering w2 Shadow damage every t2 sec. If dispelled, will cause w2*s1/100 damage to the dispeller and silence them for 196364d.
   SpellAddTargetDebuff(unstable_affliction unstable_affliction add=1)
