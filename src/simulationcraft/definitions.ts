@@ -873,6 +873,16 @@ export const miscOperands: LuaObj<MiscOperand> = {
         },
         symbol: "runeforge",
     },
+    ["rune_word"]: {
+        /* TODO implement rune_word.* (unique_gear_shadowlands.cpp)
+         * rune_word.<shard_type>.<property>
+         *    <shard_type> is blood, blood_link
+         *                    frost, winds_of_winter
+         *                    unholy, chaos_bane
+         *    <property> is enabled, disabled, rank
+         */
+        code: "always(rune_word)",
+    },
     ["runic_power"]: { name: "runicpower", modifiers: powerModifiers },
     ["searing_touch"]: {
         modifiers: {
@@ -944,6 +954,15 @@ export const miscOperands: LuaObj<MiscOperand> = {
     },
     ["time"]: { name: "timeincombat" },
     ["time_to_shard"]: { name: "timetoshard" },
+    ["time_to_sht"]: {
+        /* TODO implement time_to_sht.{1,2,3,4,5}[.plus] (sc_rogue.cpp)
+         * Time to resource gain from Shadow Techniques, where first 3
+         * auto-attacks by MH/OH have zero chance, 4th auto-attack has
+         * 50% chance, and 5th auto-attack has 100% chance to proc
+         * Shadow Techniques.
+         */
+        code: "1",
+    },
 };
 export const runeOperands: LuaObj<string> = {
     ["rune"]: "rune",

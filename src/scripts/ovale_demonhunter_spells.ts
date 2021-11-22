@@ -7,15 +7,18 @@ export function registerDemonHunterSpells(scripts: OvaleScriptsClass) {
     let code = `Define(annihilation 201427)
 # Slice your target for 227518s1+201428s1 Chaos damage. Annihilation has a 197125h chance to refund 193840s1 Fury.
   SpellInfo(annihilation fury=40)
+Define(arcane_torrent 25046)
+# Remove s1 beneficial effect from all enemies within A1 yards and restore m2 Energy.
+  SpellInfo(arcane_torrent cd=120 gcd=1 energy=-15)
 Define(blade_dance 188499)
-# Strike ?a206416[your primary target for <firstbloodDmg> Physical damage and ][]199552s1 nearby enemies for <baseDmg> Physical damage?s320398[, and increase your chance to dodge by 193311s1 for 193311d.][.]
+# Strike ?a206416[your primary target for <firstbloodDmg> Physical damage and ][]all nearby enemies for <baseDmg> Physical damage?s320398[, and increase your chance to dodge by 193311s1 for 193311d.][. Deals reduced damage beyond 199552s1 targets.]
   SpellInfo(blade_dance fury=35 cd=15 duration=1)
   # Dodge chance increased by s2.
   SpellAddBuff(blade_dance blade_dance add=1)
 Define(blind_faith_buff 355894)
-# Elysian Decree shatters s1 additional Lesser Soul Fragments and grants you Blind Faith for 20 seconds. For each Lesser Soul Fragment you consume while Blind Faith is active you gain s2 Mastery and 356070s1 Fury.
+# Elysian Decree shatters s1 additional Lesser Soul Fragments and grants you Blind Faith for 20 seconds. For each Lesser Soul Fragment you consume while Blind Faith is active you gain s2 Versatility and 356070s1 Fury.
   SpellInfo(blind_faith_buff duration=20 gcd=0 offgcd=1)
-  # Mastery increased by w1.
+  # Versatility increased by w1.
   SpellAddBuff(blind_faith_buff blind_faith_buff add=1)
 Define(bulk_extraction 320341)
 # Demolish the spirit of all those around you, dealing s1 Fire damage to nearby enemies and extracting up to s2 Lesser Soul Fragments, drawing them to you for immediate consumption.
@@ -94,7 +97,7 @@ Define(eye_beam 198013)
 # Blasts all enemies in front of you, ?s320415[dealing guaranteed critical strikes][] for up to <dmg> Chaos damage over 2 seconds. Deals reduced damage to secondary targets.?s343311[rnrnWhen Eye Beam finishes fully channeling, your Haste is increased by an additional 343312s1 for 12 seconds.][]
   SpellInfo(eye_beam fury=30 cd=30 duration=2 channel=2 tick=0.2)
 Define(fel_barrage 258925)
-# Unleash a torrent of Fel energy over 3 seconds, inflicting ((3 seconds/t1)+1)*258926s1 Chaos damage to 258926s2 enemies within 258926A1 yds.
+# Unleash a torrent of Fel energy over 3 seconds, inflicting ((3 seconds/t1)+1)*258926s1 Chaos damage to all enemies within 258926A1 yds. Deals reduced damage beyond 258926s2 targets.
   SpellInfo(fel_barrage cd=60 duration=3 channel=3 tick=0.25)
   SpellRequire(fel_barrage unusable set=1 enabled=(not hastalent(fel_barrage_talent)))
   # Unleashing Fel.
@@ -145,7 +148,7 @@ Define(furious_gaze_buff 273232)
   # Haste increased by w1.
   SpellAddBuff(furious_gaze_buff furious_gaze_buff add=1)
 Define(glaive_tempest 342817)
-# Launch two demonic glaives in a whirlwind of energy, causing 14*342857s1 Chaos damage over 3 seconds to 342857i nearby enemies.
+# Launch two demonic glaives in a whirlwind of energy, causing 14*342857s1 Chaos damage over 3 seconds to all nearby enemies. Deals reduced damage beyond s2 targets.
   SpellInfo(glaive_tempest fury=30 cd=20 duration=3)
   SpellRequire(glaive_tempest unusable set=1 enabled=(not hastalent(glaive_tempest_talent)))
 Define(immolation_aura 258920)
@@ -206,14 +209,14 @@ Define(sigil_of_silence 202137)
   SpellInfo(sigil_of_silence cd=120 duration=2)
 Define(sinful_brand 317009)
 # Brand an enemy with the mark of the Venthyr, reducing their melee attack speed by s3, their casting speed by s2, and inflicting o1 Shadow damage over 8 seconds.rnrnActivating Metamorphosis applies Sinful Brand to all nearby enemies.
-  SpellInfo(sinful_brand cd=60 duration=8 tick=2)
+  SpellInfo(sinful_brand cd=45 duration=8 tick=2)
   # Suffering w1 Shadow damage every t1 sec. Casting speed slowed by w2. Melee attack speed slowed by w3.
   SpellAddTargetDebuff(sinful_brand sinful_brand add=1)
 Define(soul_cleave 228477)
-# Viciously strike 228478s2 enemies in front of you for 228478s1 Physical damage and heal yourself for s4.rnrnConsumes up to s3 Soul Fragments within s1 yds?s321021[ and heals you for an additional s5 for each Soul Fragment consumed][].
+# Viciously strike all enemies in front of you for 228478s1 Physical damage and heal yourself for s4. Deals reduced damage beyond 228478s2 targets.rnrnConsumes up to s3 Soul Fragments within s1 yds?s321021[ and heals you for an additional s5 for each Soul Fragment consumed][].
   SpellInfo(soul_cleave fury=30)
 Define(spirit_bomb 247454)
-# Consume up to s2 Soul Fragments within s1 yds and then explode, afflicting nearby enemies with Frailty for 20 seconds and damaging them for 247455s1 Fire per fragment.rnrnYou heal for 247456s1 of all damage you deal to enemies with Frailty.
+# Consume up to s2 Soul Fragments within s1 yds and then explode, afflicting nearby enemies with Frailty for 20 seconds and damaging them for 247455s1 Fire per fragment. Deals reduced damage beyond s2 targets.rnrnYou heal for 247456s1 of all damage you deal to enemies with Frailty.
   SpellInfo(spirit_bomb fury=30 duration=1.5)
   SpellRequire(spirit_bomb unusable set=1 enabled=(not hastalent(spirit_bomb_talent)))
 Define(the_hunt 323639)
@@ -269,7 +272,7 @@ Define(demonic_appetite_talent 22493)
 Define(essence_break_talent 21868)
 # Slash all enemies in front of you for s1 Chaos damage, and increase the damage your Chaos Strike and Blade Dance deal to them by 320338s1 for 8 seconds.
 Define(fel_barrage_talent 22547)
-# Unleash a torrent of Fel energy over 3 seconds, inflicting ((3 seconds/t1)+1)*258926s1 Chaos damage to 258926s2 enemies within 258926A1 yds.
+# Unleash a torrent of Fel energy over 3 seconds, inflicting ((3 seconds/t1)+1)*258926s1 Chaos damage to all enemies within 258926A1 yds. Deals reduced damage beyond 258926s2 targets.
 Define(fel_eruption_talent 22767)
 # Impales the target for s1 Chaos damage and stuns them for 4 seconds.
 Define(felblade_talent_vengeance 22504)
@@ -281,13 +284,13 @@ Define(first_blood_talent 21867)
 Define(fracture_talent 22770)
 # Rapidly slash your target for 225919sw1+225921sw1 Physical damage, and shatter s1 Lesser Soul Fragments from them.rnrn|cFFFFFFFFGenerates s4 Fury.|r
 Define(glaive_tempest_talent 21862)
-# Launch two demonic glaives in a whirlwind of energy, causing 14*342857s1 Chaos damage over 3 seconds to 342857i nearby enemies.
+# Launch two demonic glaives in a whirlwind of energy, causing 14*342857s1 Chaos damage over 3 seconds to all nearby enemies. Deals reduced damage beyond s2 targets.
 Define(momentum_talent 21901)
 # Fel Rush increases your damage done by 208628s1 for 6 seconds.rnrnVengeful Retreat's cooldown is reduced by s1/-1000 sec, and it generates (203650s1/5)*10 seconds Fury over 10 seconds if it damages at least one enemy.
 Define(sigil_of_chains_talent 22511)
 # Place a Sigil of Chains at the target location that activates after 2 seconds.rnrnAll enemies affected by the sigil are pulled to its center and are snared, reducing movement speed by 204843s1 for 6 seconds.
 Define(spirit_bomb_talent 22540)
-# Consume up to s2 Soul Fragments within s1 yds and then explode, afflicting nearby enemies with Frailty for 20 seconds and damaging them for 247455s1 Fire per fragment.rnrnYou heal for 247456s1 of all damage you deal to enemies with Frailty.
+# Consume up to s2 Soul Fragments within s1 yds and then explode, afflicting nearby enemies with Frailty for 20 seconds and damaging them for 247455s1 Fire per fragment. Deals reduced damage beyond s2 targets.rnrnYou heal for 247456s1 of all damage you deal to enemies with Frailty.
 Define(trail_of_ruin_talent 22909)
 # The final slash of Blade Dance inflicts an additional 258883o1 Chaos damage over 4 seconds.
 Define(unbound_chaos_talent 22494)

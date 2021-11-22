@@ -51,10 +51,10 @@ Define(bonedust_brew 325216)
   # The Monk's abilities have a h chance to affect the target a second time at s1 effectiveness as Shadow damage or healing.
   SpellAddTargetDebuff(bonedust_brew bonedust_brew add=1)
 Define(breath_of_fire 115181)
-# Breathe fire on targets in front of you, causing s1 Fire damage.rnrnTargets affected by Keg Smash will also burn, taking 123725o1 Fire damage and dealing 123725s2 reduced damage to you for 12 seconds.
+# Breathe fire on targets in front of you, causing s1 Fire damage. Deals reduced damage to secondary targets.rnrnTargets affected by Keg Smash will also burn, taking 123725o1 Fire damage and dealing 123725s2 reduced damage to you for 12 seconds.
   SpellInfo(breath_of_fire cd=15 gcd=1)
 Define(breath_of_fire_debuff 123725)
-# Breathe fire on targets in front of you, causing s1 Fire damage.rnrnTargets affected by Keg Smash will also burn, taking 123725o1 Fire damage and dealing 123725s2 reduced damage to you for 12 seconds.
+# Breathe fire on targets in front of you, causing s1 Fire damage. Deals reduced damage to secondary targets.rnrnTargets affected by Keg Smash will also burn, taking 123725o1 Fire damage and dealing 123725s2 reduced damage to you for 12 seconds.
   SpellInfo(breath_of_fire_debuff duration=12 gcd=1 tick=2)
   # Burning for w1 Fire damage every t1 sec.  Dealing w2 reduced damage to the Monk.
   SpellAddTargetDebuff(breath_of_fire_debuff breath_of_fire_debuff add=1)
@@ -67,7 +67,7 @@ Define(charred_passions_buff 338140)
 # Your Breath of Fire ignites your right leg in flame for 8 seconds, causing your Blackout Kick and Spinning Crane Kick to deal m1 additional damage as Fire damage and refresh the duration of your Breath of Fire on the target.
   SpellInfo(charred_passions_buff duration=8 gcd=0 offgcd=1)
 Define(chi_burst 123986)
-# Hurls a torrent of Chi energy up to 40 yds forward, dealing 148135s1 Nature damage to all enemies, and 130654s1 healing to the Monk and all allies in its path.?c1[rnrnCasting Chi Burst does not prevent avoiding attacks.][]?c3[rnrnChi Burst generates 1 Chi per enemy target damaged, up to a maximum of s3.][]
+# Hurls a torrent of Chi energy up to 40 yds forward, dealing 148135s1 Nature damage to all enemies, and 130654s1 healing to the Monk and all allies in its path. Healing reduced beyond s1 targets.rn?c1[rnrnCasting Chi Burst does not prevent avoiding attacks.][]?c3[rnrnChi Burst generates 1 Chi per enemy target damaged, up to a maximum of s3.][]
   SpellInfo(chi_burst cd=30 duration=1)
   SpellRequire(chi_burst unusable set=1 enabled=(not hastalent(chi_burst_talent)))
 Define(chi_energy_buff 337571)
@@ -127,7 +127,7 @@ Define(fist_of_the_white_tiger 261947)
   SpellInfo(fist_of_the_white_tiger energy=40 cd=30 gcd=1)
   SpellRequire(fist_of_the_white_tiger unusable set=1 enabled=(not hastalent(fist_of_the_white_tiger_talent)))
 Define(fists_of_fury 113656)
-# Pummels all targets in front of you, dealing 5*s5 Physical damage over 4 seconds to your primary target and 5*s5*s6/100 damage over 4 seconds to up to s1 other targets. Can be channeled while moving.
+# Pummels all targets in front of you, dealing 5*s5 Physical damage over 4 seconds to your primary target and 5*s5*s6/100 damage over 4 seconds to all other enemies. Deals reduced damage beyond s1 targets. Can be channeled while moving.
   SpellInfo(fists_of_fury chi=3 cd=24 duration=4 channel=4 gcd=1 tick=0.166)
 Define(fleshcraft 324631)
 # Form a shield of flesh and bone over 3 seconds that absorbs damage equal to s1 of your maximum health for 120 seconds.rnrnWhile channeling, your damage taken is reduced by s2.rnrn|cFFFFFFFFPassive:|r Moving near an enemy's corpse consumes their essence to reduce Fleshcraft's cooldown by <cdr> sec.
@@ -190,7 +190,7 @@ Define(rising_sun_kick 107428)
 # Kick upwards, dealing ?s137025[185099s1*<CAP>/AP][185099s1] Physical damage?s128595[, and reducing the effectiveness of healing on the target for 10 seconds][].
   SpellInfo(rising_sun_kick chi=2 cd=10)
 Define(rushing_jade_wind 116847)
-# Summons a whirling tornado around you, causing (1+6 seconds/t1)*148187s1 Physical damage over 6 seconds to up to s1 enemies within 107270A1 yards.
+# Summons a whirling tornado around you, causing (1+6 seconds/t1)*148187s1 Physical damage over 6 seconds to all enemies within 107270A1 yards. Deals reduced damage beyond s1 targets.
   SpellInfo(rushing_jade_wind chi=1 cd=6 duration=6 tick=0.75)
   SpellRequire(rushing_jade_wind unusable set=1 enabled=(not {hastalent(rushing_jade_wind_talent) or hastalent(rushing_jade_wind_talent_windwalker)}))
   # Dealing physical damage to nearby enemies every 116847t1 sec.
@@ -205,7 +205,7 @@ Define(spear_hand_strike 116705)
 # Jabs the target in the throat, interrupting spellcasting and preventing any spell from that school of magic from being cast for 4 seconds.
   SpellInfo(spear_hand_strike cd=15 duration=4 gcd=0 offgcd=1 interrupt=1)
 Define(spinning_crane_kick 101546)
-# Spin while kicking in the air, dealing ?s137025[4*107270s1*<CAP>/AP][4*107270s1] Physical damage over 1.5 seconds to up to s1 enemies within 107270A1 yds.?c3[rnrnSpinning Crane Kick's damage is increased by 220358s1 for each unique target you've struck in the last 20 seconds with Tiger Palm, Blackout Kick, or Rising Sun Kick. Stacks up to 228287i times.][]
+# Spin while kicking in the air, dealing ?s137025[4*107270s1*<CAP>/AP][4*107270s1] Physical damage over 1.5 seconds to all enemies within 107270A1 yds. Deals reduced damage beyond s1 targets.?c3[rnrnSpinning Crane Kick's damage is increased by 220358s1 for each unique target you've struck in the last 20 seconds with Tiger Palm, Blackout Kick, or Rising Sun Kick. Stacks up to 228287i times.][]
   SpellInfo(spinning_crane_kick chi=2 energy=40 duration=1.5 channel=1.5 tick=0.5)
   SpellRequire(spinning_crane_kick replaced_by set=spinning_crane_kick_brewmaster enabled=(specialization("brewmaster")))
 Define(spinning_crane_kick_brewmaster 322729)
@@ -216,7 +216,7 @@ Define(spinning_crane_kick_brewmaster 322729)
   # Attacking all nearby enemies for Physical damage every 101546t1 sec.
   SpellAddBuff(spinning_crane_kick_brewmaster spinning_crane_kick_brewmaster add=1)
 Define(spinning_crane_kick_brewmaster_buff 107270)
-# Spin while kicking in the air, dealing ?s137025[4*107270s1*<CAP>/AP][4*107270s1] Physical damage over 1.5 seconds to up to s1 enemies within 107270A1 yds.?c3[rnrnSpinning Crane Kick's damage is increased by 220358s1 for each unique target you've struck in the last 20 seconds with Tiger Palm, Blackout Kick, or Rising Sun Kick. Stacks up to 228287i times.][]
+# Spin while kicking in the air, dealing ?s137025[4*107270s1*<CAP>/AP][4*107270s1] Physical damage over 1.5 seconds to all enemies within 107270A1 yds. Deals reduced damage beyond s1 targets.?c3[rnrnSpinning Crane Kick's damage is increased by 220358s1 for each unique target you've struck in the last 20 seconds with Tiger Palm, Blackout Kick, or Rising Sun Kick. Stacks up to 228287i times.][]
   SpellInfo(spinning_crane_kick_brewmaster_buff gcd=0 offgcd=1)
 Define(storm_earth_and_fire 137639)
 # Split into 3 elemental spirits for 15 seconds, each spirit dealing 100+m1 of normal damage and healing.rnrnYou directly control the Storm spirit, while Earth and Fire spirits mimic your attacks on nearby enemies.rnrnWhile active, casting Storm, Earth, and Fire again will cause the spirits to fixate on your target.
@@ -268,7 +268,7 @@ Define(black_ox_brew_talent 19992)
 Define(blackout_combo_talent 22108)
 # Blackout Kick also empowers your next ability:rnrnTiger Palm: Damage increased by s1.rnBreath of Fire: Cooldown reduced by s2 sec.rnKeg Smash: Reduces the remaining cooldown on your Brews by s3 additional sec.rnCelestial Brew: Pauses Stagger damage for s4 sec.
 Define(chi_burst_talent 20185)
-# Hurls a torrent of Chi energy up to 40 yds forward, dealing 148135s1 Nature damage to all enemies, and 130654s1 healing to the Monk and all allies in its path.?c1[rnrnCasting Chi Burst does not prevent avoiding attacks.][]?c3[rnrnChi Burst generates 1 Chi per enemy target damaged, up to a maximum of s3.][]
+# Hurls a torrent of Chi energy up to 40 yds forward, dealing 148135s1 Nature damage to all enemies, and 130654s1 healing to the Monk and all allies in its path. Healing reduced beyond s1 targets.rn?c1[rnrnCasting Chi Burst does not prevent avoiding attacks.][]?c3[rnrnChi Burst generates 1 Chi per enemy target damaged, up to a maximum of s3.][]
 Define(chi_wave_talent 19820)
 # A wave of Chi energy flows through friends and foes, dealing 132467s1 Nature damage or 132463s1 healing. Bounces up to s1 times to targets within 132466a2 yards.
 Define(dampen_harm_talent 20175)
@@ -282,9 +282,9 @@ Define(fist_of_the_white_tiger_talent 19771)
 Define(hit_combo_talent 22093)
 # Each successive attack that triggers Combo Strikes in a row grants 196741s1 increased damage, stacking up to 196741u times.
 Define(rushing_jade_wind_talent_windwalker 23122)
-# Summons a whirling tornado around you, causing (1+6 seconds/t1)*148187s1 Physical damage over 6 seconds to up to s1 enemies within 107270A1 yards.
+# Summons a whirling tornado around you, causing (1+6 seconds/t1)*148187s1 Physical damage over 6 seconds to all enemies within 107270A1 yards. Deals reduced damage beyond s1 targets.
 Define(rushing_jade_wind_talent 20184)
-# Summons a whirling tornado around you, causing (1+6 seconds/t1)*148187s1 Physical damage over 6 seconds to up to s1 enemies within 107270A1 yards.
+# Summons a whirling tornado around you, causing (1+6 seconds/t1)*148187s1 Physical damage over 6 seconds to all enemies within 107270A1 yards. Deals reduced damage beyond s1 targets.
 Define(serenity_talent 21191)
 # Enter an elevated state of mental and physical serenity for ?s115069[s1 sec][12 seconds]. While in this state, you deal s2 increased damage and healing, and all Chi consumers are free and cool down s4 more quickly.
 Define(spitfire_talent 22097)
@@ -311,6 +311,8 @@ Define(shadowgrasp_totem_item 179356)
     ItemInfo(shadowgrasp_totem_item cd=120 proc=329878)
 Define(wrathstone_item 156000)
     ItemInfo(wrathstone_item shared_cd="item_cd_1141" cd=120 proc=64800)
+Define(salvaged_fusion_amplifier_item 186432)
+    ItemInfo(salvaged_fusion_amplifier_item cd=90 rppm=20 proc=355333)
 Define(charred_passions_runeforge 7076)
 Define(shaohaos_might_runeforge 7079)
 Define(fatal_touch_runeforge 7081)

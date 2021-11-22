@@ -50,11 +50,11 @@ Define(barbed_shot 217200)
   # Suffering w1 damage every t1 sec.
   SpellAddTargetDebuff(barbed_shot barbed_shot add=1)
 Define(barrage 120360)
-# Rapidly fires a spray of shots for 3 seconds, dealing an average of <damageSec> Physical damage to up to 120361I enemies in front of you. Usable while moving.
+# Rapidly fires a spray of shots for 3 seconds, dealing an average of <damageSec> Physical damage to all nearby enemies in front of you. Usable while moving. Deals reduced damage beyond 120361s1 targets.
   SpellInfo(barrage focus=60 cd=20 duration=3 channel=3 tick=0.2)
   SpellRequire(barrage unusable set=1 enabled=(not {hastalent(barrage_talent) or hastalent(barrage_talent_marksmanship)}))
 Define(beast_cleave_buff 118455)
-# After you Multi-Shot, your pet's melee attacks also strike up to 118459I other nearby enemy targets for s1 as much for the next 4 seconds.
+# After you Multi-Shot, your pet's melee attacks also strike all nearby enemies for s1 as much for the next 4 seconds. Deals reduced damage beyond 118459s2 targets.
   SpellInfo(beast_cleave_buff duration=4 gcd=0 offgcd=1)
   # Melee attacks also strike all other nearby enemy targets.
   SpellAddBuff(beast_cleave_buff beast_cleave_buff add=1)
@@ -64,7 +64,7 @@ Define(berserking 26297)
   # Haste increased by s1.
   SpellAddBuff(berserking berserking add=1)
 Define(bestial_wrath 19574)
-# Sends you and your pet into a rage, instantly dealing <damage> Physical damage to its target, and increasing all damage you both deal by s1 for 15 seconds. ?s231548&s217200[rnrnBestial Wrath's remaining cooldown is reduced by s3 sec each time you use Barbed Shot.][]
+# Sends you and your pet into a rage, instantly dealing <damage> Physical damage to its target, and increasing all damage you both deal by s1 for 15 seconds. Removes Fear and Horrify effects from your pet. ?s231548&s217200[rnrnBestial Wrath's remaining cooldown is reduced by s3 sec each time you use Barbed Shot.][]
   SpellInfo(bestial_wrath cd=90 duration=15)
   # Damage dealt increased by w1.
   SpellAddBuff(bestial_wrath bestial_wrath add=1)
@@ -83,11 +83,11 @@ Define(bloodshed 321530)
   SpellInfo(bloodshed cd=60)
   SpellRequire(bloodshed unusable set=1 enabled=(not hastalent(bloodshed_talent)))
 Define(butchery 212436)
-# Attack up to I nearby enemies in a flurry of strikes, inflicting s1 Physical damage to each.?s294029[rnrnReduces the remaining cooldown on Wildfire Bomb by <cdr> sec for each target hit.][]
+# Attack all nearby enemies in a flurry of strikes, inflicting s1 Physical damage to each. Deals reduced damage beyond s3 targets.?s294029[rnrnReduces the remaining cooldown on Wildfire Bomb by <cdr> sec for each target hit, up to s3 sec.][]
   SpellInfo(butchery focus=30 cd=9)
   SpellRequire(butchery unusable set=1 enabled=(not hastalent(butchery_talent)))
 Define(carve 187708)
-# A sweeping attack that strikes up to I enemies in front of you for s1 Physical damage.?s294029[rnrnReduces the remaining cooldown on Wildfire Bomb by <cdr> sec for each target hit.][]
+# A sweeping attack that strikes all enemies in front of you for s1 Physical damage. Deals reduced damage beyond s3 targets.?s294029[rnrnReduces the remaining cooldown on Wildfire Bomb by <cdr> sec for each target hit, up to s3 sec.][]
   SpellInfo(carve focus=35 cd=6)
   SpellRequire(carve replaced_by set=butchery enabled=(hastalent(butchery_talent)))
 Define(chakrams 259391)
@@ -117,7 +117,7 @@ Define(dead_eye_buff 321461)
 # Kill Shot has m1+1 charges, and causes Aimed Shot to recharge 321461m1/(1+(321461m1/100)) faster for 3 seconds.
   SpellInfo(dead_eye_buff duration=3 gcd=0 offgcd=1)
 Define(death_chakram 325028)
-# Throw a deadly chakram at your current target that will rapidly deal 325037s1 Shadow damage x times, bouncing to other targets if they are nearby.rnrnEach time the chakram deals damage, its damage is increased by s3 and you generate s4 Focus.
+# Throw a deadly chakram at your current target that will rapidly deal 325037s1 Shadow damage x times, bouncing to other targets if they are nearby. Enemies struck by Death Chakram take 361756s1 more Physical damage from you and your pet for 10 seconds.rnrnEach time the chakram deals damage, its damage is increased by s3 and you generate s4 Focus.
   SpellInfo(death_chakram cd=45)
 Define(dire_beast 120679)
 # Summons a powerful wild beast that attacks the target and roars, increasing your Haste by 281036s1 for 8 seconds.
@@ -138,7 +138,7 @@ Define(eagletalons_true_focus_buff 336851)
 # Trueshot lasts an additional m2/1000.1 sec and reduces the Focus cost of all of your abilities by 336851s1.
   SpellInfo(eagletalons_true_focus_buff gcd=0 offgcd=1)
 Define(explosive_shot 212431)
-# Fires an explosive shot at your target. After t1 sec, the shot will explode, dealing 212680s1 Fire damage to up to 212680I enemies within 212680A1 yards.
+# Fires an explosive shot at your target. After t1 sec, the shot will explode, dealing 212680s1 Fire damage to all enemies within 212680A1 yards. Deals reduced damage beyond s2 targets.
   SpellInfo(explosive_shot focus=20 cd=30 duration=3 tick=3)
   SpellRequire(explosive_shot unusable set=1 enabled=(not hastalent(explosive_shot_talent)))
   # Exploding for 212680s1 Fire damage after t1 sec.
@@ -154,12 +154,12 @@ Define(flare 1543)
 # Exposes all hidden and invisible enemies within the targeted area for m1 sec.
   SpellInfo(flare cd=20)
 Define(flayed_shot 324149)
-# Fire a shot at your enemy, causing them to bleed for o1 Shadow damage over 18 seconds. Each time Flayed Shot deals damage, you have a s2 chance to gain Flayer's Mark, causing your next Kill Shot to be free  and usable on any target, regardless of their current health, and deal 324156s3 increased damage.
+# Fire a shot at your enemy, dealing s3 Shadow damage and then causing them to bleed for o1 Shadow damage over 18 seconds. Each time Flayed Shot deals damage, you have a s2 chance to gain Flayer's Mark, causing your next Kill Shot to be free, usable on any target regardless of their current health, and deal 324156s3 increased damage.
   SpellInfo(flayed_shot cd=30 duration=18 tick=2)
   # Bleeding for s1 Shadow damage every t1 sec.
   SpellAddTargetDebuff(flayed_shot flayed_shot add=1)
 Define(flayers_mark_buff 324156)
-# Fire a shot at your enemy, causing them to bleed for o1 Shadow damage over 18 seconds. Each time Flayed Shot deals damage, you have a s2 chance to gain Flayer's Mark, causing your next Kill Shot to be free  and usable on any target, regardless of their current health, and deal 324156s3 increased damage.
+# Fire a shot at your enemy, dealing s3 Shadow damage and then causing them to bleed for o1 Shadow damage over 18 seconds. Each time Flayed Shot deals damage, you have a s2 chance to gain Flayer's Mark, causing your next Kill Shot to be free, usable on any target regardless of their current health, and deal 324156s3 increased damage.
   SpellInfo(flayers_mark_buff duration=12 gcd=0 offgcd=1)
   # Your next Kill Shot can be used on any target, regardless of their current health, deals s3 increased damage, and will not consume any Focus.
   SpellAddBuff(flayers_mark_buff flayers_mark_buff add=1)
@@ -219,10 +219,10 @@ Define(mongoose_fury_buff 259388)
   # Mongoose Bite damage increased by s1.
   SpellAddBuff(mongoose_fury_buff mongoose_fury_buff add=1)
 Define(multishot 2643)
-# Fires several missiles, hitting up to I targets within A2 yards of your current target for s2 Physical damage?s115939[ and triggering Beast Cleave][].?s19434[rnrn|cFFFFFFFFGenerates 213363s1 Focus per target hit.|r][]
+# Fires several missiles, hitting all nearby enemies within A2 yards of your current target for s2 Physical damage?s115939[ and triggering Beast Cleave][]. Deals reduced damage beyond s1 targets.?s19434[rnrn|cFFFFFFFFGenerates 213363s1 Focus per target hit.|r][]
   SpellInfo(multishot focus=40)
 Define(multishot_marksmanship 257620)
-# Fires several missiles, hitting your current target and up to I enemies within A1 yards for s1 Physical damage.
+# Fires several missiles, hitting your current target and all enemies within A1 yards for s1 Physical damage. Deals reduced damage beyond 2643s1 targets.
   SpellInfo(multishot_marksmanship focus=20)
 Define(muzzle 187707)
 # Interrupts spellcasting, preventing any spell in that school from being cast for 3 seconds.
@@ -365,15 +365,15 @@ Define(a_murder_of_crows_talent 22269)
 Define(alpha_predator_talent 22296)
 # Kill Command now has s1+1 charges, and deals s2 increased damage.
 Define(barrage_talent_marksmanship 22497)
-# Rapidly fires a spray of shots for 3 seconds, dealing an average of <damageSec> Physical damage to up to 120361I enemies in front of you. Usable while moving.
+# Rapidly fires a spray of shots for 3 seconds, dealing an average of <damageSec> Physical damage to all nearby enemies in front of you. Usable while moving. Deals reduced damage beyond 120361s1 targets.
 Define(barrage_talent 22002)
-# Rapidly fires a spray of shots for 3 seconds, dealing an average of <damageSec> Physical damage to up to 120361I enemies in front of you. Usable while moving.
+# Rapidly fires a spray of shots for 3 seconds, dealing an average of <damageSec> Physical damage to all nearby enemies in front of you. Usable while moving. Deals reduced damage beyond 120361s1 targets.
 Define(birds_of_prey_talent 22272)
 # Attacking your pet's target with ?s259387[Mongoose Bite][Raptor Strike] or ?s212436[Butchery][Carve] extends the duration of Coordinated Assault by <duration> sec.
 Define(bloodshed_talent 22295)
 # Command your pet to tear into your target, causing your target to bleed for <damage> over 18 seconds and increase all damage taken from your pet by 321538s2 for 18 seconds.
 Define(butchery_talent 22297)
-# Attack up to I nearby enemies in a flurry of strikes, inflicting s1 Physical damage to each.?s294029[rnrnReduces the remaining cooldown on Wildfire Bomb by <cdr> sec for each target hit.][]
+# Attack all nearby enemies in a flurry of strikes, inflicting s1 Physical damage to each. Deals reduced damage beyond s3 targets.?s294029[rnrnReduces the remaining cooldown on Wildfire Bomb by <cdr> sec for each target hit, up to s3 sec.][]
 Define(calling_the_shots_talent 22274)
 # Casting ?s342049[Chimaera Shot][Arcane Shot] or Multi-Shot reduces the cooldown of Trueshot by m1/1000.1 sec.
 Define(chakrams_talent 23105)
@@ -387,7 +387,7 @@ Define(dire_beast_talent 22282)
 Define(double_tap_talent 22287)
 # Your next Aimed Shot will fire a second time instantly at s4 power without consuming Focus, or your next Rapid Fire will shoot s3 additional shots during its channel.
 Define(explosive_shot_talent 22498)
-# Fires an explosive shot at your target. After t1 sec, the shot will explode, dealing 212680s1 Fire damage to up to 212680I enemies within 212680A1 yards.
+# Fires an explosive shot at your target. After t1 sec, the shot will explode, dealing 212680s1 Fire damage to all enemies within 212680A1 yards. Deals reduced damage beyond s2 targets.
 Define(flanking_strike_talent 22271)
 # You and your pet leap to the target and strike it as one, dealing a total of <damage> Physical damage.rnrn|cFFFFFFFFGenerates 269752s2 Focus for you and your pet.|r
 Define(hydras_bite_talent 22769)
@@ -424,7 +424,6 @@ Define(pouch_of_razor_fragments_runeforge 7717)
 Define(qapla_eredun_war_order_runeforge 7009)
 Define(sephuzs_proclamation_runeforge 7103)
 Define(soulforge_embers_runeforge 7005)
-Define(eagletalons_true_focus_runeforge 7011)
 Define(surging_shots_runeforge 7012)
 Define(rylakstalkers_confounding_strikes_runeforge 7016)
 Define(bloodletting_conduit 253)

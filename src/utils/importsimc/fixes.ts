@@ -146,6 +146,10 @@ export function getFixes(spellData: ReturnType<typeof getSpellData>) {
     fixIdentifier("condemn_fury", 317485);
     fixIdentifier("corruption_affliction_debuff", 146739);
     fixIdentifier("devastator_passive", 236279);
+    fixIdentifier("echoing_reprimand_2_buff", 323558);
+    fixIdentifier("echoing_reprimand_3_buff", 323559);
+    fixIdentifier("echoing_reprimand_4_buff", 323560);
+    fixIdentifier("echoing_reprimand_5_buff", 354838);
     fixIdentifier("festering_wound_unholy_debuff", 194310);
     fixIdentifier("frenzy_pet_buff", 272790);
     fixIdentifier("kindred_empowerment_energize", 327139);

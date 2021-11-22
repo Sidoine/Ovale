@@ -56,10 +56,10 @@ Define(desperate_prayer 19236)
 Define(devouring_plague 335467)
 # Afflicts the target with a disease that instantly causes (49.036 of Spell Power) Shadow damage plus an additional o2 Shadow damage over 6 seconds. Heals you for e2*100 of damage dealt.rnrnIf this effect is reapplied, any remaining damage will be added to the new Devouring Plague.
   SpellInfo(devouring_plague insanity=50 duration=6 tick=3)
-  # Suffering s2 damage every t2 sec.
+  # Suffering w2 damage every t2 sec.
   SpellAddTargetDebuff(devouring_plague devouring_plague add=1)
 Define(divine_star 110744)
-# Throw a Divine Star forward 24 yds, healing allies in its path for (70 of Spell Power) and dealing (40 of Spell Power) Holy damage to enemies. After reaching its destination, the Divine Star returns to you, healing allies and damaging enemies in its path again.
+# Throw a Divine Star forward 24 yds, healing allies in its path for (70 of Spell Power) and dealing (56.00000000000001 of Spell Power) Holy damage to enemies. After reaching its destination, the Divine Star returns to you, healing allies and damaging enemies in its path again. Healing reduced beyond s1 targets.
   SpellInfo(divine_star cd=15 duration=15)
   SpellRequire(divine_star unusable set=1 enabled=(not hastalent(divine_star_talent)))
 Define(fae_guardians 327661)
@@ -78,8 +78,8 @@ Define(fleshcraft 324631)
   # Immune to crowd control effects.rnHealing s17 health every t17 sec.
   SpellAddBuff(fleshcraft ultimate_form_buff add=1)
 Define(halo 120517)
-# Creates a ring of Holy energy around you that quickly expands to a 30 yd radius, healing allies for (144 of Spell Power) and dealing (103 of Spell Power) Holy damage to enemies.
-  SpellInfo(halo cd=40 duration=3.2)
+# Creates a ring of Holy energy around you that quickly expands to a 30 yd radius, healing allies for (114.99999999999999 of Spell Power) and dealing (103 of Spell Power) Holy damage to enemies. Healing reduced beyond s1 targets.rn
+  SpellInfo(halo cd=40 duration=2.15)
   SpellRequire(halo unusable set=1 enabled=(not hastalent(halo_talent)))
 Define(holy_fire 14914)
 # Consumes the enemy in Holy flames that cause (150 of Spell Power) Holy damage and an additional o2 Holy damage over 7 seconds.?a231687[ Stacks up to u times.][]
@@ -174,14 +174,14 @@ Define(searing_nightmare 341385)
   SpellInfo(searing_nightmare insanity=30)
   SpellRequire(searing_nightmare unusable set=1 enabled=(not hastalent(searing_nightmare_talent)))
 Define(shadow_covenant 314867)
-# Make a shadowy pact, healing the target and s3-1 other injured allies within A2 yds for (150 of Spell Power). For 9 seconds, your Shadow spells deal 322105m2 increased damage and healing, but you cannot cast Holy spells.
+# Make a shadowy pact, healing the target and s3-1 other injured allies within A2 yds for (165 of Spell Power). For 7 seconds, your Shadow spells deal 322105m2 increased damage and healing, but you cannot cast Holy spells.
   SpellInfo(shadow_covenant cd=30)
   SpellRequire(shadow_covenant unusable set=1 enabled=(not hastalent(shadow_covenant_talent)))
   # Shadow spells deal w2 increased damage and healing, but cannot cast Holy spells.
   SpellAddBuff(shadow_covenant shadow_covenant_buff add=1)
 Define(shadow_covenant_buff 322105)
-# Make a shadowy pact, healing the target and s3-1 other injured allies within A2 yds for (150 of Spell Power). For 9 seconds, your Shadow spells deal 322105m2 increased damage and healing, but you cannot cast Holy spells.
-  SpellInfo(shadow_covenant_buff duration=9 gcd=0 offgcd=1)
+# Make a shadowy pact, healing the target and s3-1 other injured allies within A2 yds for (165 of Spell Power). For 7 seconds, your Shadow spells deal 322105m2 increased damage and healing, but you cannot cast Holy spells.
+  SpellInfo(shadow_covenant_buff duration=7 gcd=0 offgcd=1)
 Define(shadow_crash 205385)
 # Hurl a bolt of slow-moving Shadow energy at the destination, dealing (153 of Spell Power) Shadow damage to all targets within 205386A1 yards.rnrn|cFFFFFFFFGenerates /100;s2 Insanity.|r
   SpellInfo(shadow_crash cd=30 insanity=-15)
@@ -223,8 +223,8 @@ Define(spirit_shell 109964)
   # Penance, Power Word: Radiance, and Atonement create absorb shields for w1 of their healing.
   SpellAddBuff(spirit_shell spirit_shell add=1)
 Define(surrender_to_madness 319952)
-# Deals (64.60000000000001 of Spell Power)*2 Shadow damage to the target and activates Voidform.rnrnFor the next 25 seconds, your Insanity-generating abilities generate s2 more Insanity and you can cast while moving.rnrnIf the target does not die within 25 seconds of using Surrender to Madness, you die.
-  SpellInfo(surrender_to_madness cd=90 duration=25)
+# Deals (64.60000000000001 of Spell Power)*2 Shadow damage to the target and activates Voidform.rnrnFor the next 30 seconds, your Insanity-generating abilities generate s2 more Insanity and you can cast while moving.rnrnIf the target does not die within 30 seconds of using Surrender to Madness, you die.
+  SpellInfo(surrender_to_madness cd=90 duration=30)
   SpellRequire(surrender_to_madness unusable set=1 enabled=(not hastalent(surrender_to_madness_talent)))
   # The Priest has surrendered to madness, sharing its fate with its target. If the target doesn't die within d, the Priest dies.rnrnCan cast while moving, and  Insanity-generating abilities generate w2 more Insanity.
   SpellAddBuff(surrender_to_madness surrender_to_madness add=1)
@@ -293,9 +293,9 @@ Define(wrathful_faerie_debuff 342132)
 Define(damnation_talent 21718)
 # Instantly afflicts the target with Shadow Word: Pain, Vampiric Touch and Devouring Plague.
 Define(divine_star_talent 19760)
-# Throw a Divine Star forward 24 yds, healing allies in its path for (70 of Spell Power) and dealing (40 of Spell Power) Holy damage to enemies. After reaching its destination, the Divine Star returns to you, healing allies and damaging enemies in its path again.
+# Throw a Divine Star forward 24 yds, healing allies in its path for (70 of Spell Power) and dealing (56.00000000000001 of Spell Power) Holy damage to enemies. After reaching its destination, the Divine Star returns to you, healing allies and damaging enemies in its path again. Healing reduced beyond s1 targets.
 Define(halo_talent 19763)
-# Creates a ring of Holy energy around you that quickly expands to a 30 yd radius, healing allies for (144 of Spell Power) and dealing (103 of Spell Power) Holy damage to enemies.
+# Creates a ring of Holy energy around you that quickly expands to a 30 yd radius, healing allies for (114.99999999999999 of Spell Power) and dealing (103 of Spell Power) Holy damage to enemies. Healing reduced beyond s1 targets.rn
 Define(hungering_void_talent 21978)
 # Void Bolt causes the target to become vulnerable to the void, increasing their damage taken from you by 345219m2 for 6 seconds. This effect may only be active on one target at a time.rnrnCasting Void Bolt on an enemy that is already vulnerable extends the duration of your Voidform by m3 sec, or m4 sec if Void Bolt critically strikes.
 Define(mind_bomb_talent 23375)
@@ -317,13 +317,13 @@ Define(schism_talent 22329)
 Define(searing_nightmare_talent 23127)
 # Instantly deals (43 of Spell Power) Shadow damage to enemies around the target and afflicts them with Shadow Word: Pain. If the enemy is already afflicted by your Shadow Word: Pain, Searing Nightmare's damage is increased by m1.rnrnOnly usable while channeling Mind Sear.
 Define(shadow_covenant_talent 19766)
-# Make a shadowy pact, healing the target and s3-1 other injured allies within A2 yds for (150 of Spell Power). For 9 seconds, your Shadow spells deal 322105m2 increased damage and healing, but you cannot cast Holy spells.
+# Make a shadowy pact, healing the target and s3-1 other injured allies within A2 yds for (165 of Spell Power). For 7 seconds, your Shadow spells deal 322105m2 increased damage and healing, but you cannot cast Holy spells.
 Define(shadow_crash_talent 21755)
 # Hurl a bolt of slow-moving Shadow energy at the destination, dealing (153 of Spell Power) Shadow damage to all targets within 205386A1 yards.rnrn|cFFFFFFFFGenerates /100;s2 Insanity.|r
 Define(spirit_shell_talent 21184)
 # For 10 seconds, Penance, Power Word: Radiance, and Atonement create absorb shields for s1 of their value, instead of healing.
 Define(surrender_to_madness_talent 21979)
-# Deals (64.60000000000001 of Spell Power)*2 Shadow damage to the target and activates Voidform.rnrnFor the next 25 seconds, your Insanity-generating abilities generate s2 more Insanity and you can cast while moving.rnrnIf the target does not die within 25 seconds of using Surrender to Madness, you die.
+# Deals (64.60000000000001 of Spell Power)*2 Shadow damage to the target and activates Voidform.rnrnFor the next 30 seconds, your Insanity-generating abilities generate s2 more Insanity and you can cast while moving.rnrnIf the target does not die within 30 seconds of using Surrender to Madness, you die.
 Define(twist_of_fate_talent_shadow 23125)
 # After damaging a target below s1 health, you gain 123254s2 increased damage and healing for 8 seconds.
 Define(void_torrent_talent 21720)

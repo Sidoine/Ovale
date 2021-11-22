@@ -172,12 +172,12 @@ Define(fleshcraft 324631)
   # Immune to crowd control effects.rnHealing s17 health every t17 sec.
   SpellAddBuff(fleshcraft ultimate_form_buff add=1)
 Define(flurry 44614)
-# Unleash a flurry of ice, striking the target s1 times for a total of (31.6 of Spell Power)*m1 Frost damage. Each hit reduces the target's movement speed by 228354s1 for 1 second.?a231584[rnrnWhile Brain Freeze is active, Flurry applies Winter's Chill, causing your target to take damage from your spells as if it were frozen.][]
+# Unleash a flurry of ice, striking the target s1 times for a total of (34.760000000000005 of Spell Power)*m1 Frost damage. Each hit reduces the target's movement speed by 228354s1 for 1 second.?a231584[rnrnWhile Brain Freeze is active, Flurry applies Winter's Chill, causing your target to take damage from your spells as if it were frozen.][]
   SpellInfo(flurry)
   # Movement slowed by w1.
   SpellAddTargetDebuff(flurry flurry_debuff add=1)
 Define(flurry_debuff 228354)
-# Unleash a flurry of ice, striking the target s1 times for a total of (31.6 of Spell Power)*m1 Frost damage. Each hit reduces the target's movement speed by 228354s1 for 1 second.?a231584[rnrnWhile Brain Freeze is active, Flurry applies Winter's Chill, causing your target to take damage from your spells as if it were frozen.][]
+# Unleash a flurry of ice, striking the target s1 times for a total of (34.760000000000005 of Spell Power)*m1 Frost damage. Each hit reduces the target's movement speed by 228354s1 for 1 second.?a231584[rnrnWhile Brain Freeze is active, Flurry applies Winter's Chill, causing your target to take damage from your spells as if it were frozen.][]
   SpellInfo(flurry_debuff duration=1 gcd=0 offgcd=1)
 Define(freezing_rain_buff 270232)
 # Frozen Orb makes Blizzard instant cast and increases its damage done by 270232s2 for 12 seconds.
@@ -195,7 +195,7 @@ Define(frost_nova 122)
   # Frozen in place.
   SpellAddTargetDebuff(frost_nova frost_nova add=1)
 Define(frostbolt 116)
-# Launches a bolt of frost at the enemy, causing (51.1 of Spell Power) Frost damage and slowing movement speed by 205708s1 for 8 seconds.
+# Launches a bolt of frost at the enemy, causing (55.188 of Spell Power) Frost damage and slowing movement speed by 205708s1 for 8 seconds.
   SpellInfo(frostbolt)
 Define(frozen_debuff 174955)
 # Deals m2 Frost damage, and Stuns targets for 30 seconds (8 sec PvP).
@@ -203,7 +203,7 @@ Define(frozen_debuff 174955)
   # Frozen.
   SpellAddTargetDebuff(frozen_debuff frozen_debuff add=1)
 Define(frozen_orb 84714)
-# Launches an orb of swirling ice up to s1 yards forward which deals up to 20*(16.27 of Spell Power) Frost damage to 84721s2 enemies it passes through. Grants 1 charge of Fingers of Frost when it first damages an enemy.rnrnEnemies damaged by the Frozen Orb are slowed by 289308s1 for 3 seconds.
+# Launches an orb of swirling ice up to s1 yards forward which deals up to 20*(16.27 of Spell Power) Frost damage to all enemies it passes through. Deals reduced damage beyond 84721s2 targets. Grants 1 charge of Fingers of Frost when it first damages an enemy.rnrnEnemies damaged by the Frozen Orb are slowed by 289308s1 for 3 seconds.
   SpellInfo(frozen_orb cd=60 duration=15)
 Define(glacial_spike 199786)
 # Conjures a massive spike of ice, and merges your current Icicles into it. It impales your target, dealing (297 of Spell Power) damage plus all of the damage stored in your Icicles, and freezes the target in place for 4 seconds. Damage may interrupt the freeze effect.rnrnRequires 5 Icicles to cast.rnrn|cFFFFFFFFPassive:|r Ice Lance no longer launches Icicles.
@@ -424,7 +424,7 @@ Define(ultimate_form_buff 323524)
 # While channeling Fleshcraft, you are immune to crowd control and you regenerate 323524s17 health every 323524t17 sec. rnrnIf you finish the full channel, you gain 3 seconds of crowd control immunity, during which you regenerate 323524s17 health every 323524t17 sec.
   SpellInfo(ultimate_form_buff duration=3 gcd=0 offgcd=1 tick=1)
 Define(winters_chill_debuff 228358)
-# Unleash a flurry of ice, striking the target s1 times for a total of (31.6 of Spell Power)*m1 Frost damage. Each hit reduces the target's movement speed by 228354s1 for 1 second.?a231584[rnrnWhile Brain Freeze is active, Flurry applies Winter's Chill, causing your target to take damage from your spells as if it were frozen.][]
+# Unleash a flurry of ice, striking the target s1 times for a total of (34.760000000000005 of Spell Power)*m1 Frost damage. Each hit reduces the target's movement speed by 228354s1 for 1 second.?a231584[rnrnWhile Brain Freeze is active, Flurry applies Winter's Chill, causing your target to take damage from your spells as if it were frozen.][]
   SpellInfo(winters_chill_debuff duration=6 max_stacks=2 gcd=0 offgcd=1)
   # Taking damage from the Mage's spells as if frozen.
   SpellAddTargetDebuff(winters_chill_debuff winters_chill_debuff add=1)
@@ -434,7 +434,7 @@ Define(alexstraszas_fury_talent 22465)
 Define(amplification_talent 22458)
 # When Clearcast, Arcane Missiles fires s2 additional lmissile:missiles;.
 Define(arcane_echo_talent 22467)
-# Direct damage you deal to enemies affected by Touch of the Magi, causes an explosion that deals (10.92 of Spell Power) Arcane damage to s1 nearby enemies.
+# Direct damage you deal to enemies affected by Touch of the Magi, causes an explosion that deals (10.92 of Spell Power) Arcane damage to all nearby enemies. Deals reduced damage beyond s1 targets.
 Define(arcane_familiar_talent 22464)
 # Summon a Familiar that attacks your enemies and increases your maximum mana by 210126s1 for 3600 seconds.
 Define(arcane_orb_talent 22449)
@@ -529,6 +529,7 @@ Define(siphon_storm_runeforge 6928)
 Define(temporal_warp_runeforge 6834)
 Define(deaths_fathom_runeforge 7475)
 Define(firestorm_runeforge 6932)
+Define(sinful_delight_runeforge 7476)
 Define(sun_kings_blessing_runeforge 6934)
 Define(freezing_winds_runeforge 6829)
 Define(glacial_fragments_runeforge 6830)
