@@ -2051,10 +2051,10 @@ cssstyle@^2.3.0:
   dependencies:
     cssom "~0.3.6"
 
-csv-parse@^4.16.3:
-  version "4.16.3"
-  resolved "https://registry.yarnpkg.com/csv-parse/-/csv-parse-4.16.3.tgz#7ca624d517212ebc520a36873c3478fa66efbaf7"
-  integrity sha512-cO1I/zmz4w2dcKHVvpCr7JVRu8/FymG5OEpmvsZYlccYolPBLoVGKUHgNoc4ZGkFeFlWGEDmMyBM+TTqRdW/wg==
+csv-parse@^5.3.5:
+  version "5.3.5"
+  resolved "https://registry.yarnpkg.com/csv-parse/-/csv-parse-5.3.5.tgz#9924bbba9f7056122f06b7af18edc1a7f022ce99"
+  integrity sha512-8O5KTIRtwmtD3+EVfW6BCgbwZqJbhTYsQZry12F1TP5RUp0sD9tp1UnCWic3n0mLOhzeocYaCZNYxOGSg3dmmQ==
 
 dargs@^7.0.0:
   version "7.0.0"
